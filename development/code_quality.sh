@@ -77,6 +77,7 @@ lint() {
   ${CONTAINER_RUNTIME} run --rm --volume "$(pwd)":${MEGALINTER_DEF_WORKSPACE} \
     -e MEGALINTER_CONFIG='development/megalinter.yml' \
     -e DEFAULT_WORKSPACE=${MEGALINTER_DEF_WORKSPACE} \
+    -e SKIP_LINTER_OUTPUT_SANITIZATION="${MEGALINTER_SKIP_LINTER_OUTPUT_SANITIZATION}" \
     -e LOG_LEVEL=INFO \
     ghcr.io/oxsecurity/megalinter-java:v8.8.0
   store_exit_code "$?" "Lint" \
