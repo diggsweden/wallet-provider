@@ -74,15 +74,24 @@ lint() {
   print_header 'LINTER HEALTH (MEGALINTER)'
   # Pre-emptively install node packages to avoid issues with corporate proxy.
   npm install
-  ${CONTAINER_RUNTIME} run --rm --volume "$(pwd)":${MEGALINTER_DEF_WORKSPACE} -e MEGALINTER_CONFIG='development/megalinter.yml' -e DEFAULT_WORKSPACE=${MEGALINTER_DEF_WORKSPACE} -e LOG_LEVEL=INFO ghcr.io/oxsecurity/megalinter-java:v8.8.0
-  store_exit_code "$?" "Lint" "${MISSING} ${RED}Lint check failed, see logs (std out and/or ./megalinter-reports) and fix problems.${NC}\n" "${GREEN}${CHECKMARK}${CHECKMARK} Lint check passed${NC}\n"
+  ${CONTAINER_RUNTIME} run --rm --volume "$(pwd)":${MEGALINTER_DEF_WORKSPACE} \
+    -e MEGALINTER_CONFIG='development/megalinter.yml' \
+    -e DEFAULT_WORKSPACE=${MEGALINTER_DEF_WORKSPACE} \
+    -e SKIP_LINTER_OUTPUT_SANITIZATION="${MEGALINTER_SKIP_LINTER_OUTPUT_SANITIZATION}" \
+    -e LOG_LEVEL=INFO \
+    ghcr.io/oxsecurity/megalinter-java:v8.8.0
+  store_exit_code "$?" "Lint" \
+    "${MISSING} ${RED}Lint check failed, see logs (std out and/or ./megalinter-reports) and fix problems.${NC}\n" \
+    "${GREEN}${CHECKMARK}${CHECKMARK} Lint check passed${NC}\n"
   printf '\n\n'
 }
 
 license() {
   print_header 'LICENSE HEALTH (REUSE)'
   ${CONTAINER_RUNTIME} run --rm --volume "$(pwd)":/data docker.io/fsfe/reuse:5.0.2-debian lint
-  store_exit_code "$?" "License" "${MISSING} ${RED}License check failed, see logs and fix problems.${NC}\n" "${GREEN}${CHECKMARK}${CHECKMARK} License check passed${NC}\n"
+  store_exit_code "$?" "License" \
+    "${MISSING} ${RED}License check failed, see logs and fix problems.${NC}\n" \
+    "${GREEN}${CHECKMARK}${CHECKMARK} License check passed${NC}\n"
   printf '\n\n'
 }
 
@@ -93,11 +102,18 @@ commit() {
   print_header 'COMMIT HEALTH (CONFORM)'
 
   if [[ "$(git rev-list --count "${compareToBranch}"..)" == 0 ]]; then
-    printf "%s" "${GREEN} No commits found in current branch: ${YELLOW}${currentBranch}${NC}, compared to: ${YELLOW}${compareToBranch}${NC} ${NC}"
-    store_exit_code "$?" "Commit" "${MISSING} ${RED}Commit check count failed, see logs (std out) and fix problems.${NC}\n" "${YELLOW}${CHECKMARK}${CHECKMARK} Commit check skipped, no new commits found in current branch: ${YELLOW}${currentBranch}${NC}\n"
+    printf "%s" \
+      "${GREEN} No commits found in current branch: ${YELLOW}${currentBranch}${NC}, compared to: ${YELLOW}${compareToBranch}${NC} ${NC}"
+    store_exit_code "$?" "Commit" \
+      "${MISSING} ${RED}Commit check count failed, see logs (std out) and fix problems.${NC}\n" \
+      "${YELLOW}${CHECKMARK}${CHECKMARK} Commit check skipped, no new commits found in current branch: ${YELLOW}${currentBranch}${NC}\n"
   else
-    ${CONTAINER_RUNTIME} run --rm -i --volume "$(pwd)":/repo -w /repo ghcr.io/siderolabs/conform:v0.1.0-alpha.30-2-gfadbbb4 enforce --base-branch="${compareToBranch}"
-    store_exit_code "$?" "Commit" "${MISSING} ${RED}Commit check failed, see logs (std out) and fix problems.${NC}\n" "${GREEN}${CHECKMARK}${CHECKMARK} Commit check passed${NC}\n"
+    ${CONTAINER_RUNTIME} run --rm -i --volume "$(pwd)":/repo -w /repo \
+      ghcr.io/siderolabs/conform:v0.1.0-alpha.30-2-gfadbbb4 \
+      enforce --base-branch="${compareToBranch}"
+    store_exit_code "$?" "Commit" \
+      "${MISSING} ${RED}Commit check failed, see logs (std out) and fix problems.${NC}\n" \
+      "${GREEN}${CHECKMARK}${CHECKMARK} Commit check passed${NC}\n"
   fi
 
   printf '\n\n'
@@ -106,7 +122,9 @@ commit() {
 verify() {
   print_header 'VERIFY'
   mvn verify "${MAVEN_CLI_OPTS[@]}"
-  store_exit_code "$?" "Verify" "${MISSING} ${RED}Verify check failed, see logs (std out) and fix problems.${NC}\n" "${GREEN}${CHECKMARK}${CHECKMARK} Verify check passed${NC}\n"
+  store_exit_code "$?" "Verify" \
+    "${MISSING} ${RED}Verify check failed, see logs (std out) and fix problems.${NC}\n" \
+    "${GREEN}${CHECKMARK}${CHECKMARK} Verify check passed${NC}\n"
   printf '\n\n'
 }
 
