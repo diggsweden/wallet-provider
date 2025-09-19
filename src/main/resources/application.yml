@@ -8,11 +8,6 @@ spring:
     name: wallet-provider
   profiles:
     active: dev
-  security:
-    oauth2:
-      client:
-        registration: {}
-        provider: {}
   docker:
     compose:
       enabled: false
