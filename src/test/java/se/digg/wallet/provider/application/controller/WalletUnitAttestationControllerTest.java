@@ -29,7 +29,7 @@ class WalletUnitAttestationControllerTest {
   ObjectMapper mapper = new ObjectMapper();
 
   @Test
-  void assertThatPostWalletUnitAttestation_givenValidPublicKey_shouldReturnCreated()
+  void assertThatPostWalletUnitAttestation_givenValidPublicKey_shouldReturnOk()
       throws Exception {
     WalletUnitAttestationDto input = new WalletUnitAttestationDto(UUID.randomUUID(), "jsonString");
 
