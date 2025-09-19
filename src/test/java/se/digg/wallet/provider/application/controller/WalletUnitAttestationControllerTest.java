@@ -7,6 +7,7 @@ package se.digg.wallet.provider.application.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import java.util.UUID;
@@ -25,21 +26,17 @@ class WalletUnitAttestationControllerTest {
   ObjectMapper mapper = new ObjectMapper();
 
   @Test
-  void basicTest() throws Exception {
+  void assertThatPostWalletUnitAttestation_givenValidPublicKey_shouldReturnHttpCreated() throws Exception {
     WalletUnitAttestationDto input = new WalletUnitAttestationDto(UUID.randomUUID(), "publicKey");
-    // {
-    // "kty": "EC",
-    // "crv": "P-256",
-    // "x": "f83OJ3D2xF4G7Xvt1M7QhZ8P9d8LxV_tvn9RB9a9j7o",
-    // "y": "x_FEzRu9PsXvZ46Vf1pSx1DjxzVg6RtqZjXU2JcY4xE"
-    // }
 
-    ObjectWriter objectWriter = mapper.writer().withDefaultPrettyPrinter();
-    String requestJson = objectWriter.writeValueAsString(input);
-
-    String path = "/wallet-unit-attestation";
+      String path = "/wallet-unit-attestation";
     mockMvc
-        .perform(post(path).contentType(MediaType.APPLICATION_JSON.getType()).content(requestJson))
+        .perform(post(path).contentType(MediaType.APPLICATION_JSON.getType()).content(asJson(input)))
         .andExpect(status().isCreated());
+  }
+
+  private String asJson(WalletUnitAttestationDto input) throws JsonProcessingException {
+    ObjectWriter objectWriter = mapper.writer().withDefaultPrettyPrinter();
+      return objectWriter.writeValueAsString(input);
   }
 }
