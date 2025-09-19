@@ -6,5 +6,5 @@ package se.digg.wallet.provider.application.model;
 
 import java.util.UUID;
 
-public record WalletUnitAttestationDto(UUID walletId, String publicKey) {
+public record WalletUnitAttestationDto(UUID walletId, String jwk) {
 }
