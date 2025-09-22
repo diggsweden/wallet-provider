@@ -34,3 +34,10 @@ management:
       enabled: true
     diskspace:
       enabled: true
+
+wua:
+  keystore:
+    location: ${WUA_KEYSTORE_PATH:file:/etc/wallet-provider/wua-signing.p12}
+    password: ${WUA_KEYSTORE_PASSWORD}
+    alias: ${WUA_KEYSTORE_ALIAS}
+    type: PKCS12
