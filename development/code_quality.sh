@@ -128,6 +128,22 @@ verify() {
   printf '\n\n'
 }
 
+version_control() {
+  print_header 'VERSION CONTROL'
+  git status
+  test -z "$(git status --porcelain | awk '{$1=$1};1')"
+  store_exit_code "$?" "Version control" \
+    "${MISSING} ${RED}Some changes are not under version control! \
+This can happen if
+
+  1. You forgot to version control your changes
+  2. A linter automatically fixed a problem or reformatted the code.
+
+Please accept or discard any outstanding changes and try again.${NC}\n\n" \
+    "${GREEN}${CHECKMARK}${CHECKMARK} Version control check passed${NC}\n"
+  printf '\n\n'
+}
+
 # coverage() {
 #   print_header 'COVERAGE (JACOCO)'
 #   mvn clean verify "${MAVEN_CLI_OPTS[@]}" -Dcoverage -Djacoco.fail=true
@@ -166,5 +182,6 @@ lint
 commit
 verify
 license
+version_control
 
 check_exit_codes
