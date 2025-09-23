@@ -37,7 +37,7 @@ management:
 
 wua:
   keystore:
-    location: ${WUA_KEYSTORE_PATH:file:/etc/wallet-provider/wua-signing.p12}
+    location: ${WUA_KEYSTORE_PATH}
     password: ${WUA_KEYSTORE_PASSWORD}
     alias: ${WUA_KEYSTORE_ALIAS}
     type: PKCS12
