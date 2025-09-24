@@ -57,7 +57,7 @@ public class WalletUnitAttestationService {
 
     return createSignedJwt(
         keystoreProperties.getSigningKey(),
-        keystoreProperties.alias(),
+        keystoreProperties.getAlias(),
         "Digg",
         Duration.ofHours(24),
         claims);
