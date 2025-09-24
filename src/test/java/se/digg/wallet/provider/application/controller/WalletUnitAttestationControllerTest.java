@@ -40,9 +40,15 @@ class WalletUnitAttestationControllerTest {
     when(service.createWalletUnitAttestation(anyString())).thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
-        "{\"kty\":\"EC\",\"use\":\"sig\",\"crv\":\"P-256\","
-            + "\"x\":\"18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM\","
-            + "\"y\":\"-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA\"}";
+        """
+            {
+                "kty": "EC",
+                "use": "sig",
+                "crv": "P-256",
+                "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
+                "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
+            }
+            """;
     WalletUnitAttestationDto input = new WalletUnitAttestationDto(UUID.randomUUID(), jwk);
 
     mockMvc
