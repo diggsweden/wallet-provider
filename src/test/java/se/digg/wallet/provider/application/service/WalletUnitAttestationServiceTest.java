@@ -33,25 +33,6 @@ class WalletUnitAttestationServiceTest {
   private WuaKeystoreProperties keystoreProperties;
 
   @SuppressWarnings("unchecked")
-  @Test
-  void assertThatCreateWalletUnitAttestation_givenValidJwk_shouldSucceed() throws Exception {
-    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
-    gen.initialize(Curve.P_256.toECParameterSpec());
-    KeyPair keyPair = gen.generateKeyPair();
-    ECKey jwk = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
-
-    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString());
-
-    assertNotNull(jwt);
-    assertEquals("Digg", jwt.getJWTClaimsSet().getIssuer());
-
-    verifyAttestedKeysClaim(jwt, jwk);
-    verifyEudiWalletInfoClaim(jwt);
-    verifyStatusClaim(jwt);
-    verifyJwtSignature(jwt, keystoreProperties.getPublicKey());
-  }
-
-  @SuppressWarnings("unchecked")
   private static void verifyStatusClaim(SignedJWT jwt) throws ParseException {
     Map<String, Object> status = jwt.getJWTClaimsSet().getJSONObjectClaim("status");
     Map<String, Object> statusList = (Map<String, Object>) status.get("status_list");
@@ -83,6 +64,25 @@ class WalletUnitAttestationServiceTest {
     assertEquals(jwk.getX().toString(), attestedKey.get("x"));
     assertEquals(jwk.getY().toString(), attestedKey.get("y"));
     assertEquals(jwk.getCurve().toString(), attestedKey.get("crv"));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  void assertThatCreateWalletUnitAttestation_givenValidJwk_shouldSucceed() throws Exception {
+    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
+    gen.initialize(Curve.P_256.toECParameterSpec());
+    KeyPair keyPair = gen.generateKeyPair();
+    ECKey jwk = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
+
+    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString());
+
+    assertNotNull(jwt);
+    assertEquals("Digg", jwt.getJWTClaimsSet().getIssuer());
+
+    verifyAttestedKeysClaim(jwt, jwk);
+    verifyEudiWalletInfoClaim(jwt);
+    verifyStatusClaim(jwt);
+    verifyJwtSignature(jwt, keystoreProperties.getPublicKey());
   }
 
   private void verifyJwtSignature(SignedJWT jwt, ECPublicKey publicKey) throws JOSEException {

@@ -13,7 +13,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
 
 @ConfigurationProperties(prefix = "wua.keystore")
-public record WuaKeystoreProperties(Resource location, String password, String alias, String type) {
+public record WuaKeystoreProperties(
+    Resource location,
+    String password,
+    String alias,
+    String type,
+    String eudiWalletInfo,
+    String status,
+    String issuer,
+    int validityHours) {
 
   public ECPrivateKey getSigningKey() {
     try {

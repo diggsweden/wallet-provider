@@ -4,6 +4,9 @@
 
 package se.digg.wallet.provider.application.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -27,40 +30,39 @@ import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
 public class WalletUnitAttestationService {
 
   private final WuaKeystoreProperties keystoreProperties;
+  private final ObjectMapper objectMapper;
 
-  public WalletUnitAttestationService(WuaKeystoreProperties keystoreProperties) {
+  public WalletUnitAttestationService(
+      WuaKeystoreProperties keystoreProperties,
+      ObjectMapper objectMapper) {
     this.keystoreProperties = keystoreProperties;
+    this.objectMapper = objectMapper;
   }
 
   public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk) throws Exception {
     ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
-
-    Map<String, Object> eudiWalletInfo =
-        Map.of(
-            "general_info",
-            Map.of(
-                "wallet_provider_name", "Digg",
-                "wallet_solution_id", "Diggidigg-id",
-                "wallet_solution_version", "0.0.1",
-                "wallet_solution_certification_information", "UNCERTIFIED"),
-            "wscd_info", Map.of("wscd_certification_information", "UNCERTIFIED"));
-
-    Map<String, Object> status =
-        Map.of("status_list", Map.of("idx", 412, "uri", "https://revocation_url/statuslists/1"));
-
     List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
 
     Map<String, Object> claims = new HashMap<>();
-    claims.put("eudi_wallet_info", eudiWalletInfo);
-    claims.put("status", status);
+    claims.put("eudi_wallet_info", getEudiWalletInfo());
+    claims.put("status", getStatus());
     claims.put("attested_keys", attestedKeys);
 
     return createSignedJwt(
         keystoreProperties.getSigningKey(),
         keystoreProperties.alias(),
-        "Digg",
-        Duration.ofHours(24),
+        keystoreProperties.issuer(),
+        Duration.ofHours(keystoreProperties.validityHours()),
         claims);
+  }
+
+  private Map<String, Object> getStatus() throws JsonProcessingException {
+    return objectMapper.readValue(keystoreProperties.status(), new TypeReference<>() {});
+  }
+
+  private Map<String, Object> getEudiWalletInfo() throws JsonProcessingException {
+    return objectMapper.readValue(
+        keystoreProperties.eudiWalletInfo(), new TypeReference<>() {});
   }
 
   private SignedJWT createSignedJwt(
@@ -84,10 +86,11 @@ public class WalletUnitAttestationService {
 
     JWTClaimsSet claimsSet = claimsBuilder.build();
 
-    JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.ES256)
-        .keyID(keyId)
-        .type(new JOSEObjectType("keyattestation+jwt"))
-        .build();
+    JWSHeader header =
+        new JWSHeader.Builder(JWSAlgorithm.ES256)
+            .keyID(keyId)
+            .type(new JOSEObjectType("keyattestation+jwt"))
+            .build();
 
     SignedJWT signedJwt = new SignedJWT(header, claimsSet);
 

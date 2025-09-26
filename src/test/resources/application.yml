@@ -12,3 +12,24 @@ wua:
     password: Test1234
     alias: wua-signing
     type: PKCS12
+    issuer: "Digg"
+    validity-hours: 24
+    eudi-wallet-info: >
+      {
+        "general_info": {
+          "wallet_provider_name": "Digg",
+          "wallet_solution_id": "Diggidigg-id",
+          "wallet_solution_version": "0.0.1",
+          "wallet_solution_certification_information": "UNCERTIFIED"
+        },
+        "wscd_info": {
+          "wscd_certification_information": "UNCERTIFIED"
+        }
+      }
+    status: >
+      {
+        "status_list": {
+          "idx": 412,
+          "uri": "https://revocation_url/statuslists/1"
+        }
+      }
