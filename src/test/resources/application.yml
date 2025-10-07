@@ -8,9 +8,9 @@ spring:
 
 wua:
   keystore:
-    location: classpath:dev/wua-signing.p12
-    password: Test1234
-    alias: wua-signing
+    location: classpath:certificates/wallet-provider.p12
+    password: secret
+    alias: wallet-provider
     type: PKCS12
     issuer: "Digg"
     validity-hours: 24
