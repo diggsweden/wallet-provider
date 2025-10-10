@@ -5,6 +5,7 @@
 package se.digg.wallet.provider.application.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -83,6 +84,19 @@ class WalletUnitAttestationServiceTest {
     verifyEudiWalletInfoClaim(jwt);
     verifyStatusClaim(jwt);
     verifyJwtSignature(jwt, keystoreProperties.getPublicKey());
+  }
+
+  @Test
+  void assertThatCreateWalletUnitAttestation_hasX5cHeader() throws Exception {
+    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
+    gen.initialize(Curve.P_256.toECParameterSpec());
+    KeyPair keyPair = gen.generateKeyPair();
+    ECKey jwk = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
+
+    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString());
+
+    assertNotNull(jwt.getHeader().getX509CertChain());
+    assertFalse(jwt.getHeader().getX509CertChain().isEmpty());
   }
 
   private void verifyJwtSignature(SignedJWT jwt, ECPublicKey publicKey) throws JOSEException {
