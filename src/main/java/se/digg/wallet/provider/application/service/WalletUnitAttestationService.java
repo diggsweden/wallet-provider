@@ -7,15 +7,17 @@ package se.digg.wallet.provider.application.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.time.Duration;
 import java.time.Instant;
@@ -33,8 +35,7 @@ public class WalletUnitAttestationService {
   private final ObjectMapper objectMapper;
 
   public WalletUnitAttestationService(
-      WuaKeystoreProperties keystoreProperties,
-      ObjectMapper objectMapper) {
+      WuaKeystoreProperties keystoreProperties, ObjectMapper objectMapper) {
     this.keystoreProperties = keystoreProperties;
     this.objectMapper = objectMapper;
   }
@@ -48,30 +49,12 @@ public class WalletUnitAttestationService {
     claims.put("status", getStatus());
     claims.put("attested_keys", attestedKeys);
 
-    return createSignedJwt(
-        keystoreProperties.getSigningKey(),
-        keystoreProperties.alias(),
-        keystoreProperties.issuer(),
-        Duration.ofHours(keystoreProperties.validityHours()),
-        claims);
-  }
+    ECPrivateKey signingKey = keystoreProperties.getSigningKey();
+    String keyId = keystoreProperties.alias();
+    List<X509Certificate> certificateChain = keystoreProperties.getCertificateChain();
+    String issuer = keystoreProperties.issuer();
+    Duration validity = Duration.ofHours(keystoreProperties.validityHours());
 
-  private Map<String, Object> getStatus() throws JsonProcessingException {
-    return objectMapper.readValue(keystoreProperties.status(), new TypeReference<>() {});
-  }
-
-  private Map<String, Object> getEudiWalletInfo() throws JsonProcessingException {
-    return objectMapper.readValue(
-        keystoreProperties.eudiWalletInfo(), new TypeReference<>() {});
-  }
-
-  private SignedJWT createSignedJwt(
-      ECPrivateKey signingKey,
-      String keyId,
-      String issuer,
-      Duration validity,
-      Map<String, Object> claims)
-      throws JOSEException {
     Instant now = Instant.now();
 
     JWTClaimsSet.Builder claimsBuilder =
@@ -86,10 +69,23 @@ public class WalletUnitAttestationService {
 
     JWTClaimsSet claimsSet = claimsBuilder.build();
 
+    List<Base64> x5c =
+        certificateChain.stream()
+            .map(
+                c -> {
+                  try {
+                    return Base64.encode(c.getEncoded());
+                  } catch (CertificateEncodingException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .toList();
+
     JWSHeader header =
         new JWSHeader.Builder(JWSAlgorithm.ES256)
             .keyID(keyId)
             .type(new JOSEObjectType("keyattestation+jwt"))
+            .x509CertChain(x5c)
             .build();
 
     SignedJWT signedJwt = new SignedJWT(header, claimsSet);
@@ -98,5 +94,13 @@ public class WalletUnitAttestationService {
     signedJwt.sign(signer);
 
     return signedJwt;
+  }
+
+  private Map<String, Object> getStatus() throws JsonProcessingException {
+    return objectMapper.readValue(keystoreProperties.status(), new TypeReference<>() {});
+  }
+
+  private Map<String, Object> getEudiWalletInfo() throws JsonProcessingException {
+    return objectMapper.readValue(keystoreProperties.eudiWalletInfo(), new TypeReference<>() {});
   }
 }

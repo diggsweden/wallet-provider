@@ -7,8 +7,12 @@ package se.digg.wallet.provider.application.config;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
 
@@ -43,6 +47,18 @@ public record WuaKeystoreProperties(
       return (ECPublicKey) cert.getPublicKey();
     } catch (Exception e) {
       throw new RuntimeException("Failed to load public key from filesystem", e);
+    }
+  }
+
+  public List<X509Certificate> getCertificateChain() {
+    try {
+      KeyStore keyStore = KeyStore.getInstance(type());
+      keyStore.load(location().getInputStream(), password().toCharArray());
+      return Arrays.stream(keyStore.getCertificateChain(alias()))
+          .map(c -> (X509Certificate) c)
+          .collect(Collectors.toList());
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to load certificate chain from filesystem", e);
     }
   }
 }
