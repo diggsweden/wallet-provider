@@ -1,9 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
-
-SPDX-License-Identifier: CC0-1.0
--->
-
 # Development Guide
 
 This guide outlines core essentials for developing in this project.
@@ -11,41 +5,48 @@ This guide outlines core essentials for developing in this project.
 ## Table of Contents
 
 - [Setup and Configuration](#setup-and-configuration)
+  - [Prerequisites](#prerequisites)
+  - [Quick Start](#quick-start)
   - [IDE Setup](#ide-setup)
   - [Consuming SNAPSHOTS](#consuming-snapshots-from-maven-central)
 - [Development Workflow](#development-workflow)
+  - [Available Commands](#available-commands)
   - [Testing and Verification](#testing-format-and-lint)
   - [Documentation](#documentation)
   - [Pull Request Process](#pull-request-workflow)
 
 ## Setup and Configuration
 
-### IDE Setup
+### Prerequisites
 
-Run the code quality script.
+- [mise](https://mise.jdx.dev/) - Tool version manager
+- [just](https://github.com/casey/just) - Command runner (installed via mise)
+
+### Quick Start
 
 ```shell
-./development/code_quality.sh
+# Install all development tools
+mise install
+
+# Setup shared linting tools
+just setup-devtools
+
+# Run all quality checks
+just verify
 ```
 
-This will run the automated test suite
-and other automation such as linters and formatters.
-As a side effect all required dependencies will be downloaded.
-After running the script, please take a look in
-[the generated IDE configuration file](./megalinter-reports/IDE-config.txt).
-It contains a list of suggested plugins and configuration for various editors and IDEs,
-e.g. VS Code and IntelliJ.
+### IDE Setup
 
 #### VSCode
 
- 1. Install plugins:
+1. Install plugins:
 
-    - [Checkstyle for Java](https://marketplace.visualstudio.com/items?itemName=shengchen.vscode-checkstyle)
-    - [markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint)
-    - [PMD for Java](https://marketplace.visualstudio.com/items?itemName=cracrayol.pmd-java)
-    - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-    - [ShellCheck](https://marketplace.visualstudio.com/items?itemName=timonwong.shellcheck)
-    - [shell-format](https://marketplace.visualstudio.com/items?itemName=foxundermoon.shell-format) version 7.2.5
+   - [Checkstyle for Java](https://marketplace.visualstudio.com/items?itemName=shengchen.vscode-checkstyle)
+   - [markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint)
+   - [PMD for Java](https://marketplace.visualstudio.com/items?itemName=cracrayol.pmd-java)
+   - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+   - [ShellCheck](https://marketplace.visualstudio.com/items?itemName=timonwong.shellcheck)
+   - [shell-format](https://marketplace.visualstudio.com/items?itemName=foxundermoon.shell-format) version 7.2.5
 
         **Note 1:** There is
         [a known issue](https://github.com/foxundermoon/vs-shell-format/issues/396)
@@ -56,7 +57,7 @@ e.g. VS Code and IntelliJ.
         **Note 2:** You need to have the `shfmt` binary installed in order to use the plugin.
         On Ubuntu you can install it with `sudo apt-get install shfmt`.
 
- 2. Open workspace settings - settings.json (for example with Ctrl+Shift+P → Preferences: Workspace Settings (JSON)) and add:
+2. Open workspace settings - settings.json (for example with Ctrl+Shift+P → Preferences: Workspace Settings (JSON)) and add:
 
     ```json
     "editor.formatOnSave": true,
@@ -78,15 +79,15 @@ e.g. VS Code and IntelliJ.
 
 #### IntelliJ
 
- 1. **Code Style**
-    - Settings → `Editor → Code Style → Java`
-    - Click gear → `Import Scheme → Eclipse XML Profile`
-    - Select `development/format/eclipse-java-google-style.xml`
+1. **Code Style**
+   - Settings → `Editor → Code Style → Java`
+   - Click gear → `Import Scheme → Eclipse XML Profile`
+   - Select `development/format/eclipse-java-google-style.xml`
 
- 2. **Checkstyle**
-    - Install "CheckStyle-IDEA" plugin
-    - Settings → `Tools → Checkstyle`
-    - Click the built-in Google Style Check
+2. **Checkstyle**
+   - Install "CheckStyle-IDEA" plugin
+   - Settings → `Tools → Checkstyle`
+   - Click the built-in Google Style Check
 
 ## Consuming SNAPSHOTS from Maven Central
 
@@ -110,9 +111,57 @@ Configure your pom.xml file with:
 
 ## Development Workflow
 
+### Available Commands
+
+Run `just` to see all available commands. Key commands:
+
+| Command | Description |
+|---------|-------------|
+| `just verify` | Run all checks (lint + test) |
+| `just lint-all` | Run all linters |
+| `just lint-fix` | Auto-fix linting issues |
+| `just test` | Run tests (mvn verify) |
+| `just build` | Build project |
+| `just clean` | Clean build artifacts |
+
+#### Linting Commands
+
+| Command | Tool | Description |
+|---------|------|-------------|
+| `just lint-commits` | conform | Validate commit messages |
+| `just lint-secrets` | gitleaks | Scan for secrets |
+| `just lint-yaml` | yamlfmt | Lint YAML files |
+| `just lint-markdown` | rumdl | Lint markdown files |
+| `just lint-shell` | shellcheck | Lint shell scripts |
+| `just lint-shell-fmt` | shfmt | Check shell formatting |
+| `just lint-actions` | actionlint | Lint GitHub Actions |
+| `just lint-license` | reuse | Check license compliance |
+| `just lint-xml` | xmllint | Validate XML files |
+| `just lint-container` | hadolint | Lint Containerfile |
+| `just lint-java` | Maven | Run all Java linters |
+| `just lint-java-checkstyle` | checkstyle | Java style checks |
+| `just lint-java-pmd` | pmd | Java static analysis |
+| `just lint-java-spotbugs` | spotbugs | Java bug detection |
+| `just lint-java-fmt` | formatter | Check Java formatting |
+
+#### Fix Commands
+
+| Command | Description |
+|---------|-------------|
+| `just lint-yaml-fix` | Fix YAML formatting |
+| `just lint-markdown-fix` | Fix markdown formatting |
+| `just lint-shell-fmt-fix` | Fix shell formatting |
+| `just lint-java-fmt-fix` | Fix Java formatting |
+
 ### Testing, Format and Lint
 
-Run Maven verification:
+Run all verification:
+
+```shell
+just verify
+```
+
+Or run Maven directly:
 
 ```shell
 mvn clean verify
@@ -136,38 +185,45 @@ View documentation in your browser:
 
 When submitting a PR, CI will automatically run several checks. To avoid surprises, run these checks locally first.
 
-#### Pull Request Workflow Prerequisites
-
-- [Podman](https://podman.io/)
-
 #### Running Code Quality Checks Locally
 
-1. Run the quality check script:
+```shell
+# Run all checks
+just verify
 
-   ```shell
-   ./development/code_quality.sh
-   ```
+# Or run linting only
+just lint-all
 
-2. Fix any identified issues
-
-3. Update your PR with fixes
-
-4. Verify CI passes in the updated PR
+# Auto-fix where possible
+just lint-fix
+```
 
 #### Quality Check Details
 
-- **Linting with megalinter**: BASH, Java, Markdown, XML, YAML, GitHub Actions, security scanning
+- **Java Linting**: Checkstyle, PMD, SpotBugs
+- **General Linting**: Shell, YAML, Markdown, GitHub Actions, XML
+- **Container Linting**: Hadolint for Containerfile
+- **Security**: Secret scanning with gitleaks
 - **License Compliance**: REUSE tool ensures proper copyright information
 - **Commit Structure**: Conform checks commit messages for changelog generation
-- **Dependency Analysis**: Scans for vulnerabilities, outdated packages, and license issues
-- **OpenSSF Scorecard**: Validates security best practices
 
 #### Handling Failed Checks
 
 If any checks fail in the CI pipeline:
 
 1. Review the CI error logs
-2. Run checks locally to reproduce the issues
-3. Make necessary fixes in your local environment
-4. Update your Pull Request
-5. Verify all checks pass in the updated PR
+2. Run checks locally to reproduce the issues:
+
+   ```shell
+   just lint-all
+   ```
+
+3. Auto-fix where possible:
+
+   ```shell
+   just lint-fix
+   ```
+
+4. Make necessary manual fixes
+5. Update your Pull Request
+6. Verify all checks pass in the updated PR

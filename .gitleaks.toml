@@ -14,7 +14,9 @@ regexes = [
 ]
 paths = [
     ".gitleaks-test.txt",
-    ".gitleaks-test/"
+    ".gitleaks-test/",
+    '''src/test/.*''',
+    '''.*test.*'''
 ]
 
 [[rules]]
