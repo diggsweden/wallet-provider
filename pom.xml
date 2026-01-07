@@ -53,7 +53,7 @@ SPDX-License-Identifier: EUPL-1.2
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springdoc</groupId>
@@ -95,6 +95,10 @@ SPDX-License-Identifier: EUPL-1.2
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
