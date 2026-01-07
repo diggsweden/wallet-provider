@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.nimbusds.jwt.SignedJWT;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -150,7 +149,7 @@ class WalletUnitAttestationControllerTest {
         .andExpect(content().string(expectedJwt));
   }
 
-  private String asJson(Object input) throws JacksonException {
+  private String asJson(WalletUnitAttestationRequest input) throws JacksonException {
     ObjectWriter objectWriter = mapper.writer().withDefaultPrettyPrinter();
     return objectWriter.writeValueAsString(input);
   }
