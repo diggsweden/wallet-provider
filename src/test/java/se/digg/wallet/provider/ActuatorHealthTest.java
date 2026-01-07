@@ -4,30 +4,27 @@
 
 package se.digg.wallet.provider;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
+@AutoConfigureRestTestClient
 public class ActuatorHealthTest {
 
   @Autowired
-  private TestRestTemplate testRestTemplate;
+  private RestTestClient restClient;
 
   @Test
   void isHealthy() {
-    ResponseEntity<String> response =
-        testRestTemplate.exchange("/actuator/health", HttpMethod.GET, null, String.class);
-    String body = response.getBody();
-
-    assertNotNull(body);
-    assertEquals("{\"status\":\"UP\"}", body);
+    restClient.get()
+        .uri("/actuator/health")
+        .exchangeSuccessfully()
+        .expectBody(String.class)
+        .isEqualTo("""
+            {"groups":["liveness","readiness"],"status":"UP"}""");
   }
 }

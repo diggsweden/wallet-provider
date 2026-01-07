@@ -4,9 +4,6 @@
 
 package se.digg.wallet.provider.application.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -27,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class WalletUnitAttestationService {
@@ -96,11 +96,11 @@ public class WalletUnitAttestationService {
     return signedJwt;
   }
 
-  private Map<String, Object> getStatus() throws JsonProcessingException {
+  private Map<String, Object> getStatus() throws JacksonException {
     return objectMapper.readValue(keystoreProperties.status(), new TypeReference<>() {});
   }
 
-  private Map<String, Object> getEudiWalletInfo() throws JsonProcessingException {
+  private Map<String, Object> getEudiWalletInfo() throws JacksonException {
     return objectMapper.readValue(keystoreProperties.eudiWalletInfo(), new TypeReference<>() {});
   }
 }
