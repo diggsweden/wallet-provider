@@ -37,7 +37,7 @@ public class WalletUnitAttestationService {
   public WalletUnitAttestationService(
       WuaKeystoreProperties keystoreProperties, ObjectMapper objectMapper) {
     this.keystoreProperties = keystoreProperties;
-    this.objectMapper = objectMapper;
+    this.objectMapper = objectMapper.copy();
   }
 
   public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk) throws Exception {
