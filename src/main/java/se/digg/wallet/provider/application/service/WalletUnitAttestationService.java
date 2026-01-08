@@ -63,9 +63,7 @@ public class WalletUnitAttestationService {
             .issueTime(Date.from(now))
             .expirationTime(Date.from(now.plus(validity)));
 
-    if (claims != null) {
-      claims.forEach(claimsBuilder::claim);
-    }
+    claims.forEach(claimsBuilder::claim);
 
     JWTClaimsSet claimsSet = claimsBuilder.build();
 
