@@ -34,7 +34,7 @@ public record WuaKeystoreProperties(
       PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias(), password().toCharArray());
 
       return (ECPrivateKey) privateKey;
-    } catch (Exception e) {
+    } catch (Throwable e) {
       throw new WalletRuntimeException("Failed to load signing key from filesystem", e);
     }
   }
@@ -45,7 +45,7 @@ public record WuaKeystoreProperties(
       keyStore.load(location().getInputStream(), password().toCharArray());
       Certificate cert = keyStore.getCertificate(alias());
       return (ECPublicKey) cert.getPublicKey();
-    } catch (Exception e) {
+    } catch (Throwable e) {
       throw new WalletRuntimeException("Failed to load public key from filesystem", e);
     }
   }
@@ -57,7 +57,7 @@ public record WuaKeystoreProperties(
       return Arrays.stream(keyStore.getCertificateChain(alias()))
           .map(c -> (X509Certificate) c)
           .collect(Collectors.toList());
-    } catch (Exception e) {
+    } catch (Throwable e) {
       throw new WalletRuntimeException("Failed to load certificate chain from filesystem", e);
     }
   }

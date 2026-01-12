@@ -25,9 +25,11 @@ public class WalletUnitAttestationController {
 
   @PostMapping
   public ResponseEntity<String> postWalletUnitAttestation(
-      @RequestBody WalletUnitAttestationDto walletUnitAttestationDto) throws Exception {
+      @RequestBody WalletUnitAttestationDto walletUnitAttestationDto) {
     SignedJWT signedJwt =
         attestationService.createWalletUnitAttestation(walletUnitAttestationDto.jwk());
-    return ResponseEntity.ok(signedJwt.serialize());
+    return signedJwt != null
+        ? ResponseEntity.ok(signedJwt.serialize())
+        : ResponseEntity.badRequest().build();
   }
 }

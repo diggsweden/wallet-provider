@@ -7,6 +7,7 @@ package se.digg.wallet.provider.application.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.nimbusds.jose.JOSEException;
@@ -97,6 +98,12 @@ class WalletUnitAttestationServiceTest {
 
     assertNotNull(jwt.getHeader().getX509CertChain());
     assertFalse(jwt.getHeader().getX509CertChain().isEmpty());
+  }
+
+  @Test
+  void assertThatCreateWalletUnitAttestation_givenNullKey_shouldReturnNull() {
+    var result = service.createWalletUnitAttestation(null);
+    assertNull(result);
   }
 
   private void verifyJwtSignature(SignedJWT jwt, ECPublicKey publicKey) throws JOSEException {
