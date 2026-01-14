@@ -7,6 +7,7 @@ package se.digg.wallet.provider.application.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -19,6 +20,7 @@ import com.nimbusds.jwt.SignedJWT;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
+import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -45,62 +47,68 @@ public class WalletUnitAttestationService {
     this.objectMapper = objectMapper.copy();
   }
 
+  private SignedJWT createWalletUnitAttestationUnsafely(String walletPublicKeyJwk)
+      throws ParseException,
+      JsonProcessingException, JOSEException {
+    ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
+    List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
+
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("eudi_wallet_info", getEudiWalletInfo());
+    claims.put("status", getStatus());
+    claims.put("attested_keys", attestedKeys);
+
+    ECPrivateKey signingKey = keystoreProperties.getSigningKey();
+    String keyId = keystoreProperties.alias();
+    List<X509Certificate> certificateChain = keystoreProperties.getCertificateChain();
+    String issuer = keystoreProperties.issuer();
+    Duration validity = Duration.ofHours(keystoreProperties.validityHours());
+
+    Instant now = Instant.now();
+
+    JWTClaimsSet.Builder claimsBuilder =
+        new JWTClaimsSet.Builder()
+            .issuer(issuer)
+            .issueTime(Date.from(now))
+            .expirationTime(Date.from(now.plus(validity)));
+
+    claims.forEach(claimsBuilder::claim);
+
+    JWTClaimsSet claimsSet = claimsBuilder.build();
+
+    List<Base64> x5c =
+        certificateChain.stream()
+            .map(
+                c -> {
+                  try {
+                    return Base64.encode(c.getEncoded());
+                  } catch (CertificateEncodingException e) {
+                    throw new WalletRuntimeException(e);
+                  }
+                })
+            .toList();
+
+    JWSHeader header =
+        new JWSHeader.Builder(JWSAlgorithm.ES256)
+            .keyID(keyId)
+            .type(new JOSEObjectType("keyattestation+jwt"))
+            .x509CertChain(x5c)
+            .build();
+
+    SignedJWT signedJwt = new SignedJWT(header, claimsSet);
+
+    JWSSigner signer = new ECDSASigner(signingKey);
+    signedJwt.sign(signer);
+
+    return signedJwt;
+  }
+
   public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk) {
     try {
-      ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
-      List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
-
-      Map<String, Object> claims = new HashMap<>();
-      claims.put("eudi_wallet_info", getEudiWalletInfo());
-      claims.put("status", getStatus());
-      claims.put("attested_keys", attestedKeys);
-
-      ECPrivateKey signingKey = keystoreProperties.getSigningKey();
-      String keyId = keystoreProperties.alias();
-      List<X509Certificate> certificateChain = keystoreProperties.getCertificateChain();
-      String issuer = keystoreProperties.issuer();
-      Duration validity = Duration.ofHours(keystoreProperties.validityHours());
-
-      Instant now = Instant.now();
-
-      JWTClaimsSet.Builder claimsBuilder =
-          new JWTClaimsSet.Builder()
-              .issuer(issuer)
-              .issueTime(Date.from(now))
-              .expirationTime(Date.from(now.plus(validity)));
-
-      claims.forEach(claimsBuilder::claim);
-
-      JWTClaimsSet claimsSet = claimsBuilder.build();
-
-      List<Base64> x5c =
-          certificateChain.stream()
-              .map(
-                  c -> {
-                    try {
-                      return Base64.encode(c.getEncoded());
-                    } catch (CertificateEncodingException e) {
-                      throw new WalletRuntimeException(e);
-                    }
-                  })
-              .toList();
-
-      JWSHeader header =
-          new JWSHeader.Builder(JWSAlgorithm.ES256)
-              .keyID(keyId)
-              .type(new JOSEObjectType("keyattestation+jwt"))
-              .x509CertChain(x5c)
-              .build();
-
-      SignedJWT signedJwt = new SignedJWT(header, claimsSet);
-
-      JWSSigner signer = new ECDSASigner(signingKey);
-      signedJwt.sign(signer);
-
-      return signedJwt;
-    } catch (Throwable e) {
-      LOGGER.error("Could not create attestation.");
-      return null;
+      return createWalletUnitAttestationUnsafely(walletPublicKeyJwk);
+    } catch (ParseException | JsonProcessingException | JOSEException e) {
+      LOGGER.error("Could not create attestation.", e);
+      throw new WalletRuntimeException(e);
     }
   }
 

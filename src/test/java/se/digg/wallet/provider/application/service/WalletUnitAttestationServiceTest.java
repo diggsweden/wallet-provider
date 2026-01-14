@@ -7,7 +7,7 @@ package se.digg.wallet.provider.application.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.nimbusds.jose.JOSEException;
@@ -24,6 +24,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import se.digg.wallet.provider.application.config.WalletRuntimeException;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
 
 @SpringBootTest
@@ -101,9 +102,9 @@ class WalletUnitAttestationServiceTest {
   }
 
   @Test
-  void assertThatCreateWalletUnitAttestation_givenNullKey_shouldReturnNull() {
-    var result = service.createWalletUnitAttestation(null);
-    assertNull(result);
+  void assertThatCreateWalletUnitAttestation_givenNullKey_shouldThrowException() {
+    assertThrowsExactly(WalletRuntimeException.class,
+        () -> service.createWalletUnitAttestation(null));
   }
 
   private void verifyJwtSignature(SignedJWT jwt, ECPublicKey publicKey) throws JOSEException {

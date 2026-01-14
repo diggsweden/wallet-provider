@@ -28,8 +28,6 @@ public class WalletUnitAttestationController {
       @RequestBody WalletUnitAttestationDto walletUnitAttestationDto) {
     SignedJWT signedJwt =
         attestationService.createWalletUnitAttestation(walletUnitAttestationDto.jwk());
-    return signedJwt != null
-        ? ResponseEntity.ok(signedJwt.serialize())
-        : ResponseEntity.badRequest().build();
+    return ResponseEntity.ok(signedJwt.serialize());
   }
 }
