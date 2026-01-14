@@ -4,15 +4,22 @@
 
 package se.digg.wallet.provider.application.config;
 
+import java.io.IOException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
 
@@ -27,6 +34,8 @@ public record WuaKeystoreProperties(
     String issuer,
     int validityHours) {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(WuaKeystoreProperties.class);
+
   public ECPrivateKey getSigningKey() {
     try {
       KeyStore keyStore = KeyStore.getInstance(type());
@@ -34,8 +43,10 @@ public record WuaKeystoreProperties(
       PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias(), password().toCharArray());
 
       return (ECPrivateKey) privateKey;
-    } catch (Throwable e) {
-      throw new WalletRuntimeException("Failed to load signing key from filesystem", e);
+    } catch (CertificateException | IOException | KeyStoreException
+        | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+      LOGGER.error("Failed to load signing key from filesystem", e);
+      throw new WalletRuntimeException(e);
     }
   }
 
