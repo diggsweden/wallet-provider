@@ -56,8 +56,10 @@ public record WuaKeystoreProperties(
       keyStore.load(location().getInputStream(), password().toCharArray());
       Certificate cert = keyStore.getCertificate(alias());
       return (ECPublicKey) cert.getPublicKey();
-    } catch (Throwable e) {
-      throw new WalletRuntimeException("Failed to load public key from filesystem", e);
+    } catch (CertificateException | IOException | KeyStoreException
+        | NoSuchAlgorithmException e) {
+      LOGGER.error("Failed to load public key from filesystem", e);
+      throw new WalletRuntimeException(e);
     }
   }
 
@@ -68,8 +70,10 @@ public record WuaKeystoreProperties(
       return Arrays.stream(keyStore.getCertificateChain(alias()))
           .map(c -> (X509Certificate) c)
           .collect(Collectors.toList());
-    } catch (Throwable e) {
-      throw new WalletRuntimeException("Failed to load certificate chain from filesystem", e);
+    } catch (CertificateException | IOException | KeyStoreException
+        | NoSuchAlgorithmException e) {
+      LOGGER.error("Failed to load certificate chain from filesystem", e);
+      throw new WalletRuntimeException(e);
     }
   }
 }
