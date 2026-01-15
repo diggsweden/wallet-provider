@@ -18,8 +18,6 @@ import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
 
@@ -34,8 +32,6 @@ public record WuaKeystoreProperties(
     String issuer,
     int validityHours) {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(WuaKeystoreProperties.class);
-
   public ECPrivateKey getSigningKey() {
     try {
       KeyStore keyStore = KeyStore.getInstance(type());
@@ -45,8 +41,7 @@ public record WuaKeystoreProperties(
       return (ECPrivateKey) privateKey;
     } catch (CertificateException | IOException | KeyStoreException
         | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-      LOGGER.error("Failed to load signing key from filesystem", e);
-      throw new WalletRuntimeException(e);
+      throw new WalletRuntimeException("Failed to load signing key from filesystem", e);
     }
   }
 
@@ -58,8 +53,7 @@ public record WuaKeystoreProperties(
       return (ECPublicKey) cert.getPublicKey();
     } catch (CertificateException | IOException | KeyStoreException
         | NoSuchAlgorithmException e) {
-      LOGGER.error("Failed to load public key from filesystem", e);
-      throw new WalletRuntimeException(e);
+      throw new WalletRuntimeException("Failed to load public key from filesystem", e);
     }
   }
 
@@ -72,8 +66,7 @@ public record WuaKeystoreProperties(
           .collect(Collectors.toList());
     } catch (CertificateException | IOException | KeyStoreException
         | NoSuchAlgorithmException e) {
-      LOGGER.error("Failed to load certificate chain from filesystem", e);
-      throw new WalletRuntimeException(e);
+      throw new WalletRuntimeException("Failed to load certificate chain from filesystem", e);
     }
   }
 }
