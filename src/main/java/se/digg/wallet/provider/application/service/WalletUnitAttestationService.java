@@ -27,16 +27,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.provider.application.config.WalletRuntimeException;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
 
 @Service
 public class WalletUnitAttestationService {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(WalletUnitAttestationService.class);
 
   private final WuaKeystoreProperties keystoreProperties;
   private final ObjectMapper objectMapper;
@@ -107,8 +103,7 @@ public class WalletUnitAttestationService {
     try {
       return createWalletUnitAttestationUnsafely(walletPublicKeyJwk);
     } catch (ParseException | JsonProcessingException | JOSEException e) {
-      LOGGER.error("Could not create attestation.", e);
-      throw new WalletRuntimeException(e);
+      throw new WalletRuntimeException("Could not create attestation.", e);
     }
   }
 
