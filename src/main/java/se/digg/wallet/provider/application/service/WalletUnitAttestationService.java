@@ -7,6 +7,7 @@ package se.digg.wallet.provider.application.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -19,6 +20,7 @@ import com.nimbusds.jwt.SignedJWT;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
+import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -26,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
+import se.digg.wallet.provider.application.config.WalletRuntimeException;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
 
 @Service
@@ -37,10 +40,12 @@ public class WalletUnitAttestationService {
   public WalletUnitAttestationService(
       WuaKeystoreProperties keystoreProperties, ObjectMapper objectMapper) {
     this.keystoreProperties = keystoreProperties;
-    this.objectMapper = objectMapper;
+    this.objectMapper = objectMapper.copy();
   }
 
-  public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk) throws Exception {
+  private SignedJWT createWalletUnitAttestationUnsafely(String walletPublicKeyJwk)
+      throws ParseException,
+      JsonProcessingException, JOSEException {
     ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
     List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
 
@@ -63,9 +68,7 @@ public class WalletUnitAttestationService {
             .issueTime(Date.from(now))
             .expirationTime(Date.from(now.plus(validity)));
 
-    if (claims != null) {
-      claims.forEach(claimsBuilder::claim);
-    }
+    claims.forEach(claimsBuilder::claim);
 
     JWTClaimsSet claimsSet = claimsBuilder.build();
 
@@ -76,7 +79,7 @@ public class WalletUnitAttestationService {
                   try {
                     return Base64.encode(c.getEncoded());
                   } catch (CertificateEncodingException e) {
-                    throw new RuntimeException(e);
+                    throw new WalletRuntimeException(e);
                   }
                 })
             .toList();
@@ -94,6 +97,14 @@ public class WalletUnitAttestationService {
     signedJwt.sign(signer);
 
     return signedJwt;
+  }
+
+  public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk) {
+    try {
+      return createWalletUnitAttestationUnsafely(walletPublicKeyJwk);
+    } catch (ParseException | JsonProcessingException | JOSEException e) {
+      throw new WalletRuntimeException("Could not create attestation.", e);
+    }
   }
 
   private Map<String, Object> getStatus() throws JsonProcessingException {
