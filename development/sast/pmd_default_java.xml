@@ -29,7 +29,6 @@
             <property name="maximumStaticImports" value="15" />
         </properties>
     </rule>
-    <rule ref="category/java/codestyle.xml/ForLoopShouldBeWhileLoop" />
     <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName" />
     <rule ref="category/java/codestyle.xml/UnnecessaryImport" />
     <rule ref="category/java/codestyle.xml/UnnecessaryModifier" />
@@ -58,7 +57,7 @@
     <rule ref="category/java/errorprone.xml/UnconditionalIfStatement" />
     <rule ref="category/java/errorprone.xml/UnnecessaryConversionTemporary" />
     <rule ref="category/java/errorprone.xml/UnusedNullCheckInEquals" />
-    <rule ref="category/java/errorprone.xml/UselessOperationOnImmutable" />
+    <rule ref="category/java/errorprone.xml/UselessPureMethodCall" />
 
     <rule ref="category/java/multithreading.xml/AvoidThreadGroup" />
     <rule ref="category/java/multithreading.xml/DontCallThreadRun" />

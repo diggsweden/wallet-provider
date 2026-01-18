@@ -4,9 +4,14 @@
 
 package se.digg.wallet.provider.application.config;
 
+import java.io.IOException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -34,8 +39,9 @@ public record WuaKeystoreProperties(
       PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias(), password().toCharArray());
 
       return (ECPrivateKey) privateKey;
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to load signing key from filesystem", e);
+    } catch (CertificateException | IOException | KeyStoreException
+        | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+      throw new WalletRuntimeException("Failed to load signing key from filesystem", e);
     }
   }
 
@@ -45,8 +51,9 @@ public record WuaKeystoreProperties(
       keyStore.load(location().getInputStream(), password().toCharArray());
       Certificate cert = keyStore.getCertificate(alias());
       return (ECPublicKey) cert.getPublicKey();
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to load public key from filesystem", e);
+    } catch (CertificateException | IOException | KeyStoreException
+        | NoSuchAlgorithmException e) {
+      throw new WalletRuntimeException("Failed to load public key from filesystem", e);
     }
   }
 
@@ -57,8 +64,9 @@ public record WuaKeystoreProperties(
       return Arrays.stream(keyStore.getCertificateChain(alias()))
           .map(c -> (X509Certificate) c)
           .collect(Collectors.toList());
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to load certificate chain from filesystem", e);
+    } catch (CertificateException | IOException | KeyStoreException
+        | NoSuchAlgorithmException e) {
+      throw new WalletRuntimeException("Failed to load certificate chain from filesystem", e);
     }
   }
 }
