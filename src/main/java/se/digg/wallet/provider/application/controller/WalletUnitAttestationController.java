@@ -34,7 +34,7 @@ public class WalletUnitAttestationController {
 
   @PostMapping("/v2")
   public ResponseEntity<String> postWalletUnitAttestationV2(
-      @RequestBody WalletUnitAttestationDtoV2 walletUnitAttestationDto) {
+      @RequestBody WalletUnitAttestationDtoV2 walletUnitAttestationDto) throws Exception {
     SignedJWT signedJwt =
         attestationService.createWalletUnitAttestationV2(walletUnitAttestationDto.jwk(),
             walletUnitAttestationDto.nonce());
