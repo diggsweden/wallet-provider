@@ -101,7 +101,7 @@ public class WalletUnitAttestationService {
 
 
   private SignedJWT createWalletUnitAttestationV2Unsafely(String walletPublicKeyJwk, String nonce)
-          throws ParseException, JsonProcessingException, JOSEException {
+      throws ParseException, JsonProcessingException, JOSEException {
     ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
     List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
 
@@ -137,7 +137,7 @@ public class WalletUnitAttestationService {
 
     JWSHeader header =
         new JWSHeader.Builder(JWSAlgorithm.ES256)
-            .type(new JOSEObjectType("key-attestation+jwt"))
+            .type(new JOSEObjectType("key-attestation+jwt")) // REQUIRED, MUST be key-attestation+jwt
             .x509CertChain(x5c)
             .build();
 
