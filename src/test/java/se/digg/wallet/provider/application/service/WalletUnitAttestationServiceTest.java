@@ -130,14 +130,13 @@ class WalletUnitAttestationServiceTest {
   void assertThatV2_containsNonceButNotKid() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwtV1 = service.createWalletUnitAttestation(jwk.toJSONString());
     SignedJWT jwtV2 = service.createWalletUnitAttestationV2(jwk.toString(), "");
 
-    assertFalse(jwtV1.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
-    assertTrue(jwtV2.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
+    assertEquals("key-attestation+jwt", jwtV2.getHeader().getType().getType());
 
-    assertTrue(jwtV1.getHeader().toJSONObject().containsKey("kid"));
     assertFalse(jwtV2.getHeader().toJSONObject().containsKey("kid"));
+
+    assertTrue(jwtV2.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
   }
 
   private void verifyJwtSignature(SignedJWT jwt, ECPublicKey publicKey) throws JOSEException {
