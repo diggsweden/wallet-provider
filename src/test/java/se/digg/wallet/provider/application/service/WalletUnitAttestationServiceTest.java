@@ -72,11 +72,7 @@ class WalletUnitAttestationServiceTest {
   @SuppressWarnings("unchecked")
   @Test
   void assertThatCreateWalletUnitAttestation_givenValidJwk_shouldSucceed() throws Exception {
-    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
-    gen.initialize(Curve.P_256.toECParameterSpec());
-    KeyPair keyPair = gen.generateKeyPair();
-    ECKey jwk = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
-
+    ECKey jwk = createJWK();
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString());
 
     assertNotNull(jwt);
@@ -91,10 +87,7 @@ class WalletUnitAttestationServiceTest {
   @SuppressWarnings("unchecked")
   @Test
   void assertThatCreateWalletUnitAttestationV2_givenValidJwk_shouldSucceed() throws Exception {
-    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
-    gen.initialize(Curve.P_256.toECParameterSpec());
-    KeyPair keyPair = gen.generateKeyPair();
-    ECKey jwk = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
+    ECKey jwk = createJWK();
 
     SignedJWT jwt = service.createWalletUnitAttestationV2(jwk.toString(), "nonce");
 
@@ -109,10 +102,7 @@ class WalletUnitAttestationServiceTest {
 
   @Test
   void assertThatCreateWalletUnitAttestation_hasX5cHeader() throws Exception {
-    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
-    gen.initialize(Curve.P_256.toECParameterSpec());
-    KeyPair keyPair = gen.generateKeyPair();
-    ECKey jwk = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
+    ECKey jwk = createJWK();
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString());
 
@@ -122,10 +112,7 @@ class WalletUnitAttestationServiceTest {
 
   @Test
   void assertThatCreateWalletUnitAttestationV2_hasX5cHeader() throws Exception {
-    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
-    gen.initialize(Curve.P_256.toECParameterSpec());
-    KeyPair keyPair = gen.generateKeyPair();
-    ECKey jwk = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
+    ECKey jwk = createJWK();
 
     SignedJWT jwt = service.createWalletUnitAttestationV2(jwk.toString(), "nonce");
 
@@ -139,7 +126,29 @@ class WalletUnitAttestationServiceTest {
         () -> service.createWalletUnitAttestation(null));
   }
 
+  @Test
+  void assertThatV2_containsNonceButNotKid() throws Exception {
+    ECKey jwk = createJWK();
+
+    SignedJWT jwtV1 = service.createWalletUnitAttestation(jwk.toJSONString());
+    SignedJWT jwtV2 = service.createWalletUnitAttestationV2(jwk.toString(), "");
+
+    assertFalse(jwtV1.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
+    assertTrue(jwtV2.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
+
+    assertTrue(jwtV1.getHeader().toJSONObject().containsKey("kid"));
+    assertFalse(jwtV2.getHeader().toJSONObject().containsKey("kid"));
+  }
+
   private void verifyJwtSignature(SignedJWT jwt, ECPublicKey publicKey) throws JOSEException {
     assertTrue(jwt.verify(new ECDSAVerifier(publicKey)));
+  }
+
+  private ECKey createJWK() throws Exception {
+    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
+    gen.initialize(Curve.P_256.toECParameterSpec());
+    KeyPair keyPair = gen.generateKeyPair();
+
+    return new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
   }
 }
