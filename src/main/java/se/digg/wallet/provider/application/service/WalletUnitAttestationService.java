@@ -137,7 +137,8 @@ public class WalletUnitAttestationService {
 
     JWSHeader header =
         new JWSHeader.Builder(JWSAlgorithm.ES256)
-            .type(new JOSEObjectType("key-attestation+jwt")) // REQUIRED, MUST be key-attestation+jwt
+            // REQUIRED, MUST be key-attestation+jwt
+            .type(new JOSEObjectType("key-attestation+jwt"))
             .x509CertChain(x5c)
             .build();
 
