@@ -99,9 +99,68 @@ public class WalletUnitAttestationService {
     return signedJwt;
   }
 
+
+  private SignedJWT createWalletUnitAttestationV2Unsafely(String walletPublicKeyJwk, String nonce)
+      throws ParseException, JsonProcessingException, JOSEException {
+    ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
+    List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
+
+    ECPrivateKey signingKey = keystoreProperties.getSigningKey();
+    List<X509Certificate> certificateChain = keystoreProperties.getCertificateChain();
+    String issuer = keystoreProperties.issuer();
+    Duration validity = Duration.ofHours(keystoreProperties.validityHours());
+
+    Instant now = Instant.now();
+
+    var claimsSet =
+        new JWTClaimsSet.Builder()
+            .issuer(issuer)
+            .issueTime(Date.from(now))
+            .expirationTime(Date.from(now.plus(validity)))
+            .claim("eudi_wallet_info", getEudiWalletInfo())
+            .claim("status", getStatus())
+            .claim("attested_keys", attestedKeys)
+            .claim("nonce", nonce)
+            .build();
+
+    List<Base64> x5c =
+        certificateChain.stream()
+            .map(
+                c -> {
+                  try {
+                    return Base64.encode(c.getEncoded());
+                  } catch (CertificateEncodingException e) {
+                    throw new WalletRuntimeException(e);
+                  }
+                })
+            .toList();
+
+    JWSHeader header =
+        new JWSHeader.Builder(JWSAlgorithm.ES256)
+            // REQUIRED, MUST be key-attestation+jwt
+            .type(new JOSEObjectType("key-attestation+jwt"))
+            .x509CertChain(x5c)
+            .build();
+
+    SignedJWT signedJwt = new SignedJWT(header, claimsSet);
+
+    JWSSigner signer = new ECDSASigner(signingKey);
+    signedJwt.sign(signer);
+
+    return signedJwt;
+  }
+
   public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk) {
     try {
       return createWalletUnitAttestationUnsafely(walletPublicKeyJwk);
+    } catch (ParseException | JsonProcessingException | JOSEException e) {
+      throw new WalletRuntimeException("Could not create attestation.", e);
+    }
+  }
+
+  public SignedJWT createWalletUnitAttestationV2(String walletPublicKeyJwk, String nonce) {
+    try {
+      return createWalletUnitAttestationV2Unsafely(walletPublicKeyJwk, nonce);
     } catch (ParseException | JsonProcessingException | JOSEException e) {
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
