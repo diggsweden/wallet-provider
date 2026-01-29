@@ -5,12 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Changed
-
-- Merge pull request #32 from diggsweden/feat/wua-v2-oid4vci-1.0-second-try
-
 ## [0.0.3] - 2026-01-29
 
 ### Added
@@ -21,12 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Merge pull request #32 from diggsweden/feat/wua-v2-oid4vci-1.0-second-try
 - Update dependency org.assertj:assertj-core to v3.27.7 [security] (#34)
 
 ### Fixed
 
 - Move comment to avoid warning
 - Handle exceptions to avoid spotbugs errors
+
 
 ## [0.0.2] - 2026-01-18
 
@@ -111,7 +107,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
-[unreleased]: https://github.com/diggsweden/wallet-provider/compare/v0.0.3..HEAD
 [0.0.3]: https://github.com/diggsweden/wallet-provider/compare/v0.0.2..v0.0.3
 [0.0.2]: https://github.com/diggsweden/wallet-provider/compare/v0.0.1..v0.0.2
 
