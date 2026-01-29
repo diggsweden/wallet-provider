@@ -72,12 +72,24 @@ class WalletUnitAttestationServiceTest {
   @SuppressWarnings("unchecked")
   @Test
   void assertThatCreateWalletUnitAttestation_givenValidJwk_shouldSucceed() throws Exception {
-    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
-    gen.initialize(Curve.P_256.toECParameterSpec());
-    KeyPair keyPair = gen.generateKeyPair();
-    ECKey jwk = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
-
+    ECKey jwk = createJWK();
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString());
+
+    assertNotNull(jwt);
+    assertEquals("Digg", jwt.getJWTClaimsSet().getIssuer());
+
+    verifyAttestedKeysClaim(jwt, jwk);
+    verifyEudiWalletInfoClaim(jwt);
+    verifyStatusClaim(jwt);
+    verifyJwtSignature(jwt, keystoreProperties.getPublicKey());
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  void assertThatCreateWalletUnitAttestationV2_givenValidJwk_shouldSucceed() throws Exception {
+    ECKey jwk = createJWK();
+
+    SignedJWT jwt = service.createWalletUnitAttestationV2(jwk.toString(), "nonce");
 
     assertNotNull(jwt);
     assertEquals("Digg", jwt.getJWTClaimsSet().getIssuer());
@@ -90,12 +102,19 @@ class WalletUnitAttestationServiceTest {
 
   @Test
   void assertThatCreateWalletUnitAttestation_hasX5cHeader() throws Exception {
-    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
-    gen.initialize(Curve.P_256.toECParameterSpec());
-    KeyPair keyPair = gen.generateKeyPair();
-    ECKey jwk = new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
+    ECKey jwk = createJWK();
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString());
+
+    assertNotNull(jwt.getHeader().getX509CertChain());
+    assertFalse(jwt.getHeader().getX509CertChain().isEmpty());
+  }
+
+  @Test
+  void assertThatCreateWalletUnitAttestationV2_hasX5cHeader() throws Exception {
+    ECKey jwk = createJWK();
+
+    SignedJWT jwt = service.createWalletUnitAttestationV2(jwk.toString(), "nonce");
 
     assertNotNull(jwt.getHeader().getX509CertChain());
     assertFalse(jwt.getHeader().getX509CertChain().isEmpty());
@@ -107,7 +126,28 @@ class WalletUnitAttestationServiceTest {
         () -> service.createWalletUnitAttestation(null));
   }
 
+  @Test
+  void assertThatV2_containsNonceButNotKid() throws Exception {
+    ECKey jwk = createJWK();
+
+    SignedJWT jwtV2 = service.createWalletUnitAttestationV2(jwk.toString(), "");
+
+    assertEquals("key-attestation+jwt", jwtV2.getHeader().getType().getType());
+
+    assertFalse(jwtV2.getHeader().toJSONObject().containsKey("kid"));
+
+    assertTrue(jwtV2.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
+  }
+
   private void verifyJwtSignature(SignedJWT jwt, ECPublicKey publicKey) throws JOSEException {
     assertTrue(jwt.verify(new ECDSAVerifier(publicKey)));
+  }
+
+  private ECKey createJWK() throws Exception {
+    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
+    gen.initialize(Curve.P_256.toECParameterSpec());
+    KeyPair keyPair = gen.generateKeyPair();
+
+    return new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
   }
 }
