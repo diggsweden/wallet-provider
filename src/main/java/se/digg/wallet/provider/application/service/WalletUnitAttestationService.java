@@ -43,6 +43,7 @@ public class WalletUnitAttestationService {
     this.objectMapper = objectMapper.copy();
   }
 
+  @Deprecated(since = "0.0.3", forRemoval = true)
   private SignedJWT createWalletUnitAttestationUnsafely(String walletPublicKeyJwk)
       throws ParseException,
       JsonProcessingException, JOSEException {
@@ -150,6 +151,7 @@ public class WalletUnitAttestationService {
     return signedJwt;
   }
 
+  @Deprecated(since = "0.0.3", forRemoval = true)
   public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk) {
     try {
       return createWalletUnitAttestationUnsafely(walletPublicKeyJwk);

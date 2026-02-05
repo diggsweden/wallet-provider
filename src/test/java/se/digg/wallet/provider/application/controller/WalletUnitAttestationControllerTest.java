@@ -5,6 +5,7 @@
 package se.digg.wallet.provider.application.controller;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -33,6 +34,11 @@ class WalletUnitAttestationControllerTest {
   @MockitoBean
   private WalletUnitAttestationService service;
 
+
+  private static final String WUA_URL = "/wallet-unit-attestation";
+  private static final String WUA_V2_URL = "/wallet-unit-attestation/v2";
+
+  @Deprecated(forRemoval = true)
   @Test
   void assertThatPostWalletUnitAttestation_givenWalletIdAndValidPublicKey_shouldReturnOk()
       throws Exception {
@@ -53,7 +59,7 @@ class WalletUnitAttestationControllerTest {
 
     mockMvc
         .perform(
-            post("/wallet-unit-attestation")
+            post(WUA_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
@@ -61,7 +67,7 @@ class WalletUnitAttestationControllerTest {
   }
 
   @Test
-  void assertThatPostWalletUnitAttestationV2_givenWalletIdAndValidPublicKey_shouldReturnOk()
+  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndNonce_shouldReturnOk()
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createWalletUnitAttestationV2(anyString(), anyString()))
@@ -83,13 +89,72 @@ class WalletUnitAttestationControllerTest {
 
     mockMvc
         .perform(
-            post("/wallet-unit-attestation/v2")
+            post(WUA_V2_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
         .andExpect(content().string(expectedJwt));
   }
 
+  @Test
+  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndEmptyNonce_shouldReturnOk()
+          throws Exception {
+    String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
+    when(service.createWalletUnitAttestationV2(anyString(), anyString()))
+            .thenReturn(SignedJWT.parse(expectedJwt));
+
+    String jwk =
+            """
+                {
+                    "kty": "EC",
+                    "use": "sig",
+                    "crv": "P-256",
+                    "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
+                    "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
+                }
+                """;
+    String nonce = "";
+    WalletUnitAttestationDtoV2 input =
+            new WalletUnitAttestationDtoV2(UUID.randomUUID(), jwk, nonce);
+
+    mockMvc
+            .perform(
+                    post(WUA_V2_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(asJson(input)))
+            .andExpect(status().isOk())
+            .andExpect(content().string(expectedJwt));
+  }
+
+  @Test
+  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndNullNonce_shouldReturnOk()
+          throws Exception {
+    String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
+    when(service.createWalletUnitAttestationV2(anyString(), eq(null)))
+            .thenReturn(SignedJWT.parse(expectedJwt));
+
+    String jwk =
+            """
+                {
+                    "kty": "EC",
+                    "use": "sig",
+                    "crv": "P-256",
+                    "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
+                    "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
+                }
+                """;
+
+    WalletUnitAttestationDtoV2 input =
+            new WalletUnitAttestationDtoV2(UUID.randomUUID(), jwk, null);
+
+    mockMvc
+            .perform(
+                    post(WUA_V2_URL)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(asJson(input)))
+            .andExpect(status().isOk())
+            .andExpect(content().string(expectedJwt));
+  }
 
   private String asJson(Object input) throws JsonProcessingException {
     ObjectWriter objectWriter = mapper.writer().withDefaultPrettyPrinter();

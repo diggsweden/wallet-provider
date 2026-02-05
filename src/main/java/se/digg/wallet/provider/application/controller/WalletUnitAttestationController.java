@@ -24,6 +24,7 @@ public class WalletUnitAttestationController {
     this.attestationService = attestationService;
   }
 
+  @Deprecated(since = "0.0.3", forRemoval = true)
   @PostMapping
   public ResponseEntity<String> postWalletUnitAttestation(
       @RequestBody WalletUnitAttestationDto walletUnitAttestationDto) {
