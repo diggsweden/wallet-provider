@@ -70,6 +70,7 @@ class WalletUnitAttestationServiceTest {
   }
 
   @SuppressWarnings("unchecked")
+  @Deprecated(forRemoval = true)
   @Test
   void assertThatCreateWalletUnitAttestation_givenValidJwk_shouldSucceed() throws Exception {
     ECKey jwk = createJWK();
@@ -100,6 +101,7 @@ class WalletUnitAttestationServiceTest {
     verifyJwtSignature(jwt, keystoreProperties.getPublicKey());
   }
 
+  @Deprecated(forRemoval = true)
   @Test
   void assertThatCreateWalletUnitAttestation_hasX5cHeader() throws Exception {
     ECKey jwk = createJWK();
@@ -120,6 +122,7 @@ class WalletUnitAttestationServiceTest {
     assertFalse(jwt.getHeader().getX509CertChain().isEmpty());
   }
 
+  @Deprecated(forRemoval = true)
   @Test
   void assertThatCreateWalletUnitAttestation_givenNullKey_shouldThrowException() {
     assertThrowsExactly(WalletRuntimeException.class,
@@ -130,13 +133,34 @@ class WalletUnitAttestationServiceTest {
   void assertThatV2_containsNonceButNotKid() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwtV2 = service.createWalletUnitAttestationV2(jwk.toString(), "");
+    SignedJWT jwtV2 = service.createWalletUnitAttestationV2(jwk.toString(), "nonce");
 
     assertEquals("key-attestation+jwt", jwtV2.getHeader().getType().getType());
 
     assertFalse(jwtV2.getHeader().toJSONObject().containsKey("kid"));
 
     assertTrue(jwtV2.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
+  }
+
+  @Test
+  void assertThatV2_handlesEmptyNonce() throws Exception {
+    ECKey jwk = createJWK();
+
+    SignedJWT jwtV2 = service.createWalletUnitAttestationV2(jwk.toString(), "");
+
+    assertEquals(7, jwtV2.getJWTClaimsSet().toJSONObject().size());
+    assertTrue(jwtV2.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
+    assertEquals("", jwtV2.getJWTClaimsSet().toJSONObject().get("nonce"));
+  }
+
+  @Test
+  void assertThatV2_handlesNullNonce() throws Exception {
+    ECKey jwk = createJWK();
+
+    SignedJWT jwtV2 = service.createWalletUnitAttestationV2(jwk.toString(), null);
+
+    assertEquals(6, jwtV2.getJWTClaimsSet().toJSONObject().size());
+    assertFalse(jwtV2.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
   }
 
   private void verifyJwtSignature(SignedJWT jwt, ECPublicKey publicKey) throws JOSEException {
