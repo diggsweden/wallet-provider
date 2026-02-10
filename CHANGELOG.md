@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.5] - 2026-02-10
+
+### Changed
+
+- Merge pull request #24 from diggsweden/renovate/actions-checkout-6.x
+- Update actions/checkout action to v6
+- Merge pull request #21 from diggsweden/renovate/actions-setup-java-5.x
+- Update actions/setup-java action to v5
+- Merge pull request #17 from diggsweden/renovate/cgr.dev-chainguard-jre-latest
+- Update cgr.dev/chainguard/jre:latest docker digest to 867928b
+- Merge pull request #14 from diggsweden/renovate/pin-dependencies
+- Pin docker.io/library/eclipse-temurin docker tag to c98f0d2
+
 ## [0.0.4] - 2026-02-05
 
 ### Added
@@ -14,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Merge pull request #35 from diggsweden/fix/handle-empty-or-missing-nonce
+
 
 ## [0.0.3] - 2026-01-29
 
@@ -117,6 +131,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.0.5]: https://github.com/diggsweden/wallet-provider/compare/v0.0.4..v0.0.5
 [0.0.4]: https://github.com/diggsweden/wallet-provider/compare/v0.0.3..v0.0.4
 [0.0.3]: https://github.com/diggsweden/wallet-provider/compare/v0.0.2..v0.0.3
 [0.0.2]: https://github.com/diggsweden/wallet-provider/compare/v0.0.1..v0.0.2
