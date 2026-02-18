@@ -98,62 +98,62 @@ class WalletUnitAttestationControllerTest {
 
   @Test
   void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndEmptyNonce_shouldReturnOk()
-          throws Exception {
+      throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createWalletUnitAttestationV2(anyString(), anyString()))
-            .thenReturn(SignedJWT.parse(expectedJwt));
+        .thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
-            """
-                {
-                    "kty": "EC",
-                    "use": "sig",
-                    "crv": "P-256",
-                    "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
-                    "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
-                }
-                """;
+        """
+            {
+                "kty": "EC",
+                "use": "sig",
+                "crv": "P-256",
+                "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
+                "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
+            }
+            """;
     String nonce = "";
     WalletUnitAttestationDtoV2 input =
-            new WalletUnitAttestationDtoV2(UUID.randomUUID(), jwk, nonce);
+        new WalletUnitAttestationDtoV2(UUID.randomUUID(), jwk, nonce);
 
     mockMvc
-            .perform(
-                    post(WUA_V2_URL)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJson(input)))
-            .andExpect(status().isOk())
-            .andExpect(content().string(expectedJwt));
+        .perform(
+            post(WUA_V2_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJson(input)))
+        .andExpect(status().isOk())
+        .andExpect(content().string(expectedJwt));
   }
 
   @Test
   void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndNullNonce_shouldReturnOk()
-          throws Exception {
+      throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createWalletUnitAttestationV2(anyString(), eq(null)))
-            .thenReturn(SignedJWT.parse(expectedJwt));
+        .thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
-            """
-                {
-                    "kty": "EC",
-                    "use": "sig",
-                    "crv": "P-256",
-                    "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
-                    "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
-                }
-                """;
+        """
+            {
+                "kty": "EC",
+                "use": "sig",
+                "crv": "P-256",
+                "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
+                "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
+            }
+            """;
 
     WalletUnitAttestationDtoV2 input =
-            new WalletUnitAttestationDtoV2(UUID.randomUUID(), jwk, null);
+        new WalletUnitAttestationDtoV2(UUID.randomUUID(), jwk, null);
 
     mockMvc
-            .perform(
-                    post(WUA_V2_URL)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJson(input)))
-            .andExpect(status().isOk())
-            .andExpect(content().string(expectedJwt));
+        .perform(
+            post(WUA_V2_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJson(input)))
+        .andExpect(status().isOk())
+        .andExpect(content().string(expectedJwt));
   }
 
   private String asJson(Object input) throws JsonProcessingException {
