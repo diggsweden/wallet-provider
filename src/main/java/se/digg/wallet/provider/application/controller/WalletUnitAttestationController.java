@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import se.digg.wallet.provider.application.model.WalletUnitAttestationDto;
 import se.digg.wallet.provider.application.model.WalletUnitAttestationDtoV2;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 
@@ -22,15 +21,6 @@ public class WalletUnitAttestationController {
 
   public WalletUnitAttestationController(WalletUnitAttestationService attestationService) {
     this.attestationService = attestationService;
-  }
-
-  @Deprecated(since = "0.0.3", forRemoval = true)
-  @PostMapping
-  public ResponseEntity<String> postWalletUnitAttestation(
-      @RequestBody WalletUnitAttestationDto walletUnitAttestationDto) {
-    SignedJWT signedJwt =
-        attestationService.createWalletUnitAttestation(walletUnitAttestationDto.jwk());
-    return ResponseEntity.ok(signedJwt.serialize());
   }
 
   @PostMapping("/v2")

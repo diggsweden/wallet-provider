@@ -7,7 +7,6 @@ package se.digg.wallet.provider.application.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.nimbusds.jose.JOSEException;
@@ -24,7 +23,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import se.digg.wallet.provider.application.config.WalletRuntimeException;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
 
 @SpringBootTest
@@ -70,22 +68,6 @@ class WalletUnitAttestationServiceTest {
   }
 
   @SuppressWarnings("unchecked")
-  @Deprecated(forRemoval = true)
-  @Test
-  void assertThatCreateWalletUnitAttestation_givenValidJwk_shouldSucceed() throws Exception {
-    ECKey jwk = createJWK();
-    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString());
-
-    assertNotNull(jwt);
-    assertEquals("Digg", jwt.getJWTClaimsSet().getIssuer());
-
-    verifyAttestedKeysClaim(jwt, jwk);
-    verifyEudiWalletInfoClaim(jwt);
-    verifyStatusClaim(jwt);
-    verifyJwtSignature(jwt, keystoreProperties.getPublicKey());
-  }
-
-  @SuppressWarnings("unchecked")
   @Test
   void assertThatCreateWalletUnitAttestationV2_givenValidJwk_shouldSucceed() throws Exception {
     ECKey jwk = createJWK();
@@ -101,17 +83,6 @@ class WalletUnitAttestationServiceTest {
     verifyJwtSignature(jwt, keystoreProperties.getPublicKey());
   }
 
-  @Deprecated(forRemoval = true)
-  @Test
-  void assertThatCreateWalletUnitAttestation_hasX5cHeader() throws Exception {
-    ECKey jwk = createJWK();
-
-    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString());
-
-    assertNotNull(jwt.getHeader().getX509CertChain());
-    assertFalse(jwt.getHeader().getX509CertChain().isEmpty());
-  }
-
   @Test
   void assertThatCreateWalletUnitAttestationV2_hasX5cHeader() throws Exception {
     ECKey jwk = createJWK();
@@ -120,13 +91,6 @@ class WalletUnitAttestationServiceTest {
 
     assertNotNull(jwt.getHeader().getX509CertChain());
     assertFalse(jwt.getHeader().getX509CertChain().isEmpty());
-  }
-
-  @Deprecated(forRemoval = true)
-  @Test
-  void assertThatCreateWalletUnitAttestation_givenNullKey_shouldThrowException() {
-    assertThrowsExactly(WalletRuntimeException.class,
-        () -> service.createWalletUnitAttestation(null));
   }
 
   @Test

@@ -21,7 +21,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import se.digg.wallet.provider.application.model.WalletUnitAttestationDto;
 import se.digg.wallet.provider.application.model.WalletUnitAttestationDtoV2;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 
@@ -35,36 +34,7 @@ class WalletUnitAttestationControllerTest {
   private WalletUnitAttestationService service;
 
 
-  private static final String WUA_URL = "/wallet-unit-attestation";
   private static final String WUA_V2_URL = "/wallet-unit-attestation/v2";
-
-  @Deprecated(forRemoval = true)
-  @Test
-  void assertThatPostWalletUnitAttestation_givenWalletIdAndValidPublicKey_shouldReturnOk()
-      throws Exception {
-    String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
-    when(service.createWalletUnitAttestation(anyString())).thenReturn(SignedJWT.parse(expectedJwt));
-
-    String jwk =
-        """
-            {
-                "kty": "EC",
-                "use": "sig",
-                "crv": "P-256",
-                "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
-                "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
-            }
-            """;
-    WalletUnitAttestationDto input = new WalletUnitAttestationDto(UUID.randomUUID(), jwk);
-
-    mockMvc
-        .perform(
-            post(WUA_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJson(input)))
-        .andExpect(status().isOk())
-        .andExpect(content().string(expectedJwt));
-  }
 
   @Test
   void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndNonce_shouldReturnOk()
