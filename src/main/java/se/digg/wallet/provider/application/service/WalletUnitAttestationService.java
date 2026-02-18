@@ -42,7 +42,7 @@ public class WalletUnitAttestationService {
     this.objectMapper = objectMapper.copy();
   }
 
-  private SignedJWT createWalletUnitAttestationV2Unsafely(String walletPublicKeyJwk, String nonce)
+  private SignedJWT createWalletUnitAttestationUnsafely(String walletPublicKeyJwk, String nonce)
       throws ParseException, JsonProcessingException, JOSEException {
     ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
     List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
@@ -92,9 +92,9 @@ public class WalletUnitAttestationService {
     return signedJwt;
   }
 
-  public SignedJWT createWalletUnitAttestationV2(String walletPublicKeyJwk, String nonce) {
+  public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk, String nonce) {
     try {
-      return createWalletUnitAttestationV2Unsafely(walletPublicKeyJwk, nonce);
+      return createWalletUnitAttestationUnsafely(walletPublicKeyJwk, nonce);
     } catch (ParseException | JsonProcessingException | JOSEException e) {
       throw new WalletRuntimeException("Could not create attestation.", e);
     }

@@ -69,10 +69,10 @@ class WalletUnitAttestationServiceTest {
 
   @SuppressWarnings("unchecked")
   @Test
-  void assertThatCreateWalletUnitAttestationV2_givenValidJwk_shouldSucceed() throws Exception {
+  void assertThatCreateWalletUnitAttestation_givenValidJwk_shouldSucceed() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwt = service.createWalletUnitAttestationV2(jwk.toString(), "nonce");
+    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
 
     assertNotNull(jwt);
     assertEquals("Digg", jwt.getJWTClaimsSet().getIssuer());
@@ -84,47 +84,47 @@ class WalletUnitAttestationServiceTest {
   }
 
   @Test
-  void assertThatCreateWalletUnitAttestationV2_hasX5cHeader() throws Exception {
+  void assertThatCreateWalletUnitAttestation_hasX5CHeader() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwt = service.createWalletUnitAttestationV2(jwk.toString(), "nonce");
+    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
 
     assertNotNull(jwt.getHeader().getX509CertChain());
     assertFalse(jwt.getHeader().getX509CertChain().isEmpty());
   }
 
   @Test
-  void assertThatV2_containsNonceButNotKid() throws Exception {
+  void assertThatCreateWalletUnitAttestation_containsNonceButNotKid() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwtV2 = service.createWalletUnitAttestationV2(jwk.toString(), "nonce");
+    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
 
-    assertEquals("key-attestation+jwt", jwtV2.getHeader().getType().getType());
+    assertEquals("key-attestation+jwt", jwt.getHeader().getType().getType());
 
-    assertFalse(jwtV2.getHeader().toJSONObject().containsKey("kid"));
+    assertFalse(jwt.getHeader().toJSONObject().containsKey("kid"));
 
-    assertTrue(jwtV2.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
+    assertTrue(jwt.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
   }
 
   @Test
-  void assertThatV2_handlesEmptyNonce() throws Exception {
+  void assertThatCreateWalletUnitAttestation_handlesEmptyNonce() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwtV2 = service.createWalletUnitAttestationV2(jwk.toString(), "");
+    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "");
 
-    assertEquals(7, jwtV2.getJWTClaimsSet().toJSONObject().size());
-    assertTrue(jwtV2.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
-    assertEquals("", jwtV2.getJWTClaimsSet().toJSONObject().get("nonce"));
+    assertEquals(7, jwt.getJWTClaimsSet().toJSONObject().size());
+    assertTrue(jwt.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
+    assertEquals("", jwt.getJWTClaimsSet().toJSONObject().get("nonce"));
   }
 
   @Test
-  void assertThatV2_handlesNullNonce() throws Exception {
+  void assertThatCreateWalletUnitAttestation_handlesNullNonce() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwtV2 = service.createWalletUnitAttestationV2(jwk.toString(), null);
+    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), null);
 
-    assertEquals(6, jwtV2.getJWTClaimsSet().toJSONObject().size());
-    assertFalse(jwtV2.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
+    assertEquals(6, jwt.getJWTClaimsSet().toJSONObject().size());
+    assertFalse(jwt.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
   }
 
   private void verifyJwtSignature(SignedJWT jwt, ECPublicKey publicKey) throws JOSEException {

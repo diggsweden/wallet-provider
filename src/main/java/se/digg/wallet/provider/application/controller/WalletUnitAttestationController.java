@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import se.digg.wallet.provider.application.model.WalletUnitAttestationDtoV2;
+import se.digg.wallet.provider.application.model.WalletUnitAttestationDto;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 
 @RequestMapping("/wallet-unit-attestation")
@@ -24,10 +24,10 @@ public class WalletUnitAttestationController {
   }
 
   @PostMapping({"", "/v2"})
-  public ResponseEntity<String> postWalletUnitAttestationV2(
-      @RequestBody WalletUnitAttestationDtoV2 walletUnitAttestationDto) {
+  public ResponseEntity<String> postWalletUnitAttestation(
+      @RequestBody WalletUnitAttestationDto walletUnitAttestationDto) {
     SignedJWT signedJwt =
-        attestationService.createWalletUnitAttestationV2(walletUnitAttestationDto.jwk(),
+        attestationService.createWalletUnitAttestation(walletUnitAttestationDto.jwk(),
             walletUnitAttestationDto.nonce());
     return ResponseEntity.ok(signedJwt.serialize());
   }

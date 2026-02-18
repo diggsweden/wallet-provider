@@ -24,7 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import se.digg.wallet.provider.application.model.WalletUnitAttestationDtoV2;
+import se.digg.wallet.provider.application.model.WalletUnitAttestationDto;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 
 @WebMvcTest(WalletUnitAttestationController.class)
@@ -42,10 +42,10 @@ class WalletUnitAttestationControllerTest {
 
   @ParameterizedTest
   @FieldSource("PATHS")
-  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndNonce_shouldReturnOk(String path)
+  void assertThatPostWalletUnitAttestation_givenPublicKeyAndNonce_shouldReturnOk(String path)
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
-    when(service.createWalletUnitAttestationV2(anyString(), anyString()))
+    when(service.createWalletUnitAttestation(anyString(), anyString()))
         .thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
@@ -59,8 +59,8 @@ class WalletUnitAttestationControllerTest {
             }
             """;
     String nonce = "123123123123";
-    WalletUnitAttestationDtoV2 input =
-        new WalletUnitAttestationDtoV2(UUID.randomUUID(), jwk, nonce);
+    WalletUnitAttestationDto input =
+        new WalletUnitAttestationDto(UUID.randomUUID(), jwk, nonce);
 
     mockMvc
         .perform(
@@ -73,10 +73,10 @@ class WalletUnitAttestationControllerTest {
 
   @ParameterizedTest
   @FieldSource("PATHS")
-  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndEmptyNonce_shouldReturnOk(String path)
+  void assertThatPostWalletUnitAttestation_givenPublicKeyAndEmptyNonce_shouldReturnOk(String path)
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
-    when(service.createWalletUnitAttestationV2(anyString(), anyString()))
+    when(service.createWalletUnitAttestation(anyString(), anyString()))
         .thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
@@ -90,8 +90,8 @@ class WalletUnitAttestationControllerTest {
             }
             """;
     String nonce = "";
-    WalletUnitAttestationDtoV2 input =
-        new WalletUnitAttestationDtoV2(UUID.randomUUID(), jwk, nonce);
+    WalletUnitAttestationDto input =
+        new WalletUnitAttestationDto(UUID.randomUUID(), jwk, nonce);
 
     mockMvc
         .perform(
@@ -104,10 +104,10 @@ class WalletUnitAttestationControllerTest {
 
   @ParameterizedTest
   @FieldSource("PATHS")
-  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndNullNonce_shouldReturnOk(String path)
+  void assertThatPostWalletUnitAttestation_givenPublicKeyAndNullNonce_shouldReturnOk(String path)
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
-    when(service.createWalletUnitAttestationV2(anyString(), eq(null)))
+    when(service.createWalletUnitAttestation(anyString(), eq(null)))
         .thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
@@ -121,8 +121,8 @@ class WalletUnitAttestationControllerTest {
             }
             """;
 
-    WalletUnitAttestationDtoV2 input =
-        new WalletUnitAttestationDtoV2(UUID.randomUUID(), jwk, null);
+    WalletUnitAttestationDto input =
+        new WalletUnitAttestationDto(UUID.randomUUID(), jwk, null);
 
     mockMvc
         .perform(
