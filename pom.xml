@@ -145,10 +145,11 @@ SPDX-License-Identifier: EUPL-1.2
         </configuration>
         <executions>
           <execution>
+            <id>validate</id>
+            <phase>validate</phase>
             <goals>
-              <goal>format</goal>
+              <goal>validate</goal>
             </goals>
-            <phase>verify</phase>
           </execution>
         </executions>
       </plugin>
