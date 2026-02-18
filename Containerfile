@@ -26,7 +26,7 @@ RUN chmod +x ./mvnw && \
 COPY src ./src
 
 # Build the application (skip checkstyle in Docker build)
-RUN ./mvnw clean package -DskipTests -Dcheckstyle.skip=true -Dformatter.skip -B && \
+RUN ./mvnw clean package -DskipTests -Dcheckstyle.skip -Dformatter.skip -B && \
     java -Djarmode=layertools -jar target/*.jar extract
 
 # Stage 2: Runtime stage
