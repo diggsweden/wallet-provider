@@ -23,7 +23,7 @@ public class WalletUnitAttestationController {
     this.attestationService = attestationService;
   }
 
-  @PostMapping("/v2")
+  @PostMapping({"", "/v2"})
   public ResponseEntity<String> postWalletUnitAttestationV2(
       @RequestBody WalletUnitAttestationDtoV2 walletUnitAttestationDto) {
     SignedJWT signedJwt =

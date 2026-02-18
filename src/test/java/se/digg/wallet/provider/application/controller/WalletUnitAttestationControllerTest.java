@@ -10,12 +10,15 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.nimbusds.jwt.SignedJWT;
+import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.FieldSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -33,11 +36,13 @@ class WalletUnitAttestationControllerTest {
   @MockitoBean
   private WalletUnitAttestationService service;
 
+  private static final List<String> PATHS = List.of(
+      "/wallet-unit-attestation/v2",
+      "/wallet-unit-attestation");
 
-  private static final String WUA_V2_URL = "/wallet-unit-attestation/v2";
-
-  @Test
-  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndNonce_shouldReturnOk()
+  @ParameterizedTest
+  @FieldSource("PATHS")
+  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndNonce_shouldReturnOk(String path)
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createWalletUnitAttestationV2(anyString(), anyString()))
@@ -59,15 +64,16 @@ class WalletUnitAttestationControllerTest {
 
     mockMvc
         .perform(
-            post(WUA_V2_URL)
+            post(path)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
         .andExpect(content().string(expectedJwt));
   }
 
-  @Test
-  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndEmptyNonce_shouldReturnOk()
+  @ParameterizedTest
+  @FieldSource("PATHS")
+  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndEmptyNonce_shouldReturnOk(String path)
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createWalletUnitAttestationV2(anyString(), anyString()))
@@ -89,15 +95,16 @@ class WalletUnitAttestationControllerTest {
 
     mockMvc
         .perform(
-            post(WUA_V2_URL)
+            post(path)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
         .andExpect(content().string(expectedJwt));
   }
 
-  @Test
-  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndNullNonce_shouldReturnOk()
+  @ParameterizedTest
+  @FieldSource("PATHS")
+  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndNullNonce_shouldReturnOk(String path)
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createWalletUnitAttestationV2(anyString(), eq(null)))
@@ -119,7 +126,7 @@ class WalletUnitAttestationControllerTest {
 
     mockMvc
         .perform(
-            post(WUA_V2_URL)
+            post(path)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
