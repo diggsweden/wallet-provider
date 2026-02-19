@@ -6,6 +6,5 @@ package se.digg.wallet.provider.application.model;
 
 import java.util.UUID;
 
-@Deprecated(since = "0.0.3", forRemoval = true)
-public record WalletUnitAttestationDto(UUID walletId, String jwk) {
+public record WalletUnitAttestationDto(UUID walletId, String jwk, String nonce) {
 }

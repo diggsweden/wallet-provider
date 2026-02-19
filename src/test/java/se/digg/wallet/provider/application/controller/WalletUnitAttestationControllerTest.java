@@ -10,19 +10,21 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.nimbusds.jwt.SignedJWT;
+import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.FieldSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import se.digg.wallet.provider.application.model.WalletUnitAttestationDto;
-import se.digg.wallet.provider.application.model.WalletUnitAttestationDtoV2;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 
 @WebMvcTest(WalletUnitAttestationController.class)
@@ -34,43 +36,16 @@ class WalletUnitAttestationControllerTest {
   @MockitoBean
   private WalletUnitAttestationService service;
 
+  private static final List<String> PATHS = List.of(
+      "/wallet-unit-attestation/v2",
+      "/wallet-unit-attestation");
 
-  private static final String WUA_URL = "/wallet-unit-attestation";
-  private static final String WUA_V2_URL = "/wallet-unit-attestation/v2";
-
-  @Deprecated(forRemoval = true)
-  @Test
-  void assertThatPostWalletUnitAttestation_givenWalletIdAndValidPublicKey_shouldReturnOk()
+  @ParameterizedTest
+  @FieldSource("PATHS")
+  void assertThatPostWalletUnitAttestation_givenPublicKeyAndNonce_shouldReturnOk(String path)
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
-    when(service.createWalletUnitAttestation(anyString())).thenReturn(SignedJWT.parse(expectedJwt));
-
-    String jwk =
-        """
-            {
-                "kty": "EC",
-                "use": "sig",
-                "crv": "P-256",
-                "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
-                "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
-            }
-            """;
-    WalletUnitAttestationDto input = new WalletUnitAttestationDto(UUID.randomUUID(), jwk);
-
-    mockMvc
-        .perform(
-            post(WUA_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJson(input)))
-        .andExpect(status().isOk())
-        .andExpect(content().string(expectedJwt));
-  }
-
-  @Test
-  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndNonce_shouldReturnOk()
-      throws Exception {
-    String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
-    when(service.createWalletUnitAttestationV2(anyString(), anyString()))
+    when(service.createWalletUnitAttestation(anyString(), anyString()))
         .thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
@@ -84,23 +59,24 @@ class WalletUnitAttestationControllerTest {
             }
             """;
     String nonce = "123123123123";
-    WalletUnitAttestationDtoV2 input =
-        new WalletUnitAttestationDtoV2(UUID.randomUUID(), jwk, nonce);
+    WalletUnitAttestationDto input =
+        new WalletUnitAttestationDto(UUID.randomUUID(), jwk, nonce);
 
     mockMvc
         .perform(
-            post(WUA_V2_URL)
+            post(path)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
         .andExpect(content().string(expectedJwt));
   }
 
-  @Test
-  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndEmptyNonce_shouldReturnOk()
+  @ParameterizedTest
+  @FieldSource("PATHS")
+  void assertThatPostWalletUnitAttestation_givenPublicKeyAndEmptyNonce_shouldReturnOk(String path)
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
-    when(service.createWalletUnitAttestationV2(anyString(), anyString()))
+    when(service.createWalletUnitAttestation(anyString(), anyString()))
         .thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
@@ -114,23 +90,24 @@ class WalletUnitAttestationControllerTest {
             }
             """;
     String nonce = "";
-    WalletUnitAttestationDtoV2 input =
-        new WalletUnitAttestationDtoV2(UUID.randomUUID(), jwk, nonce);
+    WalletUnitAttestationDto input =
+        new WalletUnitAttestationDto(UUID.randomUUID(), jwk, nonce);
 
     mockMvc
         .perform(
-            post(WUA_V2_URL)
+            post(path)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
         .andExpect(content().string(expectedJwt));
   }
 
-  @Test
-  void assertThatPostWalletUnitAttestationV2_givenPublicKeyAndNullNonce_shouldReturnOk()
+  @ParameterizedTest
+  @FieldSource("PATHS")
+  void assertThatPostWalletUnitAttestation_givenPublicKeyAndNullNonce_shouldReturnOk(String path)
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
-    when(service.createWalletUnitAttestationV2(anyString(), eq(null)))
+    when(service.createWalletUnitAttestation(anyString(), eq(null)))
         .thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
@@ -144,12 +121,12 @@ class WalletUnitAttestationControllerTest {
             }
             """;
 
-    WalletUnitAttestationDtoV2 input =
-        new WalletUnitAttestationDtoV2(UUID.randomUUID(), jwk, null);
+    WalletUnitAttestationDto input =
+        new WalletUnitAttestationDto(UUID.randomUUID(), jwk, null);
 
     mockMvc
         .perform(
-            post(WUA_V2_URL)
+            post(path)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
