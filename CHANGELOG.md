@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.6] - 2026-02-19
+
+### Added
+
+- Add versionless endpoint for create WUA endpoint
+- Add missing newline at end of file
+
+### Changed
+
+- Merge pull request #42 from diggsweden/feat/versionless-wua-endpoint
+- Merge pull request #41 from diggsweden/fix/skip-format-validation-in-image-build
+- Merge pull request #40 from diggsweden/test/fail-on-formatting-errors
+- Apply automated formatting
+- Merge pull request #33 from diggsweden/fix/bump-hadolint-to-v2.14.0
+- Update java non-major (#38)
+- Update dependency prettier to v3.8.1 (#37)
+
+### Fixed
+
+- Skip format validation in container image build
+- Verify correct formatting instead of fixing it
+- Bump hadolint to v2.14.0
+
+### Removed
+
+- Remove 'V2' from symbol names
+- Remove unused WUA endpoint
+- Remove unnecessary parameter value
+- Remove duplicate declaration of formatter version
+
 ## [0.0.5] - 2026-02-10
 
 ### Changed
@@ -17,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update cgr.dev/chainguard/jre:latest docker digest to 867928b
 - Merge pull request #14 from diggsweden/renovate/pin-dependencies
 - Pin docker.io/library/eclipse-temurin docker tag to c98f0d2
+
 
 ## [0.0.4] - 2026-02-05
 
@@ -131,6 +162,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.0.6]: https://github.com/diggsweden/wallet-provider/compare/v0.0.5..v0.0.6
 [0.0.5]: https://github.com/diggsweden/wallet-provider/compare/v0.0.4..v0.0.5
 [0.0.4]: https://github.com/diggsweden/wallet-provider/compare/v0.0.3..v0.0.4
 [0.0.3]: https://github.com/diggsweden/wallet-provider/compare/v0.0.2..v0.0.3
