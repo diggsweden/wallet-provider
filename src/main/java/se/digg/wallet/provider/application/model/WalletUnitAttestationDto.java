@@ -4,7 +4,5 @@
 
 package se.digg.wallet.provider.application.model;
 
-import java.util.UUID;
-
-public record WalletUnitAttestationDto(UUID walletId, String jwk, String nonce) {
+public record WalletUnitAttestationDto(String jwk, String nonce) {
 }

@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.nimbusds.jwt.SignedJWT;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +59,7 @@ class WalletUnitAttestationControllerTest {
             """;
     String nonce = "123123123123";
     WalletUnitAttestationDto input =
-        new WalletUnitAttestationDto(UUID.randomUUID(), jwk, nonce);
+        new WalletUnitAttestationDto(jwk, nonce);
 
     mockMvc
         .perform(
@@ -69,6 +68,34 @@ class WalletUnitAttestationControllerTest {
                 .content(asJson(input)))
         .andExpect(status().isOk())
         .andExpect(content().string(expectedJwt));
+  }
+
+  @ParameterizedTest
+  @FieldSource("PATHS")
+  void assertThatPostWalletUnitAttestation_givenIncorrectDatatype_shouldReturnBadRequest(
+      String path)
+      throws Exception {
+
+    String jsonString = """
+        {
+        "jwk":{
+                "kty": "EC",
+                "use": "sig",
+                "crv": "P-256",
+                "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
+                "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
+            },
+        "nonce":"123123123",
+        "walletId":"abc"
+        }
+        """;
+
+    mockMvc
+        .perform(
+            post(path)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonString))
+        .andExpect(status().isBadRequest());
   }
 
   @ParameterizedTest
@@ -91,7 +118,7 @@ class WalletUnitAttestationControllerTest {
             """;
     String nonce = "";
     WalletUnitAttestationDto input =
-        new WalletUnitAttestationDto(UUID.randomUUID(), jwk, nonce);
+        new WalletUnitAttestationDto(jwk, nonce);
 
     mockMvc
         .perform(
@@ -122,7 +149,7 @@ class WalletUnitAttestationControllerTest {
             """;
 
     WalletUnitAttestationDto input =
-        new WalletUnitAttestationDto(UUID.randomUUID(), jwk, null);
+        new WalletUnitAttestationDto(jwk, null);
 
     mockMvc
         .perform(
