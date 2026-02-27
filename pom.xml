@@ -16,7 +16,7 @@ SPDX-License-Identifier: EUPL-1.2
   </parent>
   <groupId>se.digg</groupId>
   <artifactId>wallet-provider</artifactId>
-  <version>0.0.6</version>
+  <version>0.0.7</version>
   <name>wallet-provider</name>
   <description>Backend service for Waller Provider</description>
   <url />
