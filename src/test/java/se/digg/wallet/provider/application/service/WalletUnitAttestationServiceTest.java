@@ -67,7 +67,6 @@ class WalletUnitAttestationServiceTest {
     assertEquals(jwk.getCurve().toString(), attestedKey.get("crv"));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   void assertThatCreateWalletUnitAttestation_givenValidJwk_shouldSucceed() throws Exception {
     ECKey jwk = createJWK();
