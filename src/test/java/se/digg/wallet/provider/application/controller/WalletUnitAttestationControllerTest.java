@@ -16,8 +16,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.nimbusds.jwt.SignedJWT;
 import java.util.List;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.FieldSource;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -34,14 +34,11 @@ class WalletUnitAttestationControllerTest {
   private MockMvc mockMvc;
   @MockitoBean
   private WalletUnitAttestationService service;
+  private static final String PATH = "/wallet-unit-attestation";
 
-  private static final List<String> PATHS = List.of(
-      "/wallet-unit-attestation/v2",
-      "/wallet-unit-attestation");
 
-  @ParameterizedTest
-  @FieldSource("PATHS")
-  void assertThatPostWalletUnitAttestation_givenPublicKeyAndNonce_shouldReturnOk(String path)
+  @Test
+  void assertThatPostWalletUnitAttestation_givenPublicKeyAndNonce_shouldReturnOk()
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createWalletUnitAttestation(anyString(), anyString()))
@@ -63,17 +60,15 @@ class WalletUnitAttestationControllerTest {
 
     mockMvc
         .perform(
-            post(path)
+            post(PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
         .andExpect(content().string(expectedJwt));
   }
 
-  @ParameterizedTest
-  @FieldSource("PATHS")
-  void assertThatPostWalletUnitAttestation_givenIncorrectDatatype_shouldReturnBadRequest(
-      String path)
+  @Test
+  void assertThatPostWalletUnitAttestation_givenIncorrectDatatype_shouldReturnBadRequest()
       throws Exception {
 
     String jsonString = """
@@ -92,15 +87,14 @@ class WalletUnitAttestationControllerTest {
 
     mockMvc
         .perform(
-            post(path)
+            post(PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonString))
         .andExpect(status().isBadRequest());
   }
 
-  @ParameterizedTest
-  @FieldSource("PATHS")
-  void assertThatPostWalletUnitAttestation_givenPublicKeyAndEmptyNonce_shouldReturnOk(String path)
+  @Test
+  void assertThatPostWalletUnitAttestation_givenPublicKeyAndEmptyNonce_shouldReturnOk()
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createWalletUnitAttestation(anyString(), anyString()))
@@ -122,16 +116,15 @@ class WalletUnitAttestationControllerTest {
 
     mockMvc
         .perform(
-            post(path)
+            post(PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
         .andExpect(content().string(expectedJwt));
   }
 
-  @ParameterizedTest
-  @FieldSource("PATHS")
-  void assertThatPostWalletUnitAttestation_givenPublicKeyAndNullNonce_shouldReturnOk(String path)
+  @Test
+  void assertThatPostWalletUnitAttestation_givenPublicKeyAndNullNonce_shouldReturnOk()
       throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createWalletUnitAttestation(anyString(), eq(null)))
@@ -153,7 +146,7 @@ class WalletUnitAttestationControllerTest {
 
     mockMvc
         .perform(
-            post(path)
+            post(PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
