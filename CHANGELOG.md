@@ -5,11 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.8] - 2026-03-09
+
+### Added
+
+- Add no-op version control linter
+
+### Changed
+
+- Merge pull request #48 from diggsweden/feat/fail-on-dirty-working-tree
+- Enable version control linter
+- Merge pull request #49 from diggsweden/build/add-commitlint
+- Use gommitlint
+- Update dependency org.springdoc:springdoc-openapi-starter-webmvc-ui to v2.8.16 (#51)
+- Merge pull request #45 from diggsweden/chore/bump-reusable-ci-to-v2.6.1
+- Bump workflows to use reusable-ci v2.6.1
+- Update java non-major (#44)
+
 ## [0.0.7] - 2026-02-27
 
 ### Removed
 
 - Remove walletId from WalletUnitAttestationDto (#43)
+
 
 ## [0.0.6] - 2026-02-19
 
@@ -169,6 +187,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.0.8]: https://github.com/diggsweden/wallet-provider/compare/v0.0.7..v0.0.8
 [0.0.7]: https://github.com/diggsweden/wallet-provider/compare/v0.0.6..v0.0.7
 [0.0.6]: https://github.com/diggsweden/wallet-provider/compare/v0.0.5..v0.0.6
 [0.0.5]: https://github.com/diggsweden/wallet-provider/compare/v0.0.4..v0.0.5
