@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.8] - 2026-03-09
+## [0.0.9] - 2026-03-13
+
+### Changed
+
+- Merge pull request #53 from diggsweden/fix/move-to-versionless
+
+### Fixed
+
+- Move to versionless wallet-unit-attestation
+
+## [0.0.8] - 2026-03-10
 
 ### Added
 
@@ -21,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Merge pull request #45 from diggsweden/chore/bump-reusable-ci-to-v2.6.1
 - Bump workflows to use reusable-ci v2.6.1
 - Update java non-major (#44)
+
 
 ## [0.0.7] - 2026-02-27
 
@@ -187,6 +198,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.0.9]: https://github.com/diggsweden/wallet-provider/compare/v0.0.8..v0.0.9
 [0.0.8]: https://github.com/diggsweden/wallet-provider/compare/v0.0.7..v0.0.8
 [0.0.7]: https://github.com/diggsweden/wallet-provider/compare/v0.0.6..v0.0.7
 [0.0.6]: https://github.com/diggsweden/wallet-provider/compare/v0.0.5..v0.0.6
