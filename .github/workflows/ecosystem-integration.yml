@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: CC0-1.0
+
+name: Ecosystem Integration Test
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integration-test:
+    # Use the specific commit hash from the wallet-ecosystem repository for stability.
+    # This hash corresponds to the merge of the reusable integration workflow into main.
+    uses: diggsweden/wallet-ecosystem/.github/workflows/reusable-integration.yml@758cef4f7d799a0ec8577d9bffaa28044210f1f3
+    with:
+      service-name: wallet-provider
+      service-repo: ${{ github.repository }}
+      service-ref: ${{ github.event.pull_request.head.sha || github.ref }}
