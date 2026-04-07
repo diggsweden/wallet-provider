@@ -111,9 +111,22 @@ class WalletUnitAttestationServiceTest {
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "");
 
-    assertEquals(7, jwt.getJWTClaimsSet().toJSONObject().size());
+    assertEquals(9, jwt.getJWTClaimsSet().toJSONObject().size());
     assertTrue(jwt.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
     assertEquals("", jwt.getJWTClaimsSet().toJSONObject().get("nonce"));
+  }
+
+  @Test
+  void assertThatCreateWalletUnitAttestation_containsKeyStorageAndUserAuthentication()
+      throws Exception {
+    ECKey jwk = createJWK();
+
+    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
+
+    assertEquals(List.of("iso_18045_high"),
+        jwt.getJWTClaimsSet().getStringListClaim("key_storage"));
+    assertEquals(
+        List.of("iso_18045_high"), jwt.getJWTClaimsSet().getStringListClaim("user_authentication"));
   }
 
   @Test
@@ -122,7 +135,7 @@ class WalletUnitAttestationServiceTest {
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), null);
 
-    assertEquals(6, jwt.getJWTClaimsSet().toJSONObject().size());
+    assertEquals(8, jwt.getJWTClaimsSet().toJSONObject().size());
     assertFalse(jwt.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
   }
 
