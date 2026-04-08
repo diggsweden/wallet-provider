@@ -35,6 +35,7 @@ public class WalletUnitAttestationService {
 
   private final WuaKeystoreProperties keystoreProperties;
   private final ObjectMapper objectMapper;
+  private static final String ATTACK_POTENTIAL_RESISTANCE = "iso_18045_high";
 
   public WalletUnitAttestationService(
       WuaKeystoreProperties keystoreProperties, ObjectMapper objectMapper) {
@@ -63,6 +64,8 @@ public class WalletUnitAttestationService {
             .claim("status", getStatus())
             .claim("attested_keys", attestedKeys)
             .claim("nonce", nonce)
+            .claim("key_storage", List.of(ATTACK_POTENTIAL_RESISTANCE))
+            .claim("user_authentication", List.of(ATTACK_POTENTIAL_RESISTANCE))
             .build();
 
     List<Base64> x5c =
