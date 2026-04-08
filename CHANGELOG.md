@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.10] - 2026-04-08
+
+### Added
+
+- Add attack resistance claims to key attestation
+- Add ecosystem integration test workflow (#57)
+
+### Changed
+
+- Merge pull request #59 from diggsweden/feat/attack-resistance-claims
+- Update java non-major (#56)
+- Use gommitlint instead of conform
+- Update reusable-ci to v2.7.3
+
 ## [0.0.9] - 2026-03-13
 
 ### Changed
@@ -14,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Move to versionless wallet-unit-attestation
+
 
 ## [0.0.8] - 2026-03-10
 
@@ -198,6 +213,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.0.10]: https://github.com/diggsweden/wallet-provider/compare/v0.0.9..v0.0.10
 [0.0.9]: https://github.com/diggsweden/wallet-provider/compare/v0.0.8..v0.0.9
 [0.0.8]: https://github.com/diggsweden/wallet-provider/compare/v0.0.7..v0.0.8
 [0.0.7]: https://github.com/diggsweden/wallet-provider/compare/v0.0.6..v0.0.7
