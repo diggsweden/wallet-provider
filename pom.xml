@@ -33,7 +33,7 @@ SPDX-License-Identifier: EUPL-1.2
     <url />
   </scm>
   <properties>
-    <java.version>21</java.version>
+    <java.version>25</java.version>
     <formatter-maven-plugin.version>2.29.0</formatter-maven-plugin.version>
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
     <checkstyle.version>12.3.1</checkstyle.version>
