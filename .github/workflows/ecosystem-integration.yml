@@ -23,7 +23,6 @@ jobs:
     # Use the specific commit hash from the wallet-ecosystem repository for stability.
     uses: diggsweden/wallet-ecosystem/.github/workflows/reusable-integration.yml@c6548a93878f74cae1aaf756dd2f8efcda102b88
     with:
-      ecosystem-ref: 'c6548a93878f74cae1aaf756dd2f8efcda102b88'
       service-name: wallet-provider
       service-repo: ${{ github.repository }}
       service-ref: ${{ github.event.pull_request.head.sha || github.ref }}
