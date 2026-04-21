@@ -11,20 +11,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.nimbusds.jwt.SignedJWT;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import se.digg.wallet.provider.application.model.WalletUnitAttestationDto;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
 
 @WebMvcTest(WalletUnitAttestationController.class)
 class WalletUnitAttestationControllerTest {
@@ -151,7 +150,7 @@ class WalletUnitAttestationControllerTest {
         .andExpect(content().string(expectedJwt));
   }
 
-  private String asJson(Object input) throws JsonProcessingException {
+  private String asJson(Object input) throws JacksonException {
     ObjectWriter objectWriter = mapper.writer().withDefaultPrettyPrinter();
     return objectWriter.writeValueAsString(input);
   }

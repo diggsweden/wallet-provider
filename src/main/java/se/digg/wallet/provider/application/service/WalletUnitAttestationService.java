@@ -4,9 +4,6 @@
 
 package se.digg.wallet.provider.application.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -29,22 +26,26 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.provider.application.config.WalletRuntimeException;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class WalletUnitAttestationService {
 
   private final WuaKeystoreProperties keystoreProperties;
   private final ObjectMapper objectMapper;
+
   private static final String ATTACK_POTENTIAL_RESISTANCE = "iso_18045_high";
 
   public WalletUnitAttestationService(
       WuaKeystoreProperties keystoreProperties, ObjectMapper objectMapper) {
     this.keystoreProperties = keystoreProperties;
-    this.objectMapper = objectMapper.copy();
+    this.objectMapper = objectMapper.rebuild().build();
   }
 
   private SignedJWT createWalletUnitAttestationUnsafely(String walletPublicKeyJwk, String nonce)
-      throws ParseException, JsonProcessingException, JOSEException {
+      throws ParseException, JacksonException, JOSEException {
     ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
     List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
 
@@ -98,16 +99,16 @@ public class WalletUnitAttestationService {
   public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk, String nonce) {
     try {
       return createWalletUnitAttestationUnsafely(walletPublicKeyJwk, nonce);
-    } catch (ParseException | JsonProcessingException | JOSEException e) {
+    } catch (ParseException | JacksonException | JOSEException e) {
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
   }
 
-  private Map<String, Object> getStatus() throws JsonProcessingException {
+  private Map<String, Object> getStatus() throws JacksonException {
     return objectMapper.readValue(keystoreProperties.status(), new TypeReference<>() {});
   }
 
-  private Map<String, Object> getEudiWalletInfo() throws JsonProcessingException {
+  private Map<String, Object> getEudiWalletInfo() throws JacksonException {
     return objectMapper.readValue(keystoreProperties.eudiWalletInfo(), new TypeReference<>() {});
   }
 }
