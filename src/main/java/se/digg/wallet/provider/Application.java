@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government/wallet-provider
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government/wallet-provider
 //
 // SPDX-License-Identifier: EUPL-1.2
 
