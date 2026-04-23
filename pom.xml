@@ -57,7 +57,7 @@ SPDX-License-Identifier: EUPL-1.2
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>3.0.1</version>
+      <version>3.0.3</version>
     </dependency>
     <dependency>
       <groupId>com.nimbusds</groupId>
