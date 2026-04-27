@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.12] - 2026-04-27
+
+### Changed
+
+- Use reuseable ci latest
+- Bump gommitlint to 0.9.10, switch rumdl from ubi to aqua
+- Bump reusable-ci to v2.7.9
+- Merge pull request #71 from diggsweden/renovate/java-non-major
+- Bump org.springdoc:springdoc-openapi-starter-webmvc-ui to v3.0.3
+- Merge pull request #75 from diggsweden/chore/openssf-update
+- Bump openssf-scorecard to 2.7.9
+- Merge pull request #76 from diggsweden/fix/use-main-version-of-reusable-integration
+- Update java to temurin-25 (#74)
+
+### Fixed
+
+- Use main version of reusable integration script
+
 ## [0.0.11] - 2026-04-21
 
 ### Changed
@@ -22,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Bump reusable integration workflow
+
 
 ## [0.0.10] - 2026-04-08
 
@@ -232,6 +251,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.0.12]: https://github.com/diggsweden/wallet-provider/compare/v0.0.11..v0.0.12
 [0.0.11]: https://github.com/diggsweden/wallet-provider/compare/v0.0.10..v0.0.11
 [0.0.10]: https://github.com/diggsweden/wallet-provider/compare/v0.0.9..v0.0.10
 [0.0.9]: https://github.com/diggsweden/wallet-provider/compare/v0.0.8..v0.0.9
