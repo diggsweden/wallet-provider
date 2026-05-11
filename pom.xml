@@ -10,7 +10,7 @@ SPDX-License-Identifier: EUPL-1.2
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.5</version>
+    <version>4.0.6</version>
     <!-- lookup parent from repository -->
     <relativePath />
   </parent>
@@ -39,6 +39,7 @@ SPDX-License-Identifier: EUPL-1.2
     <checkstyle.version>12.3.1</checkstyle.version>
     <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
     <spotbugs-maven-plugin.version>4.9.8.3</spotbugs-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
     <record-builder.version>47</record-builder.version>
   </properties>
   <dependencies>
@@ -203,6 +204,24 @@ SPDX-License-Identifier: EUPL-1.2
           <printFailingErrors>true</printFailingErrors>
           <linkXRef>false</linkXRef>
         </configuration>
+      </plugin>
+
+      <!-- JaCoCo plugin -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals><goal>prepare-agent</goal></goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals><goal>report</goal></goals>
+          </execution>
+        </executions>
       </plugin>
 
       <!-- SpotBugs plugin -->
