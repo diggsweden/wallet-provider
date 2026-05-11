@@ -10,7 +10,7 @@ SPDX-License-Identifier: EUPL-1.2
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.5</version>
+    <version>4.0.6</version>
     <!-- lookup parent from repository -->
     <relativePath />
   </parent>
