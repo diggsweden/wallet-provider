@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: EUPL-1.2
+
+openapi: 3.1.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /wallet-unit-attestation:
+    post:
+      tags:
+        - wallet-unit-attestation-controller
+      operationId: postWalletUnitAttestation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletUnitAttestationDto'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+components:
+  schemas:
+    WalletUnitAttestationDto:
+      type: object
+      properties:
+        jwk:
+          type: string
+        nonce:
+          type: string
