@@ -23,6 +23,9 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.provider.application.config.WalletRuntimeException;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
@@ -33,6 +36,7 @@ import tools.jackson.databind.ObjectMapper;
 @Service
 public class WalletUnitAttestationService {
 
+  private final Logger log = LoggerFactory.getLogger(WalletUnitAttestationService.class);
   private final WuaKeystoreProperties keystoreProperties;
   private final ObjectMapper objectMapper;
 
@@ -46,6 +50,8 @@ public class WalletUnitAttestationService {
 
   private SignedJWT createWalletUnitAttestationUnsafely(String walletPublicKeyJwk, String nonce)
       throws ParseException, JacksonException, JOSEException {
+    log.debug("Trying to create WUA {} nonce",
+        nonce == null ? "without" : "with");
     ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
     List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
 
@@ -93,6 +99,7 @@ public class WalletUnitAttestationService {
     JWSSigner signer = new ECDSASigner(signingKey);
     signedJwt.sign(signer);
 
+    log.debug("Successfully created WUA");
     return signedJwt;
   }
 
@@ -100,6 +107,7 @@ public class WalletUnitAttestationService {
     try {
       return createWalletUnitAttestationUnsafely(walletPublicKeyJwk, nonce);
     } catch (ParseException | JacksonException | JOSEException e) {
+      log.warn("Could not create WUA", e);
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
   }
