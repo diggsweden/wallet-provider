@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.16] - 2026-06-01
+
+### Changed
+
+- Merge pull request #85 from diggsweden/chore/bump-tomcat-embed-core-to-11.0.22
+- Bump tomcat-embed-core to version 11.0.22
+
 ## [0.0.15] - 2026-06-01
 
 ### Added
@@ -18,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Merge pull request #84 from diggsweden/chore/add-wua-logging
 - Version control current API spec
+
 
 ## [0.0.14] - 2026-05-06
 
@@ -280,6 +288,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.0.16]: https://github.com/diggsweden/wallet-provider/compare/v0.0.15..v0.0.16
 [0.0.15]: https://github.com/diggsweden/wallet-provider/compare/v0.0.14..v0.0.15
 [0.0.14]: https://github.com/diggsweden/wallet-provider/compare/v0.0.13..v0.0.14
 [0.0.13]: https://github.com/diggsweden/wallet-provider/compare/v0.0.12..v0.0.13
