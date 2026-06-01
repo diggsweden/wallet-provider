@@ -2,4 +2,5 @@
 #
 # SPDX-License-Identifier: EUPL-1.2
 
-# Global code owners - to be updated with actual maintainers
+# Global code owners
+* @ChristofferKillander @danneleaf @eric-thelin @johan-forsman @mjsaa @shir-digg
