@@ -5,11 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.14] - 2026-05-05
+## [0.0.15] - 2026-06-01
+
+### Added
+
+- Add logging for WUA requests
+- Add ability to run Digg REST-API profile linter
+- Add sonarqube integration (#83)
+- Add jacoco-maven-plugin for code coverage (#82)
+
+### Changed
+
+- Merge pull request #84 from diggsweden/chore/add-wua-logging
+- Version control current API spec
+
+## [0.0.14] - 2026-05-06
 
 ### Changed
 
 - Bump reusable-ci to v2.8.2
+
 
 ## [0.0.13] - 2026-04-27
 
@@ -265,6 +280,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.0.15]: https://github.com/diggsweden/wallet-provider/compare/v0.0.14..v0.0.15
 [0.0.14]: https://github.com/diggsweden/wallet-provider/compare/v0.0.13..v0.0.14
 [0.0.13]: https://github.com/diggsweden/wallet-provider/compare/v0.0.12..v0.0.13
 [0.0.12]: https://github.com/diggsweden/wallet-provider/compare/v0.0.11..v0.0.12
