@@ -10,7 +10,9 @@ description = "Global allow list"
 regexTarget = "match"
 regexes = [
     '''^digg\.se$''',
-    '''^ospo\@digg\.se$'''
+    '''^www\.digg\.se$''',
+    '''^ospo\@digg\.se$''',
+    '''^info\@digg\.se$'''
 ]
 paths = [
     ".gitleaks-test.txt",
