@@ -5,8 +5,7 @@
 openapi: 3.1.0
 info:
   title: Wallet Provider API
-  description: >
-    European Digital Identity Wallet Provider. #magic___^_^___line **SLA (Servicenivå):** Best effort. #magic___^_^___line **Kända problem och begränsningar:** Inga kända begränsningar.
+  description: European Digital Identity Wallet Provider.
   version: v0
   termsOfService: https://www.digg.se/
   contact:
@@ -16,6 +15,10 @@ info:
   license:
     name: EUPL-1.2
     url: https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+  x-sla:
+    availability: Test
+    responseTime: 24
+    support: Kontorstid
 servers:
   - url: '/'
 tags:
