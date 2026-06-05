@@ -6,16 +6,13 @@ package se.digg.wallet.provider.application.controller;
 
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import se.digg.wallet.provider.application.model.WalletUnitAttestationDto;
+import se.digg.wallet.provider.api.v0.WalletUnitAttestationApi;
+import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequest;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 
-@RequestMapping("/wallet-unit-attestation")
 @RestController
-public class WalletUnitAttestationController {
+public class WalletUnitAttestationController implements WalletUnitAttestationApi {
 
   private final WalletUnitAttestationService attestationService;
 
@@ -23,12 +20,12 @@ public class WalletUnitAttestationController {
     this.attestationService = attestationService;
   }
 
-  @PostMapping({""})
+  @Override
   public ResponseEntity<String> postWalletUnitAttestation(
-      @RequestBody WalletUnitAttestationDto walletUnitAttestationDto) {
+      WalletUnitAttestationRequest walletUnitAttestationRequest) {
     SignedJWT signedJwt =
-        attestationService.createWalletUnitAttestation(walletUnitAttestationDto.jwk(),
-            walletUnitAttestationDto.nonce());
+        attestationService.createWalletUnitAttestation(walletUnitAttestationRequest.getJwk(),
+            walletUnitAttestationRequest.getNonce().orElse(null));
     return ResponseEntity.ok(signedJwt.serialize());
   }
 }

@@ -4,36 +4,150 @@
 
 openapi: 3.1.0
 info:
-  title: OpenAPI definition
+  title: Wallet Provider API
+  description: European Digital Identity Wallet Provider.
   version: v0
+  termsOfService: https://www.digg.se/
+  contact:
+    name: Digg - Agency for Digital Government
+    url: https://www.digg.se/
+    email: info@digg.se
+  license:
+    name: EUPL-1.2
+    url: https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+  x-sla:
+    availability: Test
+    responseTime: 24
+    support: Kontorstid
 servers:
-  - url: http://localhost:8080
-    description: Generated server url
+  - url: '/'
+tags:
+  - name: Wallet Unit Attestation
+    description: Operations related to Wallet Unit Attestation (WUA)
+  - name: API Info
+    description: Information about the API
 paths:
   /wallet-unit-attestation:
     post:
       tags:
-        - wallet-unit-attestation-controller
+        - Wallet Unit Attestation
+      summary: Create Wallet Unit Attestation
+      description: Creates a Wallet Unit Attestation (WUA) required for the wallet instance to interact with the ecosystem.
       operationId: postWalletUnitAttestation
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WalletUnitAttestationDto'
-        required: true
+              $ref: '#/components/schemas/WalletUnitAttestationRequest'
       responses:
         "200":
-          description: OK
+          description: Successfully created Wallet Unit Attestation
           content:
-            '*/*':
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/WalletUnitAttestationResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
+  /api-info:
+    get:
+      tags:
+        - API Info
+      summary: Get API Information
+      description: Returns information about the API, its version, and status.
+      operationId: getApiInfo
+      responses:
+        "200":
+          description: Successfully retrieved API information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiInfo'
+              example:
+                version: "v0"
+                status: "OK"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
 components:
   schemas:
-    WalletUnitAttestationDto:
+    WalletUnitAttestationRequest:
       type: object
+      required:
+        - jwk
       properties:
         jwk:
           type: string
+          description: A JSON Web Key representing the public key of the Wallet Instance.
         nonce:
           type: string
+          description: Optional nonce to prevent replay attacks.
+      example:
+        jwk: '{"kty":"EC","crv":"P-256","x":"...","y":"..."}'
+        nonce: "1234567890"
+
+    WalletUnitAttestationResponse:
+      type: string
+      description: The signed Wallet Unit Attestation as a JWT string
+
+    ApiInfo:
+      type: object
+      required:
+        - version
+        - status
+      properties:
+        version:
+          type: string
+          description: API Version
+        status:
+          type: string
+          description: API Status
+
+    ProblemResponse:
+      type: object
+      description: Error information following the Problem Details for HTTP APIs
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri

@@ -19,7 +19,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import se.digg.wallet.provider.application.model.WalletUnitAttestationDto;
+import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequest;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
@@ -52,8 +52,8 @@ class WalletUnitAttestationControllerTest {
             }
             """;
     String nonce = "123123123123";
-    WalletUnitAttestationDto input =
-        new WalletUnitAttestationDto(jwk, nonce);
+    WalletUnitAttestationRequest input =
+        WalletUnitAttestationRequest.builder().jwk(jwk).nonce(nonce).build();
 
     mockMvc
         .perform(
@@ -108,8 +108,8 @@ class WalletUnitAttestationControllerTest {
             }
             """;
     String nonce = "";
-    WalletUnitAttestationDto input =
-        new WalletUnitAttestationDto(jwk, nonce);
+    WalletUnitAttestationRequest input =
+        WalletUnitAttestationRequest.builder().jwk(jwk).nonce(nonce).build();
 
     mockMvc
         .perform(
@@ -138,8 +138,8 @@ class WalletUnitAttestationControllerTest {
             }
             """;
 
-    WalletUnitAttestationDto input =
-        new WalletUnitAttestationDto(jwk, null);
+    WalletUnitAttestationRequest input =
+        WalletUnitAttestationRequest.builder().jwk(jwk).nonce(null).build();
 
     mockMvc
         .perform(
