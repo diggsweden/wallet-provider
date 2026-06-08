@@ -2,4 +2,5 @@
 #
 # SPDX-License-Identifier: EUPL-1.2
 
-# Global code owners - to be updated with actual maintainers
+# Global code owners
+* @diggsweden/team-wallet-issuer-functions
