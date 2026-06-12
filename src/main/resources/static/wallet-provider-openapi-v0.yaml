@@ -19,6 +19,14 @@ info:
     availability: Test
     responseTime: 24
     support: Kontorstid
+  x-limitations:
+    - SAK.01
+    - DOK.15
+    - UFN.02
+    - MOG.02
+    - DOK.06
+    - UFN.01
+    - VER.05
 servers:
   - url: '/'
 tags:
