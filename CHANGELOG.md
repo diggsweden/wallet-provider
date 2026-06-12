@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.18] - 2026-06-12
+
+### Added
+
+- Address REST API profile linter issues (#91)
+
+### Changed
+
+- Update CODEOWNERS (#90)
+
 ## [0.0.17] - 2026-06-05
 
 ### Changed
@@ -15,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove sonarqube integration (#89)
 - Remove suffix with repo name from copyright text and change year (#88)
+
 
 ## [0.0.16] - 2026-06-01
 
@@ -300,6 +311,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.0.18]: https://github.com/diggsweden/wallet-provider/compare/v0.0.17..v0.0.18
 [0.0.17]: https://github.com/diggsweden/wallet-provider/compare/v0.0.16..v0.0.17
 [0.0.16]: https://github.com/diggsweden/wallet-provider/compare/v0.0.15..v0.0.16
 [0.0.15]: https://github.com/diggsweden/wallet-provider/compare/v0.0.14..v0.0.15
