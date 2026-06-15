@@ -5,7 +5,7 @@
 
 title = "Wallet Provider - Gitleaks Configuration"
 
-[allowlist]
+[[allowlists]]
 description = "Global allow list"
 regexTarget = "match"
 regexes = [
