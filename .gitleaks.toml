@@ -17,8 +17,16 @@ regexes = [
 paths = [
     ".gitleaks-test.txt",
     ".gitleaks-test/",
-    '''src/test/.*''',
-    '''.*test.*'''
+]
+
+[[allowlists]]
+description = "Allow Digg packages"
+regexTarget = "line"
+regexes = [
+    '''(package|import) se.digg'''
+]
+paths = [
+    '''src/(main|test)/java'''
 ]
 
 [[rules]]
