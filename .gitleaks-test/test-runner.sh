@@ -40,7 +40,7 @@ readonly MISSING=$'\xE2\x9D\x8C'
 
 readonly suite="$1"
 readonly outputDir="$2"
-readonly image=zricethezav/gitleaks:v8.20.1
+readonly image=zricethezav/gitleaks:v8.29.1
 suiteShortName=$(basename "${suite%.*}")
 readonly suiteShortName
 readonly rawReportPath="${outputDir}/${suiteShortName}-report-raw.json"
