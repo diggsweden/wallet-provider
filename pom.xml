@@ -55,7 +55,7 @@ SPDX-License-Identifier: EUPL-1.2
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-webmvc</artifactId>
+      <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <!-- Avoid security vulnerabilities in 11.0.21 -->
     <dependency>
