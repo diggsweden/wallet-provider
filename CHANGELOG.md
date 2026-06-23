@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.19] - 2026-06-23
+
+### Changed
+
+- Merge pull request #26 from diggsweden/renovate/major-java-major
+- Adapt service to spring boot 4
+- Update java major
+
+### Removed
+
+- Remove unnecessary dependency to spring-boot-starter-webmvc
+
 ## [0.0.18] - 2026-06-12
 
 ### Added
@@ -14,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Update CODEOWNERS (#90)
+
 
 ## [0.0.17] - 2026-06-05
 
@@ -311,6 +324,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.0.19]: https://github.com/diggsweden/wallet-provider/compare/v0.0.18..v0.0.19
 [0.0.18]: https://github.com/diggsweden/wallet-provider/compare/v0.0.17..v0.0.18
 [0.0.17]: https://github.com/diggsweden/wallet-provider/compare/v0.0.16..v0.0.17
 [0.0.16]: https://github.com/diggsweden/wallet-provider/compare/v0.0.15..v0.0.16
