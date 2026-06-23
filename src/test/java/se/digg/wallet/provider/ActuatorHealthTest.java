@@ -5,7 +5,6 @@
 package se.digg.wallet.provider;
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
@@ -23,9 +22,9 @@ public class ActuatorHealthTest {
   void isHealthy() {
     restClient.get()
         .uri("/actuator/health")
-        .exchange()
-        .expectStatus().isOk()
-        .expectBody()
-        .jsonPath("$.status").isEqualTo("UP");
+        .exchangeSuccessfully()
+        .expectBody(String.class)
+        .isEqualTo("""
+            {"groups":["liveness","readiness"],"status":"UP"}""");
   }
 }
