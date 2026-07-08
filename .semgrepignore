@@ -2,6 +2,9 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
+# It is expected to 'leak' secrets to our local environment in our test code
+/src/test/java
+
 # secrets: inherit is intentional here — reusable-ci does not yet declare
 # explicit secrets in on.workflow_call.secrets, so it cannot be enumerated.
 # TODO: remove once diggsweden/reusable-ci exposes explicit secret declarations.
