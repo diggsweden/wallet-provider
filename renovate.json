@@ -29,7 +29,8 @@
       "matchManagers": ["npm"],
       "matchDepTypes": ["devDependencies"],
       "groupName": "dev dependencies",
-      "addLabels": ["dev-deps"]
+      "addLabels": ["dev-deps"],
+      "minimumReleaseAge": "7 days"
     },
     {
       "description": "Maven dependencies - Major updates",
