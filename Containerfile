@@ -27,7 +27,10 @@ COPY src ./src
 
 # Build the application (skip checkstyle in Docker build)
 RUN ./mvnw clean package -DskipTests -Dcheckstyle.skip -Dformatter.skip -B && \
-    java -Djarmode=layertools -jar target/*.jar extract
+    java -Djarmode=tools -jar target/*.jar extract --layers --destination /app/target/layers
+
+# Ensure we have a consistent name to use as an entrypoint argument
+RUN mv /app/target/layers/application/*.jar /app/target/layers/application/application.jar
 
 # Stage 2: Runtime stage
 FROM cgr.dev/chainguard/jre:latest@sha256:867928b6194d1feaf6803dc99e055f21f9de99258776e4060a86e483d6a472fb AS runtime
@@ -38,12 +41,12 @@ LABEL description="Wallet Provider"
 WORKDIR /app
 
 # Copy Spring Boot layers from builder stage (nonroot user: 65532)
-COPY --from=builder --chown=65532:65532 /app/dependencies/ ./
-COPY --from=builder --chown=65532:65532 /app/spring-boot-loader/ ./
-COPY --from=builder --chown=65532:65532 /app/snapshot-dependencies/ ./
-COPY --from=builder --chown=65532:65532 /app/application/ ./
+COPY --from=builder --chown=65532:65532 /app/target/layers/dependencies/ ./
+COPY --from=builder --chown=65532:65532 /app/target/layers/spring-boot-loader/ ./
+COPY --from=builder --chown=65532:65532 /app/target/layers/snapshot-dependencies/ ./
+COPY --from=builder --chown=65532:65532 /app/target/layers/application/ ./
 
 EXPOSE 8080
 
 # JVM options are set directly in ENTRYPOINT since distroless has no shell
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-XX:+UseG1GC", "-XX:+UseStringDeduplication", "-Djava.security.egd=file:/dev/./urandom", "-Dfile.encoding=UTF-8", "org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-XX:+UseG1GC", "-XX:+UseStringDeduplication", "-Djava.security.egd=file:/dev/./urandom", "-Dfile.encoding=UTF-8", "-jar", "application.jar"]
