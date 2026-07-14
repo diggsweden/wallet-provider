@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.22] - 2026-07-14
+
+### Changed
+
+- Merge pull request #98 from diggsweden/chore/migrate-docker-layer-extraction-to-tools-option
+- Use 'tools' option for extracting Container layers
+- Update github actions (#96)
+
 ## [0.0.21] - 2026-07-09
 
 ### Changed
@@ -18,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Exclude Java test sources from OpenGrep scanning
 - Ignore GitHub workflow files from OpenGrep scanning
 - Configure minimum release age for npm dev dependencies
+
 
 ## [0.0.20] - 2026-06-26
 
@@ -359,6 +368,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.0.22]: https://github.com/diggsweden/wallet-provider/compare/v0.0.21..v0.0.22
 [0.0.21]: https://github.com/diggsweden/wallet-provider/compare/v0.0.20..v0.0.21
 [0.0.20]: https://github.com/diggsweden/wallet-provider/compare/v0.0.19..v0.0.20
 [0.0.19]: https://github.com/diggsweden/wallet-provider/compare/v0.0.18..v0.0.19
