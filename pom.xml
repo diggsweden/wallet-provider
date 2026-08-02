@@ -41,7 +41,7 @@ SPDX-License-Identifier: EUPL-1.2
     <spotbugs-maven-plugin.version>4.10.3.0</spotbugs-maven-plugin.version>
     <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
     <record-builder.version>53</record-builder.version>
-    <openapi-generator-maven-plugin.version>7.23.0</openapi-generator-maven-plugin.version>
+    <openapi-generator-maven-plugin.version>7.24.0</openapi-generator-maven-plugin.version>
     <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
   </properties>
   <dependencies>
@@ -72,7 +72,7 @@ SPDX-License-Identifier: EUPL-1.2
     <dependency>
       <groupId>org.openapitools</groupId>
       <artifactId>jackson-databind-nullable</artifactId>
-      <version>0.2.10</version>
+      <version>0.2.11</version>
     </dependency>
     <dependency>
       <groupId>com.nimbusds</groupId>
