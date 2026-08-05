@@ -57,18 +57,20 @@ public class WalletUnitAttestationService {
 
     ECPrivateKey signingKey = keystoreProperties.getSigningKey();
     List<X509Certificate> certificateChain = keystoreProperties.getCertificateChain();
-    String issuer = keystoreProperties.issuer();
     Duration validity = Duration.ofHours(keystoreProperties.validityHours());
 
     Instant now = Instant.now();
 
+    Map<String, Object> keyStorageStatus = Map.of(
+        "status", getStatus(),
+        "exp", (System.currentTimeMillis() / 1000) + (10 * 365 * 24 * 3600L));
+
     var claimsSet =
         new JWTClaimsSet.Builder()
-            .issuer(issuer)
             .issueTime(Date.from(now))
             .expirationTime(Date.from(now.plus(validity)))
-            .claim("eudi_wallet_info", getEudiWalletInfo())
-            .claim("status", getStatus())
+            .claim("certification", "http://example.com/cert")
+            .claim("key_storage_status", keyStorageStatus)
             .claim("attested_keys", attestedKeys)
             .claim("nonce", nonce)
             .claim("key_storage", List.of(ATTACK_POTENTIAL_RESISTANCE))
@@ -116,7 +118,4 @@ public class WalletUnitAttestationService {
     return objectMapper.readValue(keystoreProperties.status(), new TypeReference<>() {});
   }
 
-  private Map<String, Object> getEudiWalletInfo() throws JacksonException {
-    return objectMapper.readValue(keystoreProperties.eudiWalletInfo(), new TypeReference<>() {});
-  }
 }
