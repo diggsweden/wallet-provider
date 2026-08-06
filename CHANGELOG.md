@@ -5,7 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.23] - 2026-07-27
+## [0.0.24] - 2026-08-06
+
+### Changed
+
+- Feat/update eudi versions (#110)
+- Update java non-major (#109)
+- Update dependency prettier to v3.9.6 (#108)
+- Update actions/checkout action to v7.0.1 (#107)
+
+## [0.0.23] - 2026-07-28
 
 ### Changed
 
@@ -21,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Wua response content type (#106)
+
 
 ## [0.0.22] - 2026-07-14
 
@@ -386,6 +396,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.0.24]: https://github.com/diggsweden/wallet-provider/compare/v0.0.23..v0.0.24
 [0.0.23]: https://github.com/diggsweden/wallet-provider/compare/v0.0.22..v0.0.23
 [0.0.22]: https://github.com/diggsweden/wallet-provider/compare/v0.0.21..v0.0.22
 [0.0.21]: https://github.com/diggsweden/wallet-provider/compare/v0.0.20..v0.0.21
