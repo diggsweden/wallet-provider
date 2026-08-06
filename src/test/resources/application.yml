@@ -26,10 +26,4 @@ wua:
           "wscd_certification_information": "UNCERTIFIED"
         }
       }
-    status: >
-      {
-        "status_list": {
-          "idx": 412,
-          "uri": "https://revocation_url/statuslists/1"
-        }
-      }
+    status: '${WALLET_PROVIDER_WUA_STATUS:{"status_list": {"idx": 412,"uri": "https://revocation_url/statuslists/1"}}}'

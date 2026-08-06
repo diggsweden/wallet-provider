@@ -27,9 +27,7 @@ public record WuaKeystoreProperties(
     String password,
     String alias,
     String type,
-    String eudiWalletInfo,
     String status,
-    String issuer,
     int validityHours) {
 
   public ECPrivateKey getSigningKey() {
