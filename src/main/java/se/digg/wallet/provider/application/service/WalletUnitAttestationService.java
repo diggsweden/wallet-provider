@@ -41,6 +41,7 @@ public class WalletUnitAttestationService {
   private final ObjectMapper objectMapper;
 
   private static final String ATTACK_POTENTIAL_RESISTANCE = "iso_18045_high";
+  private static final long ONE_YEAR_IN_SECONDS = 365 * 24 * 3600L;
 
   public WalletUnitAttestationService(
       WuaKeystoreProperties keystoreProperties, ObjectMapper objectMapper) {
@@ -63,7 +64,7 @@ public class WalletUnitAttestationService {
 
     Map<String, Object> keyStorageStatus = Map.of(
         "status", getStatus(),
-        "exp", (System.currentTimeMillis() / 1000) + (10 * 365 * 24 * 3600L));
+        "exp", (System.currentTimeMillis() / 1000) + ONE_YEAR_IN_SECONDS);
 
     var claimsSet =
         new JWTClaimsSet.Builder()
