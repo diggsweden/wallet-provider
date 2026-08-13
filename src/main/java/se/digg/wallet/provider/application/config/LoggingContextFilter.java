@@ -26,6 +26,7 @@ public class LoggingContextFilter extends OncePerRequestFilter {
 
   private static final String REQUEST_ID = "correlationId";
   private static final Pattern VALID_HEADER_FORMAT = Pattern.compile("[a-zA-Z0-9_-]{1,64}");
+  public static final String MDC_TRANSACTION_ID = "transactionId";
   public static final String X_CORRELATION_ID = "X-Correlation-Id";
 
   @Override
@@ -35,6 +36,7 @@ public class LoggingContextFilter extends OncePerRequestFilter {
     try {
       String correlationId = resolveCorrelationId(request.getHeader(X_CORRELATION_ID));
       MDC.put(REQUEST_ID, correlationId);
+      MDC.put(MDC_TRANSACTION_ID, UUID.randomUUID().toString());
       response.setHeader(X_CORRELATION_ID, correlationId);
       chain.doFilter(request, response);
     } finally {
