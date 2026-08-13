@@ -8,8 +8,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.nimbusds.jwt.SignedJWT;
 import org.junit.jupiter.api.Test;
@@ -18,6 +17,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.RestClientException;
 import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequest;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 import tools.jackson.core.JacksonException;
@@ -153,4 +153,22 @@ class WalletUnitAttestationControllerTest {
     ObjectWriter objectWriter = mapper.writer().withDefaultPrettyPrinter();
     return objectWriter.writeValueAsString(input);
   }
+
+  @Test
+  void shouldUseDefaultExceptionHandlerForRestClientException() throws Exception {
+    when(service.createWalletUnitAttestation(anyString(), anyString()))
+        .thenThrow(new RestClientException("connection refused"));
+
+    mockMvc.perform(post("/wallet-unit-attestation")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("""
+            {"jwk":"test-jwk","nonce":"test-nonce"}
+            """))
+        .andExpect(status().isInternalServerError())
+        .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+        .andExpect(jsonPath("$.title").value("Internal Server Error"))
+        .andExpect(jsonPath("$.detail").value("Remote service failure"))
+        .andExpect(jsonPath("$.type").value("about:blank"));
+  }
+
 }
