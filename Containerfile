@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: EUPL-1.2
 
 # Stage 1: Build stage
-FROM docker.io/library/eclipse-temurin:25-jdk-alpine-3.22@sha256:8650c96a915be19a2bd4ef96fdf954d9b2eb1cf47b1410fc876fbb00b2423e70 AS builder
+FROM docker.io/library/eclipse-temurin:25-jdk-alpine-3.22@sha256:916251d7b0ff689bff9f22c3bc5e0bdc2704f1bbfa41f016e0ea5eaa6cf300f8 AS builder
 
 LABEL maintainer="Digg - Agency for Digital Government"
 LABEL description="Build stage for Wallet Provider"
@@ -33,7 +33,7 @@ RUN ./mvnw clean package -DskipTests -Dcheckstyle.skip -Dformatter.skip -B && \
 RUN mv /app/target/layers/application/*.jar /app/target/layers/application/application.jar
 
 # Stage 2: Runtime stage
-FROM cgr.dev/chainguard/jre:latest@sha256:867928b6194d1feaf6803dc99e055f21f9de99258776e4060a86e483d6a472fb AS runtime
+FROM cgr.dev/chainguard/jre:latest@sha256:df582a702538248c0f07138a35975752cc16cf393901bc730f39e2478bada19c AS runtime
 
 LABEL maintainer="Digg - Agency for Digital Government"
 LABEL description="Wallet Provider"
