@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2026-08-14
+
+### Added
+
+- Add transaction id to request MDC
+
+### Changed
+
+- Merge pull request #114 from diggsweden/feat/standardised-error-handling
+- Return problem details for unhandled controller errors
+- Merge pull request #93 from diggsweden/renovate/docker.io-library-eclipse-temurin-25-jdk-alpine-3.22
+- Update docker.io/library/eclipse-temurin:25-jdk-alpine-3.22 docker digest to 916251d
+- Merge pull request #36 from diggsweden/renovate/cgr.dev-chainguard-jre-latest
+- Merge branch 'main' into renovate/cgr.dev-chainguard-jre-latest
+- Update java non-major (#112)
+- Update actions/setup-java action to v5.7.0 (#111)
+
 ## [0.0.24] - 2026-08-06
 
 ### Changed
@@ -13,6 +30,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update java non-major (#109)
 - Update dependency prettier to v3.9.6 (#108)
 - Update actions/checkout action to v7.0.1 (#107)
+- Update java non-major (#112)
+- Update actions/setup-java action to v5.7.0 (#111)
+- Feat/update eudi versions (#110)
+- Update java non-major (#109)
+- Update dependency prettier to v3.9.6 (#108)
+- Update actions/checkout action to v7.0.1 (#107)
+- Update cgr.dev/chainguard/jre:latest docker digest to df582a7
+
 
 ## [0.0.23] - 2026-07-28
 
@@ -396,6 +421,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.1.0]: https://github.com/diggsweden/wallet-provider/compare/v0.0.24..v0.1.0
 [0.0.24]: https://github.com/diggsweden/wallet-provider/compare/v0.0.23..v0.0.24
 [0.0.23]: https://github.com/diggsweden/wallet-provider/compare/v0.0.22..v0.0.23
 [0.0.22]: https://github.com/diggsweden/wallet-provider/compare/v0.0.21..v0.0.22
