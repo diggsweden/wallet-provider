@@ -12,7 +12,6 @@ import static se.digg.wallet.provider.application.controller.ProblemType.REQUEST
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 
-import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Optional;
@@ -32,11 +31,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import se.digg.wallet.provider.api.v0.model.ProblemResponse;
+import se.digg.wallet.provider.application.config.WalletRuntimeException;
 
 
 @RestControllerAdvice
@@ -64,7 +62,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
     var problemResponse = buildProblemResponse(REQUEST_ARGUMENT_NOT_VALID)
         .detail(e.getLocalizedMessage())
-        .instance(URI.create(path));
+        .instance(path);
 
 
     var violations = Map.of(
@@ -93,7 +91,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
     var problemResponse = buildProblemResponse(REQUEST_VALIDATION_FAILURE)
         .detail("Request body field value(s) does not validate.")
-        .instance(URI.create(path));
+        .instance(path);
 
     var errors = Map.of(
         "globalErrors", e.getBindingResult().getGlobalErrors().stream()
@@ -115,11 +113,11 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
     var statusCode = HttpStatus.BAD_REQUEST;
     var problemDetailResponse = ProblemResponse.builder()
-        .type(REQUEST_ARGUMENT_NOT_VALID.getUri())
+        .type(REQUEST_ARGUMENT_NOT_VALID.getUri().toString())
         .title(statusCode.getReasonPhrase())
         .status(statusCode.value())
         .detail(e.getMessage())
-        .instance(URI.create(httpServletRequest.getContextPath()))
+        .instance(httpServletRequest.getContextPath())
         .build();
 
     logDebug("A requested resource was not found in remote service",
@@ -129,45 +127,24 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   /*
-   * Handle RestClientException. Occurs on remote service call failures.
+   * Handle WalletRuntimeException. A generic application error
+   *
    */
-  @ExceptionHandler(RestClientException.class)
-  public ResponseEntity<Object> handleRestClientException(RestClientException e) {
+  @ExceptionHandler(WalletRuntimeException.class)
+  public ResponseEntity<Object> handleWalletRuntimeException(
+      WalletRuntimeException e) {
 
-    ProblemResponse problemResponse = null;
     var method = httpServletRequest.getMethod();
     var path = httpServletRequest.getServletPath();
+    var problemResponse = ProblemResponse.builder()
+        .status(HttpStatus.BAD_REQUEST.value())
+        .type(ABOUT_BLANK)
+        .title(HttpStatus.BAD_REQUEST.getReasonPhrase())
+        .detail(e.getLocalizedMessage())
+        .instance(path)
+        .build();
 
-    if (e instanceof HttpClientErrorException httpClientError) {
-
-      if (HttpStatus.NOT_FOUND.equals(httpClientError.getStatusCode())) {
-        problemResponse = buildProblemResponse(INTERNAL)
-            .detail("A requested resource was not found in remote service")
-            .instance(URI.create(path))
-            .build();
-
-        logDebug("A requested resource was not found in remote service",
-            method, path, Map.of());
-
-      } else {
-        problemResponse = buildProblemResponse(INTERNAL)
-            .detail("Remote service failure")
-            .instance(URI.create(path))
-            .build();
-
-        logWarn("Remote service failure", method, path, httpClientError);
-      }
-
-    } else {
-
-      problemResponse = buildProblemResponse(INTERNAL)
-          .detail("Remote service failure")
-          .instance(URI.create(path))
-          .build();
-
-      logError("Remote service failure", method, path, e);
-    }
-
+    logDebug("Generic error.", method, path, null, e);
     return createResponseEntity(problemResponse);
   }
 
@@ -181,7 +158,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     var path = httpServletRequest.getServletPath();
     var problemResponse = buildProblemResponse(INTERNAL)
         .detail(e.getLocalizedMessage())
-        .instance(URI.create(path))
+        .instance(path)
         .build();
 
     logError("Unexpected exception", method, path, e);
@@ -196,9 +173,9 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
       HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
 
     var problemDetailResponse = ProblemResponse.builder()
-        .type(URI.create(ABOUT_BLANK))
+        .type(ABOUT_BLANK)
         .status(statusCode.value())
-        .instance(URI.create(request.getContextPath()));
+        .instance(request.getContextPath());
 
     if (body instanceof ProblemDetail problemDetail) {
       problemDetailResponse
@@ -221,7 +198,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
 
     return ResponseEntity
-        .status(problemResponse.getStatus().orElse(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+        .status(problemResponse.getStatus())
         .contentType(MediaType.APPLICATION_PROBLEM_JSON)
         .body(problemResponse);
   }
@@ -229,8 +206,8 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   private ProblemResponse.Builder buildProblemResponse(ProblemType problemType) {
 
     return ProblemResponse.builder()
-        .type(URI.create(Optional.ofNullable(problemType.getUri().toASCIIString())
-            .orElse(ABOUT_BLANK)))
+        .type(Optional.ofNullable(problemType.getUri().toASCIIString())
+            .orElse(ABOUT_BLANK))
         .title(problemType.getTitle())
         .status(problemType.getHttpStatus().value());
   }
@@ -246,12 +223,6 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
     LOGGER.debug("{} {} {} {} transaction-id: {}", method, path, message,
         Optional.ofNullable(properties).orElse(Map.of()), MDC.get(MDC_TRANSACTION_ID), e);
-  }
-
-  private void logWarn(String message, String method, String path, Throwable e) {
-
-    LOGGER.warn("{} {} {} transaction-id: {}", method, path, message, MDC.get(MDC_TRANSACTION_ID),
-        e);
   }
 
   private void logError(String message, String method, String path, Throwable e) {

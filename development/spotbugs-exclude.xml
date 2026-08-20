@@ -1,0 +1,12 @@
+<!--
+SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
+
+SPDX-License-Identifier: EUPL-1.2
+-->
+<FindBugsFilter>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Package name="se.digg.wallet.provider.api.v0.model.*"/>
+    </Match>
+</FindBugsFilter>
+
