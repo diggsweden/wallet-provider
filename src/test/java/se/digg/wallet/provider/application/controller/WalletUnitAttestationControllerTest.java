@@ -19,6 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestClientException;
 import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequest;
+import se.digg.wallet.provider.application.config.WalletRuntimeException;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
@@ -155,9 +156,10 @@ class WalletUnitAttestationControllerTest {
   }
 
   @Test
-  void shouldUseDefaultExceptionHandlerForRestClientException() throws Exception {
+  void shouldReturnInternalServerErrorForWalletRuntimeException() throws Exception {
+    String errorMessage = "Could not create attestation.";
     when(service.createWalletUnitAttestation(anyString(), anyString()))
-        .thenThrow(new RestClientException("connection refused"));
+        .thenThrow(new WalletRuntimeException(errorMessage, null));
 
     mockMvc.perform(post("/wallet-unit-attestation")
         .contentType(MediaType.APPLICATION_JSON)
@@ -167,7 +169,7 @@ class WalletUnitAttestationControllerTest {
         .andExpect(status().isInternalServerError())
         .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
         .andExpect(jsonPath("$.title").value("Internal Server Error"))
-        .andExpect(jsonPath("$.detail").value("Remote service failure"))
+        .andExpect(jsonPath("$.detail").value(errorMessage))
         .andExpect(jsonPath("$.type").value("about:blank"));
   }
 
