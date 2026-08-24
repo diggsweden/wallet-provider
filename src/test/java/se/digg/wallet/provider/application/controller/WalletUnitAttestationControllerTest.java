@@ -166,9 +166,9 @@ class WalletUnitAttestationControllerTest {
         .content("""
             {"jwk":"test-jwk","nonce":"test-nonce"}
             """))
-        .andExpect(status().isBadRequest())
+        .andExpect(status().isInternalServerError())
         .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
-        .andExpect(jsonPath("$.title").value("Bad Request"))
+        .andExpect(jsonPath("$.title").value("Internal Server Error"))
         .andExpect(jsonPath("$.detail").value(errorMessage))
         .andExpect(jsonPath("$.type").value("about:blank"));
   }

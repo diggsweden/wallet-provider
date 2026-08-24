@@ -137,9 +137,9 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     var method = httpServletRequest.getMethod();
     var path = httpServletRequest.getServletPath();
     var problemResponse = ProblemResponse.builder()
-        .status(HttpStatus.BAD_REQUEST.value())
+        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
         .type(ABOUT_BLANK)
-        .title(HttpStatus.BAD_REQUEST.getReasonPhrase())
+        .title(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
         .detail(e.getLocalizedMessage())
         .instance(path)
         .build();
