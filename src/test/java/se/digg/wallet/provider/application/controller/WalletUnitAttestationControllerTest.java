@@ -156,7 +156,7 @@ class WalletUnitAttestationControllerTest {
   }
 
   @Test
-  void shouldUseDefaultExceptionHandlerForRestClientException() throws Exception {
+  void shouldReturnInternalServerErrorForWalletRuntimeException() throws Exception {
     String errorMessage = "Could not create attestation.";
     when(service.createWalletUnitAttestation(anyString(), anyString()))
         .thenThrow(new WalletRuntimeException(errorMessage, null));
