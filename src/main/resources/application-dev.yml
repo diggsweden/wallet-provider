@@ -1,9 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
+#
 # SPDX-License-Identifier: EUPL-1.2
 
-wua:
-  keystore:
-    location: file:src/test/resources/certificates/wallet-provider.p12
-    password: secret
-    alias: wallet-provider
-    type: PKCS12
+properties:
+  logging-filter:
+    log-body: true
