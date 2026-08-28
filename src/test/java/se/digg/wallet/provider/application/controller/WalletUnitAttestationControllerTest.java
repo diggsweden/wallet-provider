@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestClientException;
 import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequest;
 import se.digg.wallet.provider.application.config.WalletRuntimeException;
+import se.digg.wallet.provider.application.filter.SensitiveDataMasker;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
@@ -33,6 +34,8 @@ class WalletUnitAttestationControllerTest {
   private MockMvc mockMvc;
   @MockitoBean
   private WalletUnitAttestationService service;
+  @MockitoBean
+  private SensitiveDataMasker sensitiveDataMasker;
 
   @Test
   void assertThatPostWalletUnitAttestation_givenPublicKeyAndNonce_shouldReturnOk()
