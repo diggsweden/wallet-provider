@@ -4,7 +4,7 @@
 
 package se.digg.wallet.provider.application.controller;
 
-import static se.digg.wallet.provider.application.config.LoggingContextFilter.MDC_TRANSACTION_ID;
+import static se.digg.wallet.provider.application.filter.LoggingFilter.MDC_TRANSACTION_ID;
 import static se.digg.wallet.provider.application.controller.ProblemType.INTERNAL;
 import static se.digg.wallet.provider.application.controller.ProblemType.REQUEST_ARGUMENT_NOT_VALID;
 import static se.digg.wallet.provider.application.controller.ProblemType.REQUEST_VALIDATION_FAILURE;

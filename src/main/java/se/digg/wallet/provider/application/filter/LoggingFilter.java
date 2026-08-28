@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -45,8 +46,12 @@ public class LoggingFilter extends OncePerRequestFilter {
   // Enable body logging only in development environments for debugging.
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LoggingFilter.class);
+
+  private static final Pattern VALID_HEADER_FORMAT = Pattern.compile("[a-zA-Z0-9_-]{1,64}");
+  private static final String X_CORRELATION_ID = "X-Correlation-Id";
+
   public static final String MDC_TRANSACTION_ID = "transactionId";
-  public static final String MDC_CORRELATION_ID = "id";
+  public static final String MDC_CORRELATION_ID = "correlationId";
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -83,55 +88,92 @@ public class LoggingFilter extends OncePerRequestFilter {
     MDC.put(MDC_CORRELATION_ID, correlationId);
     MDC.put(MDC_TRANSACTION_ID, transactionId);
 
-    // Wrap request and response
-    ContentCachingRequestWrapper wrappedRequest =
-        new ContentCachingRequestWrapper(request, maxPayloadLength);
-    ContentCachingResponseWrapper wrappedResponse =
-        new ContentCachingResponseWrapper(response);
-
     // Add correlation ID to response header
-    wrappedResponse.setHeader("X-Correlation-ID", correlationId);
-
-    Instant startTime = Instant.now();
-    Exception capturedException = null;
+    response.setHeader(X_CORRELATION_ID, correlationId);
 
     try {
-      filterChain.doFilter(wrappedRequest, wrappedResponse);
-    } catch (Exception e) {
-      capturedException = e;
-      throw e;
-    } finally {
-      // Calculate duration
-      long durationMs = Instant.now().toEpochMilli() - startTime.toEpochMilli();
+      // Only wrap request and response when both logging is enabled and body logging is enabled
+      // to avoid unnecessary memory buffering (OOM risk with large responses)
+      if (isLoggingEnabled && isBodyLoggingEnabled) {
+        ContentCachingRequestWrapper wrappedRequest =
+            new ContentCachingRequestWrapper(request, maxPayloadLength);
+        ContentCachingResponseWrapper wrappedResponse =
+            new ContentCachingResponseWrapper(response);
 
-      if (isLoggingEnabled) {
-        // Build structured log entry
-        logStructuredEntry(
-            correlationId,
-            wrappedRequest,
-            wrappedResponse,
-            durationMs,
-            capturedException);
+        Instant startTime = Instant.now();
+        Exception capturedException = null;
+
+        try {
+          filterChain.doFilter(wrappedRequest, wrappedResponse);
+        } catch (Exception e) {
+          capturedException = e;
+          throw e;
+        } finally {
+          // Calculate duration
+          long durationMs = Instant.now().toEpochMilli() - startTime.toEpochMilli();
+
+          // Build structured log entry
+          logStructuredEntry(
+              correlationId,
+              wrappedRequest,
+              wrappedResponse,
+              durationMs,
+              capturedException);
+
+          try {
+            // Copy response body back
+            wrappedResponse.copyBodyToResponse();
+          } catch (IOException e) {
+            LOGGER.error("Failed to copy response body back to original response", e);
+          }
+        }
+      } else if (isLoggingEnabled) {
+        // Logging enabled but body logging disabled - no need to wrap
+        Instant startTime = Instant.now();
+        Exception capturedException = null;
+
+        try {
+          filterChain.doFilter(request, response);
+        } catch (Exception e) {
+          capturedException = e;
+          throw e;
+        } finally {
+          // Calculate duration
+          long durationMs = Instant.now().toEpochMilli() - startTime.toEpochMilli();
+
+          // Build structured log entry (without body)
+          logStructuredEntry(
+              correlationId,
+              request,
+              response,
+              durationMs,
+              capturedException);
+        }
+      } else {
+        // Logging disabled - just pass through without wrapping
+        filterChain.doFilter(request, response);
       }
-
-      // Copy response body back
-      wrappedResponse.copyBodyToResponse();
-
-      // Clean up MDC
+    } finally {
+      // Ensure MDC is always cleared
       MDC.clear();
     }
   }
 
   /**
-   * Gets existing correlation ID from request header or generates a new one.
+   * Gets existing correlation ID from request header or generates a new one. Validates the header
+   * value against VALID_HEADER_FORMAT to prevent log injection and header injection attacks.
    */
   private String getOrGenerateCorrelationId(HttpServletRequest request) {
-    String correlationId = request.getHeader("X-Correlation-ID");
+    String correlationId = request.getHeader(X_CORRELATION_ID);
     if (correlationId == null || correlationId.isEmpty()) {
       correlationId = request.getHeader("X-Request-ID");
     }
     if (correlationId == null || correlationId.isEmpty()) {
       correlationId = UUID.randomUUID().toString();
+    } else if (!VALID_HEADER_FORMAT.matcher(correlationId).matches()) {
+      String newId = UUID.randomUUID().toString();
+      LOGGER.warn("Replacing poorly formatted or potentially malicious id header with {}", newId);
+      correlationId = newId;
     }
     return correlationId;
   }
@@ -141,18 +183,20 @@ public class LoggingFilter extends OncePerRequestFilter {
    */
   private void logStructuredEntry(
       String correlationId,
-      ContentCachingRequestWrapper request,
-      ContentCachingResponseWrapper response,
+      HttpServletRequest request,
+      HttpServletResponse response,
       long durationMs,
       Exception exception) {
 
     try {
       String timestamp = Instant.now().toString();
+      int status = response instanceof ContentCachingResponseWrapper
+          ? ((ContentCachingResponseWrapper) response).getStatus()
+          : 200;
 
-      doLog(timestamp, correlationId, "request", requestDetails(request), durationMs, null,
-          response.getStatus());
+      doLog(timestamp, correlationId, "request", requestDetails(request), durationMs, null, status);
       doLog(timestamp, correlationId, "response", responseDetails(response), durationMs, exception,
-          response.getStatus());
+          status);
 
     } catch (Throwable e) {
       LOGGER.error("Failed to create structured log entry", e);
@@ -183,7 +227,7 @@ public class LoggingFilter extends OncePerRequestFilter {
     writeAsJsonToLogger(logEntry, responseStatus);
   }
 
-  private Map<String, Object> requestDetails(ContentCachingRequestWrapper request) {
+  private Map<String, Object> requestDetails(HttpServletRequest request) {
     // Request details
     Map<String, Object> requestDetails = new LinkedHashMap<>();
     requestDetails.put("method", request.getMethod());
@@ -197,9 +241,10 @@ public class LoggingFilter extends OncePerRequestFilter {
     // Masked headers
     requestDetails.put("headers", sensitiveDataMasker.maskHeaders(extractHeaders(request)));
 
-    // Masked request body
-    if (isBodyLoggingEnabled) {
-      String requestBody = getPayload(request.getContentAsByteArray());
+    // Masked request body (only available if request was wrapped)
+    if (isBodyLoggingEnabled && request instanceof ContentCachingRequestWrapper) {
+      String requestBody =
+          getPayload(((ContentCachingRequestWrapper) request).getContentAsByteArray());
       if (!requestBody.isEmpty()) {
         requestDetails.put("body", sensitiveDataMasker.maskJsonBody(requestBody));
       }
@@ -208,15 +253,20 @@ public class LoggingFilter extends OncePerRequestFilter {
     return requestDetails;
   }
 
-  private Map<String, Object> responseDetails(ContentCachingResponseWrapper response) {
+  private Map<String, Object> responseDetails(HttpServletResponse response) {
     // Response details
     Map<String, Object> responseDetails = new LinkedHashMap<>();
-    responseDetails.put("status", response.getStatus());
+
+    int status = response instanceof ContentCachingResponseWrapper
+        ? ((ContentCachingResponseWrapper) response).getStatus()
+        : 200;
+    responseDetails.put("status", status);
     responseDetails.put("contentType", response.getContentType());
 
-    // Response body
-    if (isBodyLoggingEnabled) {
-      String responseBody = getPayload(response.getContentAsByteArray());
+    // Response body (only available if response was wrapped)
+    if (isBodyLoggingEnabled && response instanceof ContentCachingResponseWrapper) {
+      String responseBody =
+          getPayload(((ContentCachingResponseWrapper) response).getContentAsByteArray());
       if (!responseBody.isEmpty()) {
         responseDetails.put("body", sensitiveDataMasker.maskJsonBody(responseBody));
       }
@@ -260,7 +310,8 @@ public class LoggingFilter extends OncePerRequestFilter {
   }
 
   /**
-   * Converts byte array to string with truncation.
+   * Converts byte array to string with truncation. NOTE: Truncated JSON will be invalid;
+   * maskJsonBody() falls back to pattern masking.
    */
   private String getPayload(byte[] content) {
 

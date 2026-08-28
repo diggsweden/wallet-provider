@@ -15,15 +15,29 @@ properties:
     enabled: true
     max-payload-length: 10000
     exclude-path:
-      exact-match: >
-        /
-      contains: >
-        /actuator, /swagger, /v3/api-docs, .html, .png, .gif, .js, .yaml
+      exact-match:
+        - /
+      contains:
+        - /actuator
+        - /swagger
+        - /v3/api-docs
+        - .html
+        - .png
+        - .gif
+        - .js
+        - .yaml
     sensitive-data-mask:
       mask-value: "***MASKED***"
       # enter values in lower case
-      headers: >
-        authorization, x-api-key, api-key, apikey, x-auth-token, cookie, set-cookie, x-csrf-token
+      headers:
+        - authorization
+        - x-api-key
+        - api-key
+        - apikey
+        - x-auth-token
+        - cookie
+        - set-cookie
+        - x-csrf-token
     # WARNING: Body masking only masks header values by name.
     # JWTs and sensitive data in request/response bodies will NOT be masked.
     # For production security, keep log-body disabled.

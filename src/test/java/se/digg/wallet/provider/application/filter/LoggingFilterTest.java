@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,7 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.slf4j.MDC;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -32,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -249,6 +252,67 @@ public class LoggingFilterTest {
     var consoleOut = console.getOut();
 
     assertThat(getLoggedObject(consoleOut)).isEmpty();
+  }
+
+  @Test
+  void clearsMdcAfterFilterExecution() throws IOException, ServletException {
+
+    var httpServletRequest = MockMvcRequestBuilders
+        .get("/test")
+        .buildRequest(new SpringBootMockServletContext("/"));
+    var httpServletResponse = new MockHttpServletResponse();
+
+    // Store MDC values during filter execution
+    var capturedCorrelationId = new AtomicReference<String>();
+    var capturedTransactionId = new AtomicReference<String>();
+
+    doAnswer(invocation -> {
+      // Capture MDC values while filter is running
+      capturedCorrelationId.set(MDC.get(LoggingFilter.MDC_CORRELATION_ID));
+      capturedTransactionId.set(MDC.get(LoggingFilter.MDC_TRANSACTION_ID));
+      return null;
+    }).when(filterChain).doFilter(any(), any());
+
+    filter.doFilter(httpServletRequest, httpServletResponse, filterChain);
+
+    // MDC should have been set during filter execution
+    assertThat(capturedCorrelationId.get()).isNotNull();
+    assertThat(capturedTransactionId.get()).isNotNull();
+
+    // MDC should be cleared after filter completes
+    assertThat(MDC.get(LoggingFilter.MDC_CORRELATION_ID)).isNull();
+    assertThat(MDC.get(LoggingFilter.MDC_TRANSACTION_ID)).isNull();
+  }
+
+  @Test
+  void clearsMdcWhenFilterChainThrowsException() throws IOException, ServletException {
+
+    var httpServletRequest = MockMvcRequestBuilders
+        .get("/test")
+        .buildRequest(new SpringBootMockServletContext("/"));
+    var httpServletResponse = new MockHttpServletResponse();
+
+    // Store MDC values during filter execution
+    var capturedCorrelationId = new AtomicReference<String>();
+    var capturedTransactionId = new AtomicReference<String>();
+
+    doAnswer(invocation -> {
+      // Capture MDC values while filter is running
+      capturedCorrelationId.set(MDC.get(LoggingFilter.MDC_CORRELATION_ID));
+      capturedTransactionId.set(MDC.get(LoggingFilter.MDC_TRANSACTION_ID));
+      throw new ServletException("Test exception");
+    }).when(filterChain).doFilter(any(), any());
+
+    assertThrows(ServletException.class,
+        () -> filter.doFilter(httpServletRequest, httpServletResponse, filterChain));
+
+    // MDC should have been set during filter execution
+    assertThat(capturedCorrelationId.get()).isNotNull();
+    assertThat(capturedTransactionId.get()).isNotNull();
+
+    // MDC should be cleared after exception
+    assertThat(MDC.get(LoggingFilter.MDC_CORRELATION_ID)).isNull();
+    assertThat(MDC.get(LoggingFilter.MDC_TRANSACTION_ID)).isNull();
   }
 
   private Map<String, Object> getLoggedObject(String consoleOut) throws JacksonException {
