@@ -10,7 +10,7 @@ SPDX-License-Identifier: EUPL-1.2
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.1.0</version>
+    <version>4.1.1</version>
     <!-- lookup parent from repository -->
     <relativePath />
   </parent>
@@ -38,7 +38,7 @@ SPDX-License-Identifier: EUPL-1.2
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
     <checkstyle.version>13.11.0</checkstyle.version>
     <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
-    <spotbugs-maven-plugin.version>4.10.3.0</spotbugs-maven-plugin.version>
+    <spotbugs-maven-plugin.version>4.10.4.0</spotbugs-maven-plugin.version>
     <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
     <record-builder.version>53</record-builder.version>
     <openapi-generator-maven-plugin.version>7.24.0</openapi-generator-maven-plugin.version>
