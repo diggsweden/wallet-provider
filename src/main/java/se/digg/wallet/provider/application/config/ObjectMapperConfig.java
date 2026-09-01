@@ -6,7 +6,6 @@ package se.digg.wallet.provider.application.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration

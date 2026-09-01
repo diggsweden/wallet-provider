@@ -11,7 +11,6 @@ import static se.digg.wallet.provider.application.controller.ProblemType.REQUEST
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
-
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Optional;
