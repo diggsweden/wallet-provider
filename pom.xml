@@ -187,6 +187,9 @@ SPDX-License-Identifier: EUPL-1.2
           </dependency>
         </dependencies>
         <configuration>
+          <propertyExpansion>
+            org.checkstyle.google.severity=ERROR
+          </propertyExpansion>
           <configLocation>
             ${project.basedir}/development/lint/google_checks.xml
           </configLocation>
