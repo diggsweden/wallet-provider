@@ -41,7 +41,7 @@ SPDX-License-Identifier: EUPL-1.2
     <spotbugs-maven-plugin.version>4.10.4.0</spotbugs-maven-plugin.version>
     <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
     <record-builder.version>53</record-builder.version>
-    <openapi-generator-maven-plugin.version>7.24.0</openapi-generator-maven-plugin.version>
+    <openapi-generator-maven-plugin.version>7.25.0</openapi-generator-maven-plugin.version>
     <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
   </properties>
   <dependencies>
