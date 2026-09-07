@@ -5,11 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-09-07
+
+### Added
+
+- Add invalid WUA parameter exception
+- Add invalid WUA parameter exception
+
+### Changed
+
+- Merge pull request #123 from diggsweden/feature/invalid-wua-parameter-exception
+- Rename invalid parameter exception
+- Update dependency org.openapitools:openapi-generator-maven-plugin to v7.25.0 (#124)
+- Merge pull request #122 from diggsweden/test/treat-checkstyle-violations-as-errors
+- Merge pull request #121 from diggsweden/fix/remove-mise-paranoid-setting
+- Merge pull request #120 from diggsweden/renovate/major-java-major
+- Update dependency com.puppycrawl.tools:checkstyle to v14
+- Update java non-major (#119)
+
+### Fixed
+
+- Cover JOSE exception handling
+- Handle invalid WUA parameters
+- Treat Checkstyle violations as errors
+- Reorder imports
+- Suppress Checkstyle rule for Javadoc paragraph
+
+### Removed
+
+- Remove obsolete exception class
+- Remove blank lines from imports
+- Remove mise paranoid setting
+
 ## [0.1.2] - 2026-08-28
 
 ### Added
 
 - Add request/response logging and logging filter (#117)
+
 
 ## [0.1.1] - 2026-08-24
 
@@ -442,6 +475,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.1.3]: https://github.com/diggsweden/wallet-provider/compare/v0.1.2..v0.1.3
 [0.1.2]: https://github.com/diggsweden/wallet-provider/compare/v0.1.1..v0.1.2
 [0.1.1]: https://github.com/diggsweden/wallet-provider/compare/v0.1.0..v0.1.1
 [0.1.0]: https://github.com/diggsweden/wallet-provider/compare/v0.0.24..v0.1.0
