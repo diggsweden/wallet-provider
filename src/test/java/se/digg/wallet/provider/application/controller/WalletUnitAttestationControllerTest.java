@@ -17,9 +17,9 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.client.RestClientException;
 import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequest;
-import se.digg.wallet.provider.application.config.WalletRuntimeException;
+import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
+import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 import se.digg.wallet.provider.application.filter.SensitiveDataMasker;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 import tools.jackson.core.JacksonException;
@@ -172,6 +172,27 @@ class WalletUnitAttestationControllerTest {
         .andExpect(status().isInternalServerError())
         .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
         .andExpect(jsonPath("$.title").value("Internal Server Error"))
+        .andExpect(jsonPath("$.detail").value(errorMessage))
+        .andExpect(jsonPath("$.type").value("about:blank"));
+  }
+
+
+  @Test
+  void must_return_bad_request_for_an_invalid_wua_parameter() throws Exception {
+    String errorMessage = "Invalid wallet public key JWK.";
+    when(service.createWalletUnitAttestation(anyString(), anyString()))
+        .thenThrow(
+            new InvalidWuaRequestParameterException(errorMessage, new IllegalArgumentException()));
+
+    mockMvc.perform(post("/wallet-unit-attestation")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("""
+            {"jwk":"invalid-jwk","nonce":"test-nonce"}
+            """))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+        .andExpect(jsonPath("$.title").value("Bad Request"))
+        .andExpect(jsonPath("$.status").value(400))
         .andExpect(jsonPath("$.detail").value(errorMessage))
         .andExpect(jsonPath("$.type").value("about:blank"));
   }

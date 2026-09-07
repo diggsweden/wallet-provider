@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
+import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 
 @ConfigurationProperties(prefix = "wua.keystore")
 public record WuaKeystoreProperties(

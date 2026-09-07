@@ -33,7 +33,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import se.digg.wallet.provider.api.v0.model.ProblemResponse;
-import se.digg.wallet.provider.application.config.WalletRuntimeException;
+import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
+import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 
 
 @RestControllerAdvice
@@ -135,15 +136,26 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
 
     var method = httpServletRequest.getMethod();
     var path = httpServletRequest.getServletPath();
-    var problemResponse = ProblemResponse.builder()
-        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-        .type(ABOUT_BLANK)
-        .title(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-        .detail(e.getLocalizedMessage())
-        .instance(path)
-        .build();
+    var problemResponse =
+        buildProblemResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getLocalizedMessage(), path);
+
 
     logDebug("Generic error.", method, path, null, e);
+    return createResponseEntity(problemResponse);
+  }
+
+  /**
+   * Indicates that a client supplied an invalid parameter when creating a WUA.
+   */
+  @ExceptionHandler(InvalidWuaRequestParameterException.class)
+  public ResponseEntity<Object> handleInvalidWuaParameterException(
+      InvalidWuaRequestParameterException e) {
+
+    var method = httpServletRequest.getMethod();
+    var path = httpServletRequest.getServletPath();
+    var problemResponse =
+        buildProblemResponse(HttpStatus.BAD_REQUEST, e.getLocalizedMessage(), path);
+    logDebug("Invalid request parameter.", method, path, null, e);
     return createResponseEntity(problemResponse);
   }
 
@@ -210,6 +222,18 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
         .title(problemType.getTitle())
         .status(problemType.getHttpStatus().value());
   }
+
+  private ProblemResponse buildProblemResponse(
+      HttpStatus status, String detail, String path) {
+    return ProblemResponse.builder()
+        .status(status.value())
+        .type(ABOUT_BLANK)
+        .title(status.getReasonPhrase())
+        .detail(detail)
+        .instance(path)
+        .build();
+  }
+
 
   private void logDebug(String message, String method, String path,
       @Nullable Map<String, ?> properties) {
