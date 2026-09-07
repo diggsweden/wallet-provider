@@ -6,9 +6,12 @@ package se.digg.wallet.provider.application.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.crypto.ECDSAVerifier;
@@ -26,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
 import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
+import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
 class WalletUnitAttestationServiceTest {
@@ -81,6 +86,27 @@ class WalletUnitAttestationServiceTest {
     assertEquals("Invalid wallet public key JWK.", exception.getMessage());
     assertTrue(exception.getCause() instanceof ParseException);
   }
+
+
+  @Test
+  void must_wrap_jose_exception_in_wallet_runtime_exception() {
+    WuaKeystoreProperties properties = mock(WuaKeystoreProperties.class);
+    when(properties.getSigningKey()).thenReturn(mock(java.security.interfaces.ECPrivateKey.class));
+    when(properties.getCertificateChain()).thenReturn(List.of());
+    when(properties.validityHours()).thenReturn(1);
+    when(properties.status()).thenReturn("{}");
+
+    WalletUnitAttestationService service =
+        new WalletUnitAttestationService(properties, new ObjectMapper());
+
+    WalletRuntimeException exception = assertThrows(
+        WalletRuntimeException.class,
+        () -> service.createWalletUnitAttestation(createJWK().toString(), "nonce"));
+
+    assertEquals("Could not create attestation.", exception.getMessage());
+    assertInstanceOf(JOSEException.class, exception.getCause());
+  }
+
 
   @Test
   void assertThatCreateWalletUnitAttestation_hasX5CHeader() throws Exception {
