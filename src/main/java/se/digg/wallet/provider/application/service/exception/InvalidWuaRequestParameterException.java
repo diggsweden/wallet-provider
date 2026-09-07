@@ -7,13 +7,13 @@ package se.digg.wallet.provider.application.service.exception;
 /**
  * Indicates that a client supplied an invalid parameter.
  */
-public class InvalidWuaParameterException extends WalletRuntimeException {
+public class InvalidWuaRequestParameterException extends WalletRuntimeException {
 
-  public InvalidWuaParameterException(Throwable cause) {
+  public InvalidWuaRequestParameterException(Throwable cause) {
     super(cause);
   }
 
-  public InvalidWuaParameterException(String message, Throwable cause) {
+  public InvalidWuaRequestParameterException(String message, Throwable cause) {
     super(message, cause);
   }
 }

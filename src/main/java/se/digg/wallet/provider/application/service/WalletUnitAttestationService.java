@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
-import se.digg.wallet.provider.application.service.exception.InvalidWuaParameterException;
+import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
@@ -110,7 +110,7 @@ public class WalletUnitAttestationService {
     try {
       return createWalletUnitAttestationUnsafely(walletPublicKeyJwk, nonce);
     } catch (ParseException e) {
-      throw new InvalidWuaParameterException("Invalid wallet public key JWK.", e);
+      throw new InvalidWuaRequestParameterException("Invalid wallet public key JWK.", e);
     } catch (JOSEException e) {
       throw new WalletRuntimeException("Could not create attestation.", e);
     }

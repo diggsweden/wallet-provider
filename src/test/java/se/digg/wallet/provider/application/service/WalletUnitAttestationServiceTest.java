@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
-import se.digg.wallet.provider.application.service.exception.InvalidWuaParameterException;
+import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
 
 @SpringBootTest
 class WalletUnitAttestationServiceTest {
@@ -74,8 +74,8 @@ class WalletUnitAttestationServiceTest {
 
   @Test
   void must_throw_invalid_wua_parameter_exception_for_an_invalid_jwk() {
-    InvalidWuaParameterException exception = assertThrows(
-        InvalidWuaParameterException.class,
+    InvalidWuaRequestParameterException exception = assertThrows(
+        InvalidWuaRequestParameterException.class,
         () -> service.createWalletUnitAttestation("not-a-jwk", "nonce"));
 
     assertEquals("Invalid wallet public key JWK.", exception.getMessage());

@@ -18,7 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequest;
-import se.digg.wallet.provider.application.service.exception.InvalidWuaParameterException;
+import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 import se.digg.wallet.provider.application.filter.SensitiveDataMasker;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
@@ -181,7 +181,8 @@ class WalletUnitAttestationControllerTest {
   void must_return_bad_request_for_an_invalid_wua_parameter() throws Exception {
     String errorMessage = "Invalid wallet public key JWK.";
     when(service.createWalletUnitAttestation(anyString(), anyString()))
-        .thenThrow(new InvalidWuaParameterException(errorMessage, new IllegalArgumentException()));
+        .thenThrow(
+            new InvalidWuaRequestParameterException(errorMessage, new IllegalArgumentException()));
 
     mockMvc.perform(post("/wallet-unit-attestation")
         .contentType(MediaType.APPLICATION_JSON)
