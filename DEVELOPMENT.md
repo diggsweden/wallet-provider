@@ -214,6 +214,8 @@ Run `just` to see all available commands. Key commands:
 | `just lint-license` | reuse | Check license compliance |
 | `just lint-xml` | xmllint | Validate XML files |
 | `just lint-container` | hadolint | Lint Containerfile |
+| `just lint-openapi` | podman/raplp | Check REST API-profile compliance |
+| `just lint-openapi-diff` | openapi-diff | Check OpenAPI backward compatibility |
 | `just lint-java` | Maven | Run all Java linters |
 | `just lint-java-checkstyle` | checkstyle | Java style checks |
 | `just lint-java-pmd` | pmd | Java static analysis |
@@ -242,6 +244,33 @@ Or run Maven directly:
 ```shell
 mvn clean verify
 ```
+
+### OpenAPI Compatibility Checks
+
+API backward compatibility is verified automatically during testing (`mvn test`, `mvn verify`, and `just verify`) using `openapi-diff`.
+The tool compares the current API specification against the version on `main`.
+
+Run only the compatibility check:
+
+```shell
+just lint-openapi-diff
+```
+
+#### Handling Breaking Changes and New API Versions
+
+1. **Intentional Breaking Changes**:
+   To bypass specific compatibility rules for approved changes, configure the relevant rule in `development/openapi-diff.yaml`:
+
+   ```yaml
+   incompatible:
+     request:
+       required:
+         increased: false
+   ```
+
+2. **Introducing New Specification Files (Major Version Bumps)**:
+   When introducing a brand new specification file (e.g. `wallet-provider-openapi-v1.yaml`) that does not yet exist on `main`, `just lint-openapi-diff` automatically detects that no prior version exists on `main` and skips the diff check.
+   Once the Pull Request is merged to `main`, subsequent changes to the new specification file are automatically tracked and verified.
 
 ### Documentation
 
@@ -277,6 +306,7 @@ just lint-fix
 #### Quality Check Details
 
 - **Java Linting**: Checkstyle, PMD, SpotBugs
+- **API Compatibility**: openapi-diff verifies backward compatibility against main
 - **General Linting**: Shell, YAML, Markdown, GitHub Actions, XML
 - **Container Linting**: Hadolint for Containerfile
 - **Security**: Secret scanning with gitleaks

@@ -43,6 +43,13 @@ SPDX-License-Identifier: EUPL-1.2
     <record-builder.version>53</record-builder.version>
     <openapi-generator-maven-plugin.version>7.25.0</openapi-generator-maven-plugin.version>
     <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
+    <openapi.spec.relative-path>src/main/resources/static/wallet-provider-openapi-v0.yaml</openapi.spec.relative-path>
+    <openapi.spec.file>${project.basedir}/${openapi.spec.relative-path}</openapi.spec.file>
+    <openapi-diff-maven.version>2.1.4</openapi-diff-maven.version>
+    <openapi.diff.oldSpec>https://raw.githubusercontent.com/diggsweden/wallet-provider/main/${openapi.spec.relative-path}</openapi.diff.oldSpec>
+    <openapi.diff.newSpec>${openapi.spec.file}</openapi.diff.newSpec>
+    <openapi.diff.failOnIncompatible>true</openapi.diff.failOnIncompatible>
+    <openapi.diff.skip>false</openapi.diff.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -268,9 +275,7 @@ SPDX-License-Identifier: EUPL-1.2
               <goal>generate</goal>
             </goals>
             <configuration>
-              <inputSpec>
-                ${project.basedir}/src/main/resources/static/wallet-provider-openapi-v0.yaml
-              </inputSpec>
+              <inputSpec>${openapi.spec.file}</inputSpec>
               <generatorName>spring</generatorName>
               <apiPackage>se.digg.wallet.provider.api.v0</apiPackage>
               <modelPackage>se.digg.wallet.provider.api.v0.model</modelPackage>
@@ -308,6 +313,33 @@ SPDX-License-Identifier: EUPL-1.2
                 <source>${project.basedir}/target/generated-sources/openapi/src/main/java</source>
               </sources>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- OpenAPI Diff plugin -->
+      <plugin>
+        <groupId>org.openapitools.openapidiff</groupId>
+        <artifactId>openapi-diff-maven</artifactId>
+        <version>${openapi-diff-maven.version}</version>
+        <configuration>
+          <oldSpec>${openapi.diff.oldSpec}</oldSpec>
+          <newSpec>${openapi.diff.newSpec}</newSpec>
+          <failOnIncompatible>${openapi.diff.failOnIncompatible}</failOnIncompatible>
+          <skip>${openapi.diff.skip}</skip>
+          <configFiles>
+            <configFile>${project.basedir}/development/openapi-diff.yaml</configFile>
+          </configFiles>
+          <markdownOutputFileName>${project.build.directory}/openapi-diff.md</markdownOutputFileName>
+          <jsonOutputFileName>${project.build.directory}/openapi-diff.json</jsonOutputFileName>
+        </configuration>
+        <executions>
+          <execution>
+            <id>check-openapi-compatibility</id>
+            <phase>test</phase>
+            <goals>
+              <goal>diff</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>

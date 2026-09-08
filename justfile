@@ -12,6 +12,7 @@ java_lint := devtools_dir + "/linters/java"
 colors := devtools_dir + "/utils/colors.sh"
 
 maven_opts := "--batch-mode --no-transfer-progress --errors -Dstyle.color=always"
+openapi_spec_path := "src/main/resources/static/wallet-provider-openapi-v0.yaml"
 
 # Color variables
 CYAN_BOLD := "\\033[1;36m"
@@ -173,6 +174,21 @@ lint-java-fmt:
 [group('lint')]
 lint-openapi:
     ./openapi-linter.sh
+
+# Check OpenAPI backward compatibility
+[group('lint')]
+lint-openapi-diff:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    spec_path="{{openapi_spec_path}}"
+    old_spec="target/openapi-diff-old.yaml"
+    mkdir -p target
+    if git show origin/main:"$spec_path" > "$old_spec" 2>/dev/null || git show main:"$spec_path" > "$old_spec" 2>/dev/null; then
+        mvn {{maven_opts}} openapi-diff:diff -Dopenapi.diff.oldSpec="$old_spec"
+    else
+        echo "Info: '$spec_path' does not exist on main yet. Skipping backward compatibility check."
+        mvn {{maven_opts}} openapi-diff:diff -Dopenapi.diff.skip=true
+    fi
 
 # ==================================================================================== #
 # LINT-FIX - Auto-fix code issues

@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: EUPL-1.2
+
+# Configuration for openapi-diff backward compatibility checks.
+# Set individual rules to false if you intentionally introduce breaking changes.
+#
+# Examples:
+# incompatible:
+#   request:
+#     required:
+#       increased: false
+#   response:
+#     enum:
+#       increased: false
+#   openapi:
+#     endpoints:
+#       decreased: false
