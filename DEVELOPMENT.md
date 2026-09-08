@@ -13,6 +13,7 @@ This guide outlines core essentials for developing in this project.
 - [Development Workflow](#development-workflow)
   - [Available Commands](#available-commands)
   - [Testing and Verification](#testing-format-and-lint)
+  - [OpenAPI Compatibility Checks](#openapi-compatibility-checks)
   - [Documentation](#documentation)
   - [Pull Request Process](#pull-request-workflow)
 
@@ -214,6 +215,8 @@ Run `just` to see all available commands. Key commands:
 | `just lint-license` | reuse | Check license compliance |
 | `just lint-xml` | xmllint | Validate XML files |
 | `just lint-container` | hadolint | Lint Containerfile |
+| `just lint-openapi` | podman/raplp | Check REST API-profile compliance |
+| `just lint-openapi-diff` | openapi-diff | Check OpenAPI backward compatibility |
 | `just lint-java` | Maven | Run all Java linters |
 | `just lint-java-checkstyle` | checkstyle | Java style checks |
 | `just lint-java-pmd` | pmd | Java static analysis |
@@ -242,6 +245,48 @@ Or run Maven directly:
 ```shell
 mvn clean verify
 ```
+
+### OpenAPI Compatibility Checks
+
+API backward compatibility is verified during linting and verification (`just lint-all`, `just verify`, and `just lint-openapi-diff`) using `openapi-diff`.
+The tool extracts the baseline specification from local git (`origin/main` or `main`) and compares it against the local specification without requiring internet access.
+Standard unit tests (`mvn test`) skip the compatibility diff by default to remain fast and fully offline-capable.
+
+Run the compatibility check directly:
+
+```shell
+just lint-openapi-diff
+```
+
+#### Handling Breaking Changes and New API Versions
+
+1. **Workflow for Intentional Breaking Changes**:
+   When introducing a breaking change to the OpenAPI specification, `openapi-diff` will fail the build to protect API consumers.
+   If the breaking change is intentional and approved, suppress the specific failure rule in `development/openapi-diff.yaml`.
+   Commit the updated `development/openapi-diff.yaml` file together with the API specification changes in the same Pull Request.
+   This allows continuous integration checks to pass and provides reviewers with a clear audit record of the exception.
+   Once the Pull Request is merged into `main`, the new specification becomes the baseline for future comparisons.
+   You can reset `development/openapi-diff.yaml` back to default in a follow-up commit to re-enable full strict checking.
+
+2. **Introducing New Specification Files (Major Version Bumps)**:
+   When introducing a brand new specification file (for example, `wallet-provider-openapi-v2.yaml`) that does not yet exist on `main`, `just lint-openapi-diff` automatically detects that no prior version exists on `main` and skips the diff check.
+   Once the Pull Request is merged to `main`, subsequent changes to the new specification file are automatically tracked and verified.
+
+#### Compatibility Rules and Suppression Keys
+
+Rules use dot notation that maps to nested YAML keys in `development/openapi-diff.yaml`.
+Setting a rule key to `false` permits the breaking change without failing the build.
+
+Common rule examples:
+
+| Rule Key | YAML Path | Description |
+|---|---|---|
+| `incompatible.request.required.increased` | `request.required.increased` | New required property added to request body |
+| `incompatible.request.params.decreased` | `request.params.decreased` | Existing parameter removed from request |
+| `incompatible.response.responses.decreased` | `response.responses.decreased` | HTTP response status code removed |
+| `incompatible.openapi.endpoints.decreased` | `openapi.endpoints.decreased` | Entire API endpoint path or method removed |
+
+For the complete and up-to-date list of all available incompatibility rules, refer to [BackwardIncompatibleProp.java in openapi-diff](https://github.com/OpenAPITools/openapi-diff/blob/master/core/src/main/java/org/openapitools/openapidiff/core/model/BackwardIncompatibleProp.java).
 
 ### Documentation
 
@@ -277,6 +322,7 @@ just lint-fix
 #### Quality Check Details
 
 - **Java Linting**: Checkstyle, PMD, SpotBugs
+- **API Compatibility**: openapi-diff verifies backward compatibility against main
 - **General Linting**: Shell, YAML, Markdown, GitHub Actions, XML
 - **Container Linting**: Hadolint for Containerfile
 - **Security**: Secret scanning with gitleaks
