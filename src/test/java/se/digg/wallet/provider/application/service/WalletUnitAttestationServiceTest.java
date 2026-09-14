@@ -20,7 +20,9 @@ import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jwt.SignedJWT;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +77,22 @@ class WalletUnitAttestationServiceTest {
     verifyAttestedKeysClaim(jwt, jwk);
     verifyStatusClaim(jwt);
     verifyJwtSignature(jwt, keystoreProperties.getPublicKey());
+  }
+
+  @Test
+  void a_jwk_containing_a_private_key_is_rejected() throws Exception {
+    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
+    gen.initialize(Curve.P_256.toECParameterSpec());
+    KeyPair keyPair = gen.generateKeyPair();
+    ECKey privateKeyJwk =
+        new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic())
+            .privateKey((ECPrivateKey) keyPair.getPrivate())
+            .build();
+
+    assertThatThrownBy(
+        () -> service.createWalletUnitAttestation(privateKeyJwk.toJSONString(), "nonce"))
+        .isInstanceOf(InvalidWuaRequestParameterException.class)
+        .hasMessage("Private keys are not accepted.");
   }
 
   @Test

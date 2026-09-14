@@ -54,6 +54,9 @@ public class WalletUnitAttestationService {
     log.debug("Trying to create WUA {} nonce",
         nonce == null ? "without" : "with");
     ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
+    if (attestedKey.isPrivate()) {
+      throw new InvalidWuaRequestParameterException("Private keys are not accepted.");
+    }
     List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
 
     ECPrivateKey signingKey = keystoreProperties.getSigningKey();
