@@ -13,6 +13,10 @@ public class InvalidWuaRequestParameterException extends WalletRuntimeException 
     super(cause);
   }
 
+  public InvalidWuaRequestParameterException(String message) {
+    super(message);
+  }
+
   public InvalidWuaRequestParameterException(String message, Throwable cause) {
     super(message, cause);
   }
