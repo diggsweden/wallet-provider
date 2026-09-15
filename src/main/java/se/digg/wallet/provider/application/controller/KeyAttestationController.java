@@ -21,7 +21,7 @@ public class KeyAttestationController implements KeyAttestationApi {
   }
 
   @Override
-  public ResponseEntity<String> postKeyAttestation(KeyAttestationRequest keyAttestationRequest) {
+  public ResponseEntity<String> requestKeyAttestation(KeyAttestationRequest keyAttestationRequest) {
     SignedJWT signedJwt =
         attestationService.createWalletUnitAttestation(
             keyAttestationRequest.getJwk(),

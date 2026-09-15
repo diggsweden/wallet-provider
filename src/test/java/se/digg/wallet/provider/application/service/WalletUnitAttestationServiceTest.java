@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -158,7 +159,19 @@ class WalletUnitAttestationServiceTest {
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "");
 
-    assertEquals(10, jwt.getJWTClaimsSet().toJSONObject().size());
+    assertEquals(
+        Set.of(
+            "iss",
+            "sub",
+            "iat",
+            "exp",
+            "certification",
+            "key_storage_status",
+            "attested_keys",
+            "nonce",
+            "key_storage",
+            "user_authentication"),
+        jwt.getJWTClaimsSet().toJSONObject().keySet());
     assertTrue(jwt.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
     assertEquals("", jwt.getJWTClaimsSet().toJSONObject().get("nonce"));
   }
@@ -182,7 +195,18 @@ class WalletUnitAttestationServiceTest {
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), null);
 
-    assertEquals(9, jwt.getJWTClaimsSet().toJSONObject().size());
+    assertEquals(
+        Set.of(
+            "iss",
+            "sub",
+            "iat",
+            "exp",
+            "certification",
+            "key_storage_status",
+            "attested_keys",
+            "key_storage",
+            "user_authentication"),
+        jwt.getJWTClaimsSet().toJSONObject().keySet());
     assertFalse(jwt.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
   }
 
