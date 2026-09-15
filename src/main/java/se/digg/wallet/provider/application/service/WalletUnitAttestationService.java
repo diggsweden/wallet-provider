@@ -71,6 +71,8 @@ public class WalletUnitAttestationService {
 
     var claimsSet =
         new JWTClaimsSet.Builder()
+            .issuer(keystoreProperties.issuer())
+            .subject(attestedKey.computeThumbprint().toString())
             .issueTime(Date.from(now))
             .expirationTime(Date.from(now.plus(validity)))
             .claim("certification", "http://example.com/cert")

@@ -11,6 +11,7 @@ import se.digg.wallet.provider.api.v0.WalletUnitAttestationApi;
 import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequest;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 
+@Deprecated
 @RestController
 public class WalletUnitAttestationController implements WalletUnitAttestationApi {
 
