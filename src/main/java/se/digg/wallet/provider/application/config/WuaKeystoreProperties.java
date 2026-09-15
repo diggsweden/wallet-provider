@@ -32,12 +32,6 @@ public record WuaKeystoreProperties(
     int validityHours,
     String issuer) {
 
-  public WuaKeystoreProperties {
-    if (issuer == null || issuer.isBlank()) {
-      issuer = "Digg";
-    }
-  }
-
   public ECPrivateKey getSigningKey() {
     try {
       KeyStore keyStore = KeyStore.getInstance(type());
