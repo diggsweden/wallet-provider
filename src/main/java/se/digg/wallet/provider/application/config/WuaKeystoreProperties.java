@@ -29,7 +29,8 @@ public record WuaKeystoreProperties(
     String alias,
     String type,
     String status,
-    int validityHours) {
+    int validityHours,
+    String issuer) {
 
   public ECPrivateKey getSigningKey() {
     try {

@@ -73,4 +73,5 @@ wua:
     alias: ${WUA_KEYSTORE_ALIAS}
     type: PKCS12
     validity-hours: 24
+    issuer: ${WALLET_PROVIDER_ISSUER:Digg}
     status: '${WALLET_PROVIDER_WUA_STATUS:{"status_list": {"idx": 412,"uri": "https://revocation_url/statuslists/1"}}}'

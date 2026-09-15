@@ -30,13 +30,54 @@ info:
 servers:
   - url: '/'
 tags:
+  - name: Key Attestation
+    description: Operations related to Key Attestation (KA)
   - name: Wallet Unit Attestation
     description: Operations related to Wallet Unit Attestation (WUA)
   - name: API Info
     description: Information about the API
 paths:
+  /key_attestations:
+    post:
+      tags:
+        - Key Attestation
+      summary: Create Key Attestation
+      description: Creates a Key Attestation (KA) required for binding keys in the credential issuance flow.
+      operationId: postKeyAttestation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeyAttestationRequest'
+      responses:
+        "200":
+          description: Successfully created Key Attestation
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/KeyAttestationResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
   /wallet-unit-attestation:
     post:
+      deprecated: true
       tags:
         - Wallet Unit Attestation
       summary: Create Wallet Unit Attestation
@@ -110,6 +151,25 @@ paths:
                 $ref: '#/components/schemas/ProblemResponse'
 components:
   schemas:
+    KeyAttestationRequest:
+      type: object
+      required:
+        - jwk
+      properties:
+        jwk:
+          type: string
+          description: A JSON Web Key representing the public key of the client.
+        nonce:
+          type: string
+          description: Optional nonce from the Credential Issuer.
+      example:
+        jwk: '{"kty":"EC","crv":"P-256","x":"...","y":"..."}'
+        nonce: "1234567890"
+
+    KeyAttestationResponse:
+      type: string
+      description: The signed Key Attestation as a JWT string
+
     WalletUnitAttestationRequest:
       type: object
       required:

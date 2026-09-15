@@ -5,6 +5,10 @@
 package se.digg.wallet.provider.application.service.exception;
 
 public class WalletRuntimeException extends RuntimeException {
+  public WalletRuntimeException(String message) {
+    super(message);
+  }
+
   public WalletRuntimeException(String message, Throwable cause) {
     super(message, cause);
   }

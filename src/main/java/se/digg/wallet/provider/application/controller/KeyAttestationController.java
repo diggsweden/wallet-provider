@@ -7,26 +7,25 @@ package se.digg.wallet.provider.application.controller;
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import se.digg.wallet.provider.api.v0.WalletUnitAttestationApi;
-import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequest;
+import se.digg.wallet.provider.api.v0.KeyAttestationApi;
+import se.digg.wallet.provider.api.v0.model.KeyAttestationRequest;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 
-@Deprecated
 @RestController
-public class WalletUnitAttestationController implements WalletUnitAttestationApi {
+public class KeyAttestationController implements KeyAttestationApi {
 
   private final WalletUnitAttestationService attestationService;
 
-  public WalletUnitAttestationController(WalletUnitAttestationService attestationService) {
+  public KeyAttestationController(WalletUnitAttestationService attestationService) {
     this.attestationService = attestationService;
   }
 
   @Override
-  public ResponseEntity<String> postWalletUnitAttestation(
-      WalletUnitAttestationRequest walletUnitAttestationRequest) {
+  public ResponseEntity<String> postKeyAttestation(KeyAttestationRequest keyAttestationRequest) {
     SignedJWT signedJwt =
-        attestationService.createWalletUnitAttestation(walletUnitAttestationRequest.getJwk(),
-            walletUnitAttestationRequest.getNonce().orElse(null));
+        attestationService.createWalletUnitAttestation(
+            keyAttestationRequest.getJwk(),
+            keyAttestationRequest.getNonce().orElse(null));
     return ResponseEntity.ok(signedJwt.serialize());
   }
 }
