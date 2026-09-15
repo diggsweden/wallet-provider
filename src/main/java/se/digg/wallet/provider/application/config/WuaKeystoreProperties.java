@@ -29,7 +29,14 @@ public record WuaKeystoreProperties(
     String alias,
     String type,
     String status,
-    int validityHours) {
+    int validityHours,
+    String issuer) {
+
+  public WuaKeystoreProperties {
+    if (issuer == null || issuer.isBlank()) {
+      issuer = "Digg";
+    }
+  }
 
   public ECPrivateKey getSigningKey() {
     try {

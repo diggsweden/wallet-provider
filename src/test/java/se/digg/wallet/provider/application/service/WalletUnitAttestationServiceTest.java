@@ -72,6 +72,8 @@ class WalletUnitAttestationServiceTest {
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
 
     assertNotNull(jwt);
+    assertEquals("Digg", jwt.getJWTClaimsSet().getIssuer());
+    assertEquals(jwk.computeThumbprint().toString(), jwt.getJWTClaimsSet().getSubject());
     assertEquals("http://example.com/cert", jwt.getJWTClaimsSet().getStringClaim("certification"));
 
     verifyAttestedKeysClaim(jwt, jwk);
@@ -113,6 +115,7 @@ class WalletUnitAttestationServiceTest {
     when(properties.getCertificateChain()).thenReturn(List.of());
     when(properties.validityHours()).thenReturn(1);
     when(properties.status()).thenReturn("{}");
+    when(properties.issuer()).thenReturn("Digg");
 
     WalletUnitAttestationService service =
         new WalletUnitAttestationService(properties, new ObjectMapper());
@@ -155,7 +158,7 @@ class WalletUnitAttestationServiceTest {
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "");
 
-    assertEquals(8, jwt.getJWTClaimsSet().toJSONObject().size());
+    assertEquals(10, jwt.getJWTClaimsSet().toJSONObject().size());
     assertTrue(jwt.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
     assertEquals("", jwt.getJWTClaimsSet().toJSONObject().get("nonce"));
   }
@@ -179,7 +182,7 @@ class WalletUnitAttestationServiceTest {
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), null);
 
-    assertEquals(7, jwt.getJWTClaimsSet().toJSONObject().size());
+    assertEquals(9, jwt.getJWTClaimsSet().toJSONObject().size());
     assertFalse(jwt.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
   }
 
