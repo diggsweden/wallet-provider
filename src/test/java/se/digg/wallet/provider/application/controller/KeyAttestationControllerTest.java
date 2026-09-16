@@ -21,8 +21,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import se.digg.wallet.provider.api.v0.model.KeyAttestationRequest;
 import se.digg.wallet.provider.application.filter.SensitiveDataMasker;
-import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
-import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
+import se.digg.wallet.provider.application.service.KeyAttestationService;
+import se.digg.wallet.provider.application.service.exception.InvalidKeyAttestationRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
@@ -35,14 +35,14 @@ class KeyAttestationControllerTest {
   @Autowired
   private MockMvc mockMvc;
   @MockitoBean
-  private WalletUnitAttestationService service;
+  private KeyAttestationService service;
   @MockitoBean
   private SensitiveDataMasker sensitiveDataMasker;
 
   @Test
   void a_valid_request_returns_200_ok() throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
-    when(service.createWalletUnitAttestation(anyString(), anyString()))
+    when(service.createKeyAttestation(anyString(), anyString()))
         .thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
@@ -71,7 +71,7 @@ class KeyAttestationControllerTest {
   @Test
   void a_request_with_null_nonce_returns_200_ok() throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
-    when(service.createWalletUnitAttestation(anyString(), eq(null)))
+    when(service.createKeyAttestation(anyString(), eq(null)))
         .thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
@@ -99,8 +99,8 @@ class KeyAttestationControllerTest {
   @Test
   void a_request_with_an_invalid_parameter_returns_400_bad_request() throws Exception {
     String errorMessage = "Private keys are not accepted.";
-    when(service.createWalletUnitAttestation(anyString(), anyString()))
-        .thenThrow(new InvalidWuaRequestParameterException(errorMessage));
+    when(service.createKeyAttestation(anyString(), anyString()))
+        .thenThrow(new InvalidKeyAttestationRequestParameterException(errorMessage));
 
     mockMvc
         .perform(
@@ -119,7 +119,7 @@ class KeyAttestationControllerTest {
   @Test
   void a_runtime_failure_returns_500_internal_server_error() throws Exception {
     String errorMessage = "Could not create attestation.";
-    when(service.createWalletUnitAttestation(anyString(), anyString()))
+    when(service.createKeyAttestation(anyString(), anyString()))
         .thenThrow(new WalletRuntimeException(errorMessage, null));
 
     mockMvc

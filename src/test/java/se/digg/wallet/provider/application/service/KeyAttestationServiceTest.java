@@ -4,6 +4,7 @@
 
 package se.digg.wallet.provider.application.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -20,23 +21,25 @@ import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jwt.SignedJWT;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
-import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
+import se.digg.wallet.provider.application.service.exception.InvalidKeyAttestationRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
-class WalletUnitAttestationServiceTest {
+class KeyAttestationServiceTest {
 
   @Autowired
-  private WalletUnitAttestationService service;
+  private KeyAttestationService service;
   @Autowired
   private WuaKeystoreProperties keystoreProperties;
 
@@ -64,13 +67,15 @@ class WalletUnitAttestationServiceTest {
   }
 
   @Test
-  void assertThatCreateWalletUnitAttestation_givenValidJwk_shouldSucceed() throws Exception {
+  void assertThatCreateKeyAttestation_givenValidJwk_shouldSucceed() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
+    SignedJWT jwt = service.createKeyAttestation(jwk.toString(), "nonce");
 
     assertNotNull(jwt);
     assertEquals("http://example.com/cert", jwt.getJWTClaimsSet().getStringClaim("certification"));
+    assertEquals(keystoreProperties.issuer(), jwt.getJWTClaimsSet().getIssuer());
+    assertEquals(jwk.computeThumbprint().toString(), jwt.getJWTClaimsSet().getSubject());
 
     verifyAttestedKeysClaim(jwt, jwk);
     verifyStatusClaim(jwt);
@@ -78,51 +83,60 @@ class WalletUnitAttestationServiceTest {
   }
 
   @Test
-  void must_throw_invalid_wua_parameter_exception_for_an_invalid_jwk() {
-    InvalidWuaRequestParameterException exception = assertThrows(
-        InvalidWuaRequestParameterException.class,
-        () -> service.createWalletUnitAttestation("not-a-jwk", "nonce"));
+  void must_throw_invalid_key_attestation_parameter_exception_when_jwk_contains_private_key()
+      throws Exception {
+    ECKey jwkWithPrivate = createJWKWithPrivateKey();
+
+    assertThatThrownBy(() -> service.createKeyAttestation(jwkWithPrivate.toString(), "nonce"))
+        .isInstanceOf(InvalidKeyAttestationRequestParameterException.class)
+        .hasMessage("Private keys are not accepted.");
+  }
+
+  @Test
+  void must_throw_invalid_key_attestation_parameter_exception_for_an_invalid_jwk() {
+    InvalidKeyAttestationRequestParameterException exception =
+        assertThrows(
+            InvalidKeyAttestationRequestParameterException.class,
+            () -> service.createKeyAttestation("not-a-jwk", "nonce"));
 
     assertEquals("Invalid wallet public key JWK.", exception.getMessage());
     assertTrue(exception.getCause() instanceof ParseException);
   }
 
-
   @Test
   void must_wrap_jose_exception_in_wallet_runtime_exception() {
     WuaKeystoreProperties properties = mock(WuaKeystoreProperties.class);
-    when(properties.getSigningKey()).thenReturn(mock(java.security.interfaces.ECPrivateKey.class));
+    when(properties.getSigningKey()).thenReturn(mock(ECPrivateKey.class));
     when(properties.getCertificateChain()).thenReturn(List.of());
     when(properties.validityHours()).thenReturn(1);
     when(properties.status()).thenReturn("{}");
 
-    WalletUnitAttestationService service =
-        new WalletUnitAttestationService(properties, new ObjectMapper());
+    KeyAttestationService service = new KeyAttestationService(properties, new ObjectMapper());
 
-    WalletRuntimeException exception = assertThrows(
-        WalletRuntimeException.class,
-        () -> service.createWalletUnitAttestation(createJWK().toString(), "nonce"));
+    WalletRuntimeException exception =
+        assertThrows(
+            WalletRuntimeException.class,
+            () -> service.createKeyAttestation(createJWK().toString(), "nonce"));
 
     assertEquals("Could not create attestation.", exception.getMessage());
     assertInstanceOf(JOSEException.class, exception.getCause());
   }
 
-
   @Test
-  void assertThatCreateWalletUnitAttestation_hasX5CHeader() throws Exception {
+  void assertThatCreateKeyAttestation_hasX5CHeader() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
+    SignedJWT jwt = service.createKeyAttestation(jwk.toString(), "nonce");
 
     assertNotNull(jwt.getHeader().getX509CertChain());
     assertFalse(jwt.getHeader().getX509CertChain().isEmpty());
   }
 
   @Test
-  void assertThatCreateWalletUnitAttestation_containsNonceButNotKid() throws Exception {
+  void assertThatCreateKeyAttestation_containsNonceButNotKid() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
+    SignedJWT jwt = service.createKeyAttestation(jwk.toString(), "nonce");
 
     assertEquals("key-attestation+jwt", jwt.getHeader().getType().getType());
 
@@ -132,22 +146,33 @@ class WalletUnitAttestationServiceTest {
   }
 
   @Test
-  void assertThatCreateWalletUnitAttestation_handlesEmptyNonce() throws Exception {
+  void assertThatCreateKeyAttestation_handlesEmptyNonce() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "");
+    SignedJWT jwt = service.createKeyAttestation(jwk.toString(), "");
 
-    assertEquals(8, jwt.getJWTClaimsSet().toJSONObject().size());
+    assertEquals(
+        Set.of(
+            "iss",
+            "sub",
+            "iat",
+            "exp",
+            "certification",
+            "key_storage_status",
+            "attested_keys",
+            "nonce",
+            "key_storage",
+            "user_authentication"),
+        jwt.getJWTClaimsSet().toJSONObject().keySet());
     assertTrue(jwt.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
     assertEquals("", jwt.getJWTClaimsSet().toJSONObject().get("nonce"));
   }
 
   @Test
-  void assertThatCreateWalletUnitAttestation_containsKeyStorageAndUserAuthentication()
-      throws Exception {
+  void assertThatCreateKeyAttestation_containsKeyStorageAndUserAuthentication() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
+    SignedJWT jwt = service.createKeyAttestation(jwk.toString(), "nonce");
 
     assertEquals(List.of("iso_18045_high"),
         jwt.getJWTClaimsSet().getStringListClaim("key_storage"));
@@ -156,12 +181,23 @@ class WalletUnitAttestationServiceTest {
   }
 
   @Test
-  void assertThatCreateWalletUnitAttestation_handlesNullNonce() throws Exception {
+  void assertThatCreateKeyAttestation_handlesNullNonce() throws Exception {
     ECKey jwk = createJWK();
 
-    SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), null);
+    SignedJWT jwt = service.createKeyAttestation(jwk.toString(), null);
 
-    assertEquals(7, jwt.getJWTClaimsSet().toJSONObject().size());
+    assertEquals(
+        Set.of(
+            "iss",
+            "sub",
+            "iat",
+            "exp",
+            "certification",
+            "key_storage_status",
+            "attested_keys",
+            "key_storage",
+            "user_authentication"),
+        jwt.getJWTClaimsSet().toJSONObject().keySet());
     assertFalse(jwt.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
   }
 
@@ -175,5 +211,15 @@ class WalletUnitAttestationServiceTest {
     KeyPair keyPair = gen.generateKeyPair();
 
     return new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
+  }
+
+  private ECKey createJWKWithPrivateKey() throws Exception {
+    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
+    gen.initialize(Curve.P_256.toECParameterSpec());
+    KeyPair keyPair = gen.generateKeyPair();
+
+    return new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic())
+        .privateKey(keyPair.getPrivate())
+        .build();
   }
 }

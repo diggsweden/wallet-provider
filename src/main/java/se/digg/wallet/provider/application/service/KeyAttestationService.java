@@ -27,16 +27,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
-import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
+import se.digg.wallet.provider.application.service.exception.InvalidKeyAttestationRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 @Service
-public class WalletUnitAttestationService {
+public class KeyAttestationService {
 
-  private final Logger log = LoggerFactory.getLogger(WalletUnitAttestationService.class);
+  private final Logger log = LoggerFactory.getLogger(KeyAttestationService.class);
   private final WuaKeystoreProperties keystoreProperties;
   private final ObjectMapper objectMapper;
 
@@ -45,17 +45,19 @@ public class WalletUnitAttestationService {
   private static final TypeReference<Map<String, Object>> STATUS_TYPE_REF =
       new TypeReference<>() {};
 
-  public WalletUnitAttestationService(
+  public KeyAttestationService(
       WuaKeystoreProperties keystoreProperties, ObjectMapper objectMapper) {
     this.keystoreProperties = keystoreProperties;
     this.objectMapper = objectMapper.rebuild().build();
   }
 
-  private SignedJWT createWalletUnitAttestationUnsafely(String walletPublicKeyJwk, String nonce)
+  private SignedJWT createKeyAttestationUnsafely(String walletPublicKeyJwk, String nonce)
       throws ParseException, JOSEException {
-    log.debug("Trying to create WUA {} nonce",
-        nonce == null ? "without" : "with");
+    log.debug("Trying to create KA {} nonce", nonce == null ? "without" : "with");
     ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
+    if (attestedKey.isPrivate()) {
+      throw new InvalidKeyAttestationRequestParameterException("Private keys are not accepted.");
+    }
     List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
 
     ECPrivateKey signingKey = keystoreProperties.getSigningKey();
@@ -64,12 +66,15 @@ public class WalletUnitAttestationService {
 
     Instant now = Instant.now();
 
-    Map<String, Object> keyStorageStatus = Map.of(
-        "status", getStatus(),
-        "exp", (System.currentTimeMillis() / 1000) + ONE_YEAR_IN_SECONDS);
+    Map<String, Object> keyStorageStatus =
+        Map.of(
+            "status", getStatus(),
+            "exp", (System.currentTimeMillis() / 1000) + ONE_YEAR_IN_SECONDS);
 
     var claimsSet =
         new JWTClaimsSet.Builder()
+            .issuer(keystoreProperties.issuer())
+            .subject(attestedKey.computeThumbprint().toString())
             .issueTime(Date.from(now))
             .expirationTime(Date.from(now.plus(validity)))
             .claim("certification", "http://example.com/cert")
@@ -104,23 +109,22 @@ public class WalletUnitAttestationService {
     JWSSigner signer = new ECDSASigner(signingKey);
     signedJwt.sign(signer);
 
-    log.debug("Successfully created WUA");
+    log.debug("Successfully created KA");
     return signedJwt;
   }
 
-  public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk, String nonce) {
+  public SignedJWT createKeyAttestation(String walletPublicKeyJwk, String nonce) {
     try {
-      return createWalletUnitAttestationUnsafely(walletPublicKeyJwk, nonce);
+      return createKeyAttestationUnsafely(walletPublicKeyJwk, nonce);
     } catch (ParseException e) {
-      throw new InvalidWuaRequestParameterException("Invalid wallet public key JWK.", e);
+      throw new InvalidKeyAttestationRequestParameterException(
+          "Invalid wallet public key JWK.", e);
     } catch (JOSEException e) {
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
-
   }
 
   private Map<String, Object> getStatus() throws JacksonException {
     return objectMapper.readValue(keystoreProperties.status(), STATUS_TYPE_REF);
   }
-
 }
