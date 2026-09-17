@@ -33,6 +33,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
+@Deprecated
 @Service
 public class WalletUnitAttestationService {
 
