@@ -43,7 +43,7 @@ paths:
         - Key Attestation
       summary: Create Key Attestation
       description: Creates a Key Attestation (KA) required for binding keys in the credential issuance flow.
-      operationId: requestKeyAttestation
+      operationId: postKeyAttestation
       requestBody:
         required: true
         content:
