@@ -5,9 +5,11 @@
 package se.digg.wallet.provider.application.controller;
 
 import com.nimbusds.jwt.SignedJWT;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.provider.api.v0.KeyAttestationApi;
+import se.digg.wallet.provider.api.v0.model.KeyAttestationItem;
 import se.digg.wallet.provider.api.v0.model.KeyAttestationRequest;
 import se.digg.wallet.provider.api.v0.model.KeyAttestationResponse;
 import se.digg.wallet.provider.application.service.KeyAttestationService;
@@ -24,9 +26,14 @@ public class KeyAttestationController implements KeyAttestationApi {
   @Override
   public ResponseEntity<KeyAttestationResponse> postKeyAttestation(
       KeyAttestationRequest keyAttestationRequest) {
+    List<KeyAttestationItem> items = keyAttestationRequest.getJwks();
+    List<String> jwks =
+        items == null
+            ? null
+            : items.stream().map(item -> item != null ? item.getJwk() : null).toList();
     SignedJWT signedJwt =
         attestationService.createKeyAttestation(
-            keyAttestationRequest.getJwks(),
+            jwks,
             keyAttestationRequest.getNonce().orElse(null));
     return ResponseEntity.ok(new KeyAttestationResponse(signedJwt.serialize()));
   }

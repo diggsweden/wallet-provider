@@ -147,15 +147,27 @@ components:
         jwks:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/KeyAttestationItem'
           description: A list of JSON Web Keys representing the public keys of the client.
         nonce:
           type: string
           description: Optional nonce from the Credential Issuer.
       example:
         jwks:
-          - '{"kty":"EC","crv":"P-256","x":"...","y":"..."}'
+          - jwk: '{"kty":"EC","crv":"P-256","x":"...","y":"..."}'
         nonce: "1234567890"
+
+    KeyAttestationItem:
+      type: object
+      description: An item containing a client public key for key attestation.
+      required:
+        - jwk
+      properties:
+        jwk:
+          type: string
+          description: A JSON Web Key representing the public key of the client.
+      example:
+        jwk: '{"kty":"EC","crv":"P-256","x":"...","y":"..."}'
 
     KeyAttestationResponse:
       type: object

@@ -61,6 +61,9 @@ public class KeyAttestationService {
     List<Map<String, Object>> attestedKeys = new ArrayList<>();
     ECKey firstKey = null;
     for (String jwkString : walletPublicKeyJwks) {
+      if (jwkString == null || jwkString.isBlank()) {
+        throw new InvalidKeyAttestationRequestParameterException("jwk must not be empty.");
+      }
       ECKey attestedKey = ECKey.parse(jwkString);
       if (attestedKey.isPrivate()) {
         throw new InvalidKeyAttestationRequestParameterException("Private keys are not accepted.");

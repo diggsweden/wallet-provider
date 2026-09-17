@@ -24,6 +24,7 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -238,6 +239,17 @@ class KeyAttestationServiceTest {
             List.of(validJwk.toString(), jwkWithPrivate.toString()), "nonce"))
         .isInstanceOf(InvalidKeyAttestationRequestParameterException.class)
         .hasMessage("Private keys are not accepted.");
+  }
+
+  @Test
+  void must_throw_invalid_key_attestation_parameter_exception_when_jwk_is_null_or_blank() {
+    assertThatThrownBy(() -> service.createKeyAttestation(Collections.singletonList(null), "nonce"))
+        .isInstanceOf(InvalidKeyAttestationRequestParameterException.class)
+        .hasMessage("jwk must not be empty.");
+
+    assertThatThrownBy(() -> service.createKeyAttestation(List.of("   "), "nonce"))
+        .isInstanceOf(InvalidKeyAttestationRequestParameterException.class)
+        .hasMessage("jwk must not be empty.");
   }
 
   private void verifyJwtSignature(SignedJWT jwt, ECPublicKey publicKey) throws JOSEException {

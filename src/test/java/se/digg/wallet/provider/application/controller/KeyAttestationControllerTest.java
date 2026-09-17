@@ -27,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import se.digg.wallet.provider.api.v0.model.KeyAttestationItem;
 import se.digg.wallet.provider.api.v0.model.KeyAttestationRequest;
 import se.digg.wallet.provider.application.filter.SensitiveDataMasker;
 import se.digg.wallet.provider.application.service.KeyAttestationService;
@@ -65,7 +66,10 @@ class KeyAttestationControllerTest {
             """;
     String nonce = "123123123123";
     KeyAttestationRequest input =
-        KeyAttestationRequest.builder().jwks(List.of(jwk)).nonce(nonce).build();
+        KeyAttestationRequest.builder()
+            .jwks(List.of(KeyAttestationItem.builder().jwk(jwk).build()))
+            .nonce(nonce)
+            .build();
 
     mockMvc
         .perform(
@@ -94,7 +98,10 @@ class KeyAttestationControllerTest {
             }
             """;
     KeyAttestationRequest input =
-        KeyAttestationRequest.builder().jwks(List.of(jwk)).nonce(null).build();
+        KeyAttestationRequest.builder()
+            .jwks(List.of(KeyAttestationItem.builder().jwk(jwk).build()))
+            .nonce(null)
+            .build();
 
     mockMvc
         .perform(
@@ -121,7 +128,7 @@ class KeyAttestationControllerTest {
             post("/key-attestations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {"jwks":["test-jwk"],"nonce":"test-nonce"}
+                    {"jwks":[{"jwk":"test-jwk"}],"nonce":"test-nonce"}
                     """))
         .andExpect(status().is(expectedStatus.value()))
         .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
