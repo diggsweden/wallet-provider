@@ -20,6 +20,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -51,14 +52,24 @@ public class KeyAttestationService {
     this.objectMapper = objectMapper.rebuild().build();
   }
 
-  private SignedJWT createKeyAttestationUnsafely(String walletPublicKeyJwk, String nonce)
+  private SignedJWT createKeyAttestationUnsafely(List<String> walletPublicKeyJwks, String nonce)
       throws ParseException, JOSEException {
     log.debug("Trying to create KA {} nonce", nonce == null ? "without" : "with");
-    ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
-    if (attestedKey.isPrivate()) {
-      throw new InvalidKeyAttestationRequestParameterException("Private keys are not accepted.");
+    if (walletPublicKeyJwks == null || walletPublicKeyJwks.isEmpty()) {
+      throw new InvalidKeyAttestationRequestParameterException("jwks must not be empty.");
     }
-    List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
+    List<Map<String, Object>> attestedKeys = new ArrayList<>();
+    ECKey firstKey = null;
+    for (String jwkString : walletPublicKeyJwks) {
+      ECKey attestedKey = ECKey.parse(jwkString);
+      if (attestedKey.isPrivate()) {
+        throw new InvalidKeyAttestationRequestParameterException("Private keys are not accepted.");
+      }
+      if (firstKey == null) {
+        firstKey = attestedKey;
+      }
+      attestedKeys.add(attestedKey.toJSONObject());
+    }
 
     ECPrivateKey signingKey = keystoreProperties.getSigningKey();
     List<X509Certificate> certificateChain = keystoreProperties.getCertificateChain();
@@ -74,7 +85,7 @@ public class KeyAttestationService {
     var claimsSet =
         new JWTClaimsSet.Builder()
             .issuer(keystoreProperties.issuer())
-            .subject(attestedKey.computeThumbprint().toString())
+            .subject(firstKey.computeThumbprint().toString())
             .issueTime(Date.from(now))
             .expirationTime(Date.from(now.plus(validity)))
             .claim("certification", "http://example.com/cert")
@@ -113,15 +124,20 @@ public class KeyAttestationService {
     return signedJwt;
   }
 
-  public SignedJWT createKeyAttestation(String walletPublicKeyJwk, String nonce) {
+  public SignedJWT createKeyAttestation(List<String> walletPublicKeyJwks, String nonce) {
     try {
-      return createKeyAttestationUnsafely(walletPublicKeyJwk, nonce);
+      return createKeyAttestationUnsafely(walletPublicKeyJwks, nonce);
     } catch (ParseException e) {
       throw new InvalidKeyAttestationRequestParameterException(
           "Invalid wallet public key JWK.", e);
     } catch (JOSEException e) {
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
+  }
+
+  public SignedJWT createKeyAttestation(String walletPublicKeyJwk, String nonce) {
+    return createKeyAttestation(
+        walletPublicKeyJwk == null ? List.of() : List.of(walletPublicKeyJwk), nonce);
   }
 
   private Map<String, Object> getStatus() throws JacksonException {

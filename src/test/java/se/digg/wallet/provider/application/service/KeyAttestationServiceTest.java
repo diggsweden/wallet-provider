@@ -201,6 +201,45 @@ class KeyAttestationServiceTest {
     assertFalse(jwt.getJWTClaimsSet().toJSONObject().containsKey("nonce"));
   }
 
+  @Test
+  void assertThatCreateKeyAttestation_givenMultipleValidJwks_shouldSucceed() throws Exception {
+    ECKey jwk1 = createJWK();
+    ECKey jwk2 = createJWK();
+
+    SignedJWT jwt =
+        service.createKeyAttestation(List.of(jwk1.toString(), jwk2.toString()), "nonce");
+
+    assertNotNull(jwt);
+    assertEquals(jwk1.computeThumbprint().toString(), jwt.getJWTClaimsSet().getSubject());
+
+    @SuppressWarnings("unchecked")
+    List<Map<String, Object>> attestedKeys =
+        (List<Map<String, Object>>) jwt.getJWTClaimsSet().getClaim("attested_keys");
+    assertEquals(2, attestedKeys.size());
+    assertEquals(jwk1.getX().toString(), attestedKeys.get(0).get("x"));
+    assertEquals(jwk2.getX().toString(), attestedKeys.get(1).get("x"));
+  }
+
+  @Test
+  void must_throw_invalid_key_attestation_parameter_exception_when_jwks_list_is_empty() {
+    assertThatThrownBy(() -> service.createKeyAttestation(List.of(), "nonce"))
+        .isInstanceOf(InvalidKeyAttestationRequestParameterException.class)
+        .hasMessage("jwks must not be empty.");
+  }
+
+  @Test
+  void must_throw_invalid_key_attestation_parameter_exception_when_any_jwk_contains_private_key()
+      throws Exception {
+    ECKey validJwk = createJWK();
+    ECKey jwkWithPrivate = createJWKWithPrivateKey();
+
+    assertThatThrownBy(
+        () -> service.createKeyAttestation(
+            List.of(validJwk.toString(), jwkWithPrivate.toString()), "nonce"))
+        .isInstanceOf(InvalidKeyAttestationRequestParameterException.class)
+        .hasMessage("Private keys are not accepted.");
+  }
+
   private void verifyJwtSignature(SignedJWT jwt, ECPublicKey publicKey) throws JOSEException {
     assertTrue(jwt.verify(new ECDSAVerifier(publicKey)));
   }

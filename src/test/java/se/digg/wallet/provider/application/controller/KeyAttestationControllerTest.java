@@ -4,6 +4,8 @@
 
 package se.digg.wallet.provider.application.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -13,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.nimbusds.jwt.SignedJWT;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -47,7 +50,7 @@ class KeyAttestationControllerTest {
   @Test
   void a_valid_request_returns_200_ok() throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
-    when(service.createKeyAttestation(anyString(), anyString()))
+    when(service.createKeyAttestation(anyList(), anyString()))
         .thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
@@ -62,21 +65,22 @@ class KeyAttestationControllerTest {
             """;
     String nonce = "123123123123";
     KeyAttestationRequest input =
-        KeyAttestationRequest.builder().jwk(jwk).nonce(nonce).build();
+        KeyAttestationRequest.builder().jwks(List.of(jwk)).nonce(nonce).build();
 
     mockMvc
         .perform(
-            post("/key_attestations")
+            post("/key-attestations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
-        .andExpect(content().string(expectedJwt));
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.key_attestation").value(expectedJwt));
   }
 
   @Test
   void a_request_with_null_nonce_returns_200_ok() throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
-    when(service.createKeyAttestation(anyString(), eq(null)))
+    when(service.createKeyAttestation(anyList(), eq(null)))
         .thenReturn(SignedJWT.parse(expectedJwt));
 
     String jwk =
@@ -90,15 +94,16 @@ class KeyAttestationControllerTest {
             }
             """;
     KeyAttestationRequest input =
-        KeyAttestationRequest.builder().jwk(jwk).nonce(null).build();
+        KeyAttestationRequest.builder().jwks(List.of(jwk)).nonce(null).build();
 
     mockMvc
         .perform(
-            post("/key_attestations")
+            post("/key-attestations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
-        .andExpect(content().string(expectedJwt));
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.key_attestation").value(expectedJwt));
   }
 
   @ParameterizedTest(name = "returns {1} when service throws {0}")
@@ -109,14 +114,14 @@ class KeyAttestationControllerTest {
       String expectedTitle,
       String expectedDetail)
       throws Exception {
-    when(service.createKeyAttestation(anyString(), anyString())).thenThrow(serviceException);
+    when(service.createKeyAttestation(anyList(), any())).thenThrow(serviceException);
 
     mockMvc
         .perform(
-            post("/key_attestations")
+            post("/key-attestations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {"jwk":"test-jwk","nonce":"test-nonce"}
+                    {"jwks":["test-jwk"],"nonce":"test-nonce"}
                     """))
         .andExpect(status().is(expectedStatus.value()))
         .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))

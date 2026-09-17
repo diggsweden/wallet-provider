@@ -6,7 +6,7 @@ openapi: 3.1.0
 info:
   title: Wallet Provider API
   description: European Digital Identity Wallet Provider.
-  version: v0
+  version: 0.0.1
   termsOfService: https://www.digg.se/
   contact:
     name: Digg - Agency for Digital Government
@@ -37,7 +37,7 @@ tags:
   - name: API Info
     description: Information about the API
 paths:
-  /key_attestations:
+  /key-attestations:
     post:
       tags:
         - Key Attestation
@@ -54,21 +54,9 @@ paths:
         "200":
           description: Successfully created Key Attestation
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: '#/components/schemas/KeyAttestationResponse'
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemResponse'
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemResponse'
         default:
           description: Unexpected error
           content:
@@ -154,21 +142,29 @@ components:
     KeyAttestationRequest:
       type: object
       required:
-        - jwk
+        - jwks
       properties:
-        jwk:
-          type: string
-          description: A JSON Web Key representing the public key of the client.
+        jwks:
+          type: array
+          items:
+            type: string
+          description: A list of JSON Web Keys representing the public keys of the client.
         nonce:
           type: string
           description: Optional nonce from the Credential Issuer.
       example:
-        jwk: '{"kty":"EC","crv":"P-256","x":"...","y":"..."}'
+        jwks:
+          - '{"kty":"EC","crv":"P-256","x":"...","y":"..."}'
         nonce: "1234567890"
 
     KeyAttestationResponse:
-      type: string
-      description: The signed Key Attestation as a JWT string
+      type: object
+      required:
+        - key_attestation
+      properties:
+        key_attestation:
+          type: string
+          description: The signed Key Attestation as a compact JWT string.
 
     WalletUnitAttestationRequest:
       type: object

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.provider.api.v0.KeyAttestationApi;
 import se.digg.wallet.provider.api.v0.model.KeyAttestationRequest;
+import se.digg.wallet.provider.api.v0.model.KeyAttestationResponse;
 import se.digg.wallet.provider.application.service.KeyAttestationService;
 
 @RestController
@@ -21,11 +22,12 @@ public class KeyAttestationController implements KeyAttestationApi {
   }
 
   @Override
-  public ResponseEntity<String> postKeyAttestation(KeyAttestationRequest keyAttestationRequest) {
+  public ResponseEntity<KeyAttestationResponse> postKeyAttestation(
+      KeyAttestationRequest keyAttestationRequest) {
     SignedJWT signedJwt =
         attestationService.createKeyAttestation(
-            keyAttestationRequest.getJwk(),
+            keyAttestationRequest.getJwks(),
             keyAttestationRequest.getNonce().orElse(null));
-    return ResponseEntity.ok(signedJwt.serialize());
+    return ResponseEntity.ok(new KeyAttestationResponse(signedJwt.serialize()));
   }
 }
