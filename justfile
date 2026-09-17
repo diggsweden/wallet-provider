@@ -12,6 +12,7 @@ java_lint := devtools_dir + "/linters/java"
 colors := devtools_dir + "/utils/colors.sh"
 
 maven_opts := "--batch-mode --no-transfer-progress --errors -Dstyle.color=always"
+openapi_spec_path := "src/main/resources/static/wallet-provider-openapi-v0.yaml"
 
 # Color variables
 CYAN_BOLD := "\\033[1;36m"
@@ -76,9 +77,7 @@ tools-install: _ensure-devtools
 
 # ▪ Run all checks (linters + tests)
 [group('verify')]
-verify: _ensure-devtools check-tools
-    @{{devtools_dir}}/scripts/verify.sh
-    @just test
+verify: _ensure-devtools check-tools lint-all test
 
 # ==================================================================================== #
 # LINT - Code quality checks
@@ -86,7 +85,7 @@ verify: _ensure-devtools check-tools
 
 # ▪ Run all linters with summary
 [group('lint')]
-lint-all: _ensure-devtools
+lint-all: _ensure-devtools lint-openapi-diff
     @{{devtools_dir}}/scripts/verify.sh
 
 # Validate version control
@@ -173,6 +172,38 @@ lint-java-fmt:
 [group('lint')]
 lint-openapi:
     ./openapi-linter.sh
+
+# Check OpenAPI backward compatibility
+[group('lint')]
+lint-openapi-diff:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    spec_path="{{openapi_spec_path}}"
+    old_spec="target/openapi-diff-old.yaml"
+    mkdir -p target
+    target_ref=""
+    if git rev-parse --verify "origin/main" >/dev/null 2>&1; then
+        target_ref="origin/main"
+    elif git rev-parse --verify "main" >/dev/null 2>&1; then
+        target_ref="main"
+    elif git remote get-url origin >/dev/null 2>&1; then
+        git fetch --no-tags --depth=1 origin main:refs/remotes/origin/main >/dev/null 2>&1 || true
+        if git rev-parse --verify "origin/main" >/dev/null 2>&1; then
+            target_ref="origin/main"
+        fi
+    fi
+    if [ -z "$target_ref" ]; then
+        echo "Error: Could not resolve base branch (origin/main or main). Please fetch main or check your git repository." >&2
+        exit 1
+    fi
+    if git cat-file -e "${target_ref}:${spec_path}" 2>/dev/null; then
+        git show "${target_ref}:${spec_path}" > "$old_spec"
+        mvn {{maven_opts}} openapi-diff:diff -Dopenapi.diff.oldSpec="$old_spec" -Dopenapi.diff.skip=false
+    else
+        rm -f "$old_spec"
+        echo "Info: '${spec_path}' does not exist on ${target_ref} yet. Skipping backward compatibility check."
+        exit 0
+    fi
 
 # ==================================================================================== #
 # LINT-FIX - Auto-fix code issues
