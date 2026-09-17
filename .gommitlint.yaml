@@ -5,5 +5,7 @@
 gommitlint:
   crypto_signature:
     required: true
+  repo:
+    max_commits_ahead: 20
   conventional:
     max_description_length: 84
