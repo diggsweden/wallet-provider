@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-09-18
+
+### Added
+
+- Add openapi backward compatibility check
+
+### Changed
+
+- Feat/key attestations endpoint (#130)
+- Merge pull request #129 from diggsweden/feat/openapi-backward-compatibility
+- Update dependency org.springdoc:springdoc-openapi-starter-webmvc-ui to v3.1.1 (#128)
+- Update dependency com.github.spotbugs:spotbugs-maven-plugin to v4.10.4.1 (#127)
+- Merge pull request #125 from diggsweden/renovate/actions-setup-java-6.x
+- Update actions/setup-java action to v6
+- Merge pull request #126 from diggsweden/renovate/java-non-major
+- Update dependency com.puppycrawl.tools:checkstyle to v14.1.0
+
+### Fixed
+
+- Allow branch to be up to 20 commits ahead of main (#131)
+
 ## [0.1.3] - 2026-09-07
 
 ### Added
@@ -36,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove obsolete exception class
 - Remove blank lines from imports
 - Remove mise paranoid setting
+
 
 ## [0.1.2] - 2026-08-28
 
@@ -475,6 +497,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
+[0.1.4]: https://github.com/diggsweden/wallet-provider/compare/v0.1.3..v0.1.4
 [0.1.3]: https://github.com/diggsweden/wallet-provider/compare/v0.1.2..v0.1.3
 [0.1.2]: https://github.com/diggsweden/wallet-provider/compare/v0.1.1..v0.1.2
 [0.1.1]: https://github.com/diggsweden/wallet-provider/compare/v0.1.0..v0.1.1
