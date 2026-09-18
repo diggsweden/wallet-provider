@@ -108,7 +108,13 @@ public class WalletUnitAttestationService {
   public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk, String nonce) {
     try {
       return createWalletUnitAttestationUnsafely(walletPublicKeyJwk, nonce);
-    } catch (ParseException | JacksonException | JOSEException e) {
+    } catch (ParseException | JOSEException | RuntimeException e) {
+      // walletPublicKeyJwk is attacker-controlled. RuntimeException is caught alongside the
+      // checked parsing exceptions because ECKey.parse() can throw an unchecked
+      // NullPointerException on certain malformed input (see nimbus-jose-jwt's
+      // JSONObjectUtils.getGeneric) instead of the expected ParseException - without this, that
+      // input reaches the generic exception handler, which echoes the raw exception message back
+      // to the caller.
       log.warn("Could not create WUA", e);
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
