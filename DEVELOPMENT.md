@@ -14,6 +14,7 @@ This guide outlines core essentials for developing in this project.
   - [Available Commands](#available-commands)
   - [Testing and Verification](#testing-format-and-lint)
   - [OpenAPI Compatibility Checks](#openapi-compatibility-checks)
+  - [Fuzz Testing](#fuzz-testing)
   - [Documentation](#documentation)
   - [Pull Request Process](#pull-request-workflow)
 
@@ -287,6 +288,29 @@ Common rule examples:
 | `incompatible.openapi.endpoints.decreased` | `openapi.endpoints.decreased` | Entire API endpoint path or method removed |
 
 For the complete and up-to-date list of all available incompatibility rules, refer to [BackwardIncompatibleProp.java in openapi-diff](https://github.com/OpenAPITools/openapi-diff/blob/master/core/src/main/java/org/openapitools/openapidiff/core/model/BackwardIncompatibleProp.java).
+
+### Fuzz Testing
+
+Fuzz tests (`src/fuzzTest/java/**/*FuzzTest.java`, Jazzer-based) run automatically as part of
+`mvn test`/`just test`/`just verify`, alongside every other test - no special flag needed. By
+default this only replays the committed seed corpus (fast, deterministic regression testing), it
+does **not** generate new inputs.
+
+To actually fuzz - explore new inputs beyond the committed seeds - set `JAZZER_FUZZ=1` and target
+one method at a time:
+
+```shell
+JAZZER_FUZZ=1 mvn test -Dtest="TokenParsingFuzzTest#fuzzEcKeyParsing"
+```
+
+Jazzer can only run one `@FuzzTest` method per JVM process in fuzzing mode (libFuzzer holds global
+state), so `JAZZER_FUZZ=1 mvn test` without a `-Dtest` filter will fuzz only the first method it
+finds and silently skip the rest.
+
+If fuzzing finds a crash, Jazzer saves the failing input under
+`src/fuzzTest/resources/<package>/<TestClass>Inputs/<method>/crash-<hash>`. That file is not
+committed automatically - only commit it once the finding has been triaged (and fixed, if it's a
+real bug), so it becomes a permanent regression test.
 
 ### Documentation
 
