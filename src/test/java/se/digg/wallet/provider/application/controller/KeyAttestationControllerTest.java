@@ -73,7 +73,7 @@ class KeyAttestationControllerTest {
 
     mockMvc
         .perform(
-            post("/key-attestations")
+            post("/v0/key-attestations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
@@ -105,7 +105,7 @@ class KeyAttestationControllerTest {
 
     mockMvc
         .perform(
-            post("/key-attestations")
+            post("/v0/key-attestations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(input)))
         .andExpect(status().isOk())
@@ -125,7 +125,7 @@ class KeyAttestationControllerTest {
 
     mockMvc
         .perform(
-            post("/key-attestations")
+            post("/v0/key-attestations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {"jwks":[{"jwk":"test-jwk"}],"nonce":"test-nonce"}

@@ -37,7 +37,7 @@ tags:
   - name: API Info
     description: Information about the API
 paths:
-  /key-attestations:
+  /v0/key-attestations:
     post:
       tags:
         - Key Attestation
