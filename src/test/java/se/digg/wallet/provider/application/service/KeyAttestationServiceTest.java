@@ -24,11 +24,16 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
@@ -250,6 +255,50 @@ class KeyAttestationServiceTest {
     assertThatThrownBy(() -> service.createKeyAttestation(List.of("   "), "nonce"))
         .isInstanceOf(InvalidKeyAttestationRequestParameterException.class)
         .hasMessage("jwk must not be empty.");
+  }
+
+  @ParameterizedTest(name = "rejects mixed list with {0}")
+  @MethodSource("invalidMixedJwkCases")
+  void a_mixed_list_containing_any_invalid_jwk_is_rejected(
+      String description, List<String> jwks, String expectedMessagePrefix) {
+    assertThatThrownBy(() -> service.createKeyAttestation(jwks, "nonce"))
+        .isInstanceOf(InvalidKeyAttestationRequestParameterException.class)
+        .hasMessageStartingWith(expectedMessagePrefix);
+  }
+
+  static Stream<Arguments> invalidMixedJwkCases() throws Exception {
+    KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
+    gen.initialize(Curve.P_256.toECParameterSpec());
+    KeyPair keyPair = gen.generateKeyPair();
+    String validJwk =
+        new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build().toString();
+    String privateJwk =
+        new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic())
+            .privateKey(keyPair.getPrivate())
+            .build()
+            .toString();
+
+    return Stream.of(
+        Arguments.of(
+            "private key mixed with valid key",
+            List.of(validJwk, privateJwk),
+            "Private keys are not accepted."),
+        Arguments.of(
+            "malformed jwk string mixed with valid key",
+            List.of(validJwk, "not-a-valid-jwk-json"),
+            "Invalid wallet public key JWK."),
+        Arguments.of(
+            "blank jwk mixed with valid key",
+            List.of(validJwk, "   "),
+            "jwk must not be empty."),
+        Arguments.of(
+            "null jwk mixed with valid key",
+            Arrays.asList(validJwk, null),
+            "jwk must not be empty."),
+        Arguments.of(
+            "malformed jwk as first item before valid key",
+            List.of("not-a-valid-jwk-json", validJwk),
+            "Invalid wallet public key JWK."));
   }
 
   private void verifyJwtSignature(SignedJWT jwt, ECPublicKey publicKey) throws JOSEException {

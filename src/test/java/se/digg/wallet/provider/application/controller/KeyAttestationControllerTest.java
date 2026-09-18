@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -48,28 +49,17 @@ class KeyAttestationControllerTest {
   @MockitoBean
   private SensitiveDataMasker sensitiveDataMasker;
 
-  @Test
-  void a_valid_request_returns_200_ok() throws Exception {
+  @ParameterizedTest(name = "returns 200 OK for {0} JWK(s)")
+  @MethodSource("validJwkListCases")
+  void a_valid_request_with_jwks_returns_200_ok(
+      String description, List<KeyAttestationItem> jwks) throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createKeyAttestation(anyList(), anyString()))
         .thenReturn(SignedJWT.parse(expectedJwt));
 
-    String jwk =
-        """
-            {
-                "kty": "EC",
-                "use": "sig",
-                "crv": "P-256",
-                "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
-                "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
-            }
-            """;
     String nonce = "123123123123";
     KeyAttestationRequest input =
-        KeyAttestationRequest.builder()
-            .jwks(List.of(KeyAttestationItem.builder().jwk(jwk).build()))
-            .nonce(nonce)
-            .build();
+        KeyAttestationRequest.builder().jwks(jwks).nonce(nonce).build();
 
     mockMvc
         .perform(
@@ -79,6 +69,9 @@ class KeyAttestationControllerTest {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.key_attestation").value(expectedJwt));
+
+    List<String> expectedJwkStrings = jwks.stream().map(KeyAttestationItem::getJwk).toList();
+    verify(service).createKeyAttestation(eq(expectedJwkStrings), eq(nonce));
   }
 
   @Test
@@ -135,6 +128,74 @@ class KeyAttestationControllerTest {
         .andExpect(jsonPath("$.title").value(expectedTitle))
         .andExpect(jsonPath("$.status").value(expectedStatus.value()))
         .andExpect(jsonPath("$.detail").value(expectedDetail));
+  }
+
+  @ParameterizedTest(name = "returns 400 Bad Request for {0}")
+  @MethodSource("invalidControllerJwkListCases")
+  void an_invalid_jwk_list_returns_400_bad_request(
+      String description, String jsonPayload, String expectedDetail) throws Exception {
+    mockMvc
+        .perform(
+            post("/v0/key-attestations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonPayload))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+        .andExpect(jsonPath("$.title").value("Bad Request"))
+        .andExpect(jsonPath("$.status").value(400))
+        .andExpect(jsonPath("$.detail").value(expectedDetail));
+  }
+
+  static Stream<Arguments> invalidControllerJwkListCases() {
+    return Stream.of(
+        Arguments.of(
+            "empty jwks list",
+            """
+                {"jwks":[],"nonce":"test-nonce"}
+                """,
+            "jwks must not be empty."),
+        Arguments.of(
+            "jwks item with blank jwk",
+            """
+                {"jwks":[{"jwk":"   "}],"nonce":"test-nonce"}
+                """,
+            "jwk must not be empty."),
+        Arguments.of(
+            "mixed list with a blank jwk",
+            """
+                {"jwks":[{"jwk":"valid-jwk"},{"jwk":"  "}],"nonce":"test-nonce"}
+                """,
+            "jwk must not be empty."));
+  }
+
+  static Stream<Arguments> validJwkListCases() {
+    String jwk1 =
+        """
+            {
+                "kty": "EC",
+                "use": "sig",
+                "crv": "P-256",
+                "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
+                "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
+            }
+            """;
+    String jwk2 =
+        """
+            {
+                "kty": "EC",
+                "use": "sig",
+                "crv": "P-256",
+                "x": "f83OJ3D2xFMTbKEAnDEQxEtIFXJhFLDKDitwHR6Elxo",
+                "y": "x_daQauqmFriU-BRnrqkoqWZF3LGURQJn6C30Gw9Vio"
+            }
+            """;
+    return Stream.of(
+        Arguments.of("single", List.of(KeyAttestationItem.builder().jwk(jwk1).build())),
+        Arguments.of(
+            "multiple",
+            List.of(
+                KeyAttestationItem.builder().jwk(jwk1).build(),
+                KeyAttestationItem.builder().jwk(jwk2).build())));
   }
 
   static Stream<Arguments> serviceErrorCases() {

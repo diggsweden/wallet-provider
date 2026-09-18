@@ -13,6 +13,7 @@ import se.digg.wallet.provider.api.v0.model.KeyAttestationItem;
 import se.digg.wallet.provider.api.v0.model.KeyAttestationRequest;
 import se.digg.wallet.provider.api.v0.model.KeyAttestationResponse;
 import se.digg.wallet.provider.application.service.KeyAttestationService;
+import se.digg.wallet.provider.application.service.exception.InvalidKeyAttestationRequestParameterException;
 
 @RestController
 public class KeyAttestationController implements KeyAttestationApi {
@@ -27,10 +28,15 @@ public class KeyAttestationController implements KeyAttestationApi {
   public ResponseEntity<KeyAttestationResponse> postKeyAttestation(
       KeyAttestationRequest keyAttestationRequest) {
     List<KeyAttestationItem> items = keyAttestationRequest.getJwks();
-    List<String> jwks =
-        items == null
-            ? null
-            : items.stream().map(item -> item != null ? item.getJwk() : null).toList();
+    if (items == null || items.isEmpty()) {
+      throw new InvalidKeyAttestationRequestParameterException("jwks must not be empty.");
+    }
+    if (items.stream()
+        .anyMatch(item -> item == null || item.getJwk() == null || item.getJwk().isBlank())) {
+      throw new InvalidKeyAttestationRequestParameterException("jwk must not be empty.");
+    }
+
+    List<String> jwks = items.stream().map(KeyAttestationItem::getJwk).toList();
     SignedJWT signedJwt =
         attestationService.createKeyAttestation(
             jwks,
