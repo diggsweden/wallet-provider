@@ -6,7 +6,7 @@ openapi: 3.1.0
 info:
   title: Wallet Provider API
   description: European Digital Identity Wallet Provider.
-  version: v0
+  version: 0.0.1
   termsOfService: https://www.digg.se/
   contact:
     name: Digg - Agency for Digital Government
@@ -30,13 +30,42 @@ info:
 servers:
   - url: '/'
 tags:
+  - name: Key Attestation
+    description: Operations related to Key Attestation (KA)
   - name: Wallet Unit Attestation
     description: Operations related to Wallet Unit Attestation (WUA)
   - name: API Info
     description: Information about the API
 paths:
+  /v0/key-attestations:
+    post:
+      tags:
+        - Key Attestation
+      summary: Create Key Attestation
+      description: Creates a Key Attestation (KA) required for binding keys in the credential issuance flow.
+      operationId: postKeyAttestation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeyAttestationRequest'
+      responses:
+        "200":
+          description: Successfully created Key Attestation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyAttestationResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemResponse'
   /wallet-unit-attestation:
     post:
+      deprecated: true
       tags:
         - Wallet Unit Attestation
       summary: Create Wallet Unit Attestation
@@ -110,6 +139,45 @@ paths:
                 $ref: '#/components/schemas/ProblemResponse'
 components:
   schemas:
+    KeyAttestationRequest:
+      type: object
+      required:
+        - jwks
+      properties:
+        jwks:
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyAttestationItem'
+          description: A list of JSON Web Keys representing the public keys of the client.
+        nonce:
+          type: string
+          description: Optional nonce from the Credential Issuer.
+      example:
+        jwks:
+          - jwk: '{"kty":"EC","crv":"P-256","x":"...","y":"..."}'
+        nonce: "1234567890"
+
+    KeyAttestationItem:
+      type: object
+      description: An item containing a client public key for key attestation.
+      required:
+        - jwk
+      properties:
+        jwk:
+          type: string
+          description: A JSON Web Key representing the public key of the client.
+      example:
+        jwk: '{"kty":"EC","crv":"P-256","x":"...","y":"..."}'
+
+    KeyAttestationResponse:
+      type: object
+      required:
+        - key_attestation
+      properties:
+        key_attestation:
+          type: string
+          description: The signed Key Attestation as a compact JWT string.
+
     WalletUnitAttestationRequest:
       type: object
       required:

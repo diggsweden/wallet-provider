@@ -20,6 +20,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -27,17 +28,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
-import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
+import se.digg.wallet.provider.application.service.exception.InvalidKeyAttestationRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-@Deprecated
 @Service
-public class WalletUnitAttestationService {
+public class KeyAttestationService {
 
-  private final Logger log = LoggerFactory.getLogger(WalletUnitAttestationService.class);
+  private final Logger log = LoggerFactory.getLogger(KeyAttestationService.class);
   private final WuaKeystoreProperties keystoreProperties;
   private final ObjectMapper objectMapper;
 
@@ -46,18 +46,33 @@ public class WalletUnitAttestationService {
   private static final TypeReference<Map<String, Object>> STATUS_TYPE_REF =
       new TypeReference<>() {};
 
-  public WalletUnitAttestationService(
+  public KeyAttestationService(
       WuaKeystoreProperties keystoreProperties, ObjectMapper objectMapper) {
     this.keystoreProperties = keystoreProperties;
     this.objectMapper = objectMapper.rebuild().build();
   }
 
-  private SignedJWT createWalletUnitAttestationUnsafely(String walletPublicKeyJwk, String nonce)
+  private SignedJWT createKeyAttestationUnsafely(List<String> walletPublicKeyJwks, String nonce)
       throws ParseException, JOSEException {
-    log.debug("Trying to create WUA {} nonce",
-        nonce == null ? "without" : "with");
-    ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
-    List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
+    log.debug("Trying to create KA {} nonce", nonce == null ? "without" : "with");
+    if (walletPublicKeyJwks == null || walletPublicKeyJwks.isEmpty()) {
+      throw new InvalidKeyAttestationRequestParameterException("jwks must not be empty.");
+    }
+    List<Map<String, Object>> attestedKeys = new ArrayList<>();
+    ECKey firstKey = null;
+    for (String jwkString : walletPublicKeyJwks) {
+      if (jwkString == null || jwkString.isBlank()) {
+        throw new InvalidKeyAttestationRequestParameterException("jwk must not be empty.");
+      }
+      ECKey attestedKey = ECKey.parse(jwkString);
+      if (attestedKey.isPrivate()) {
+        throw new InvalidKeyAttestationRequestParameterException("Private keys are not accepted.");
+      }
+      if (firstKey == null) {
+        firstKey = attestedKey;
+      }
+      attestedKeys.add(attestedKey.toJSONObject());
+    }
 
     ECPrivateKey signingKey = keystoreProperties.getSigningKey();
     List<X509Certificate> certificateChain = keystoreProperties.getCertificateChain();
@@ -65,12 +80,15 @@ public class WalletUnitAttestationService {
 
     Instant now = Instant.now();
 
-    Map<String, Object> keyStorageStatus = Map.of(
-        "status", getStatus(),
-        "exp", (System.currentTimeMillis() / 1000) + ONE_YEAR_IN_SECONDS);
+    Map<String, Object> keyStorageStatus =
+        Map.of(
+            "status", getStatus(),
+            "exp", (System.currentTimeMillis() / 1000) + ONE_YEAR_IN_SECONDS);
 
     var claimsSet =
         new JWTClaimsSet.Builder()
+            .issuer(keystoreProperties.issuer())
+            .subject(firstKey.computeThumbprint().toString())
             .issueTime(Date.from(now))
             .expirationTime(Date.from(now.plus(validity)))
             .claim("certification", "http://example.com/cert")
@@ -105,23 +123,27 @@ public class WalletUnitAttestationService {
     JWSSigner signer = new ECDSASigner(signingKey);
     signedJwt.sign(signer);
 
-    log.debug("Successfully created WUA");
+    log.debug("Successfully created KA");
     return signedJwt;
   }
 
-  public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk, String nonce) {
+  public SignedJWT createKeyAttestation(List<String> walletPublicKeyJwks, String nonce) {
     try {
-      return createWalletUnitAttestationUnsafely(walletPublicKeyJwk, nonce);
+      return createKeyAttestationUnsafely(walletPublicKeyJwks, nonce);
     } catch (ParseException e) {
-      throw new InvalidWuaRequestParameterException("Invalid wallet public key JWK.", e);
+      throw new InvalidKeyAttestationRequestParameterException(
+          "Invalid wallet public key JWK.", e);
     } catch (JOSEException e) {
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
+  }
 
+  public SignedJWT createKeyAttestation(String walletPublicKeyJwk, String nonce) {
+    return createKeyAttestation(
+        walletPublicKeyJwk == null ? List.of() : List.of(walletPublicKeyJwk), nonce);
   }
 
   private Map<String, Object> getStatus() throws JacksonException {
     return objectMapper.readValue(keystoreProperties.status(), STATUS_TYPE_REF);
   }
-
 }

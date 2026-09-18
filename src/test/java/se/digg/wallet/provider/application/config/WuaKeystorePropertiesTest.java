@@ -34,4 +34,9 @@ class WuaKeystorePropertiesTest {
     assertNotNull(key);
     assertEquals("EC", key.getAlgorithm());
   }
+
+  @Test
+  void assertThatIssuer_givenValidKeyStore_shouldReturnDigg() {
+    assertEquals("Digg", properties.issuer());
+  }
 }
