@@ -5,6 +5,12 @@
 # It is expected to 'leak' secrets to our local environment in our test code
 /src/test/java
 
+# Same rationale as above: fuzz test sources and their seed corpus (fake
+# JWK/JWT/Bearer-token-shaped strings used to exercise parsers) live outside
+# src/test/java on purpose (see DEVELOPMENT.md, "Fuzz Testing"), so this needs
+# its own entry rather than being covered by the one above.
+/src/fuzzTest
+
 # secrets: inherit is intentional here — reusable-ci does not yet declare
 # explicit secrets in on.workflow_call.secrets, so it cannot be enumerated.
 # TODO: remove once diggsweden/reusable-ci exposes explicit secret declarations.
