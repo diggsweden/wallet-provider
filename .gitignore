@@ -13,6 +13,9 @@ target
 
 .DS_Store
 
+# Jazzer's local libFuzzer working corpus (ephemeral, not the checked-in regression seeds)
+.cifuzz-corpus/
+
 ### STS ###
 .apt_generated
 .classpath
