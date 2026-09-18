@@ -13,6 +13,7 @@ This guide outlines core essentials for developing in this project.
 - [Development Workflow](#development-workflow)
   - [Available Commands](#available-commands)
   - [Testing and Verification](#testing-format-and-lint)
+  - [Fuzz Testing](#fuzz-testing)
   - [Documentation](#documentation)
   - [Pull Request Process](#pull-request-workflow)
 
@@ -242,6 +243,29 @@ Or run Maven directly:
 ```shell
 mvn clean verify
 ```
+
+### Fuzz Testing
+
+Fuzz tests (`src/fuzzTest/java/**/*FuzzTest.java`, Jazzer-based) run automatically as part of
+`mvn test`/`just test`/`just verify`, alongside every other test - no special flag needed. By
+default this only replays the committed seed corpus (fast, deterministic regression testing), it
+does **not** generate new inputs.
+
+To actually fuzz - explore new inputs beyond the committed seeds - set `JAZZER_FUZZ=1` and target
+one method at a time:
+
+```shell
+JAZZER_FUZZ=1 mvn test -Dtest="TokenParsingFuzzTest#fuzzEcKeyParsing"
+```
+
+Jazzer can only run one `@FuzzTest` method per JVM process in fuzzing mode (libFuzzer holds global
+state), so `JAZZER_FUZZ=1 mvn test` without a `-Dtest` filter will fuzz only the first method it
+finds and silently skip the rest.
+
+If fuzzing finds a crash, Jazzer saves the failing input under
+`src/fuzzTest/resources/<package>/<TestClass>Inputs/<method>/crash-<hash>`. That file is not
+committed automatically - only commit it once the finding has been triaged (and fixed, if it's a
+real bug), so it becomes a permanent regression test.
 
 ### Documentation
 

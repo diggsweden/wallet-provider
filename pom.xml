@@ -121,6 +121,14 @@ SPDX-License-Identifier: EUPL-1.2
       <version>3.27.7</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- Jazzer Fuzzing Dependency (JUnit 5) -->
+    <dependency>
+      <groupId>com.code-intelligence</groupId>
+      <artifactId>jazzer-junit</artifactId>
+      <version>0.30.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -162,6 +170,13 @@ SPDX-License-Identifier: EUPL-1.2
           <compilerTargetPlatform>
             ${maven.compiler.target}
           </compilerTargetPlatform>
+          <!-- Explicit because setting <directories> overrides (not adds to) the plugin's own
+               main+test defaults; src/fuzzTest/java must be listed here to still be formatted. -->
+          <directories>
+            <directory>${project.basedir}/src/main/java</directory>
+            <directory>${project.basedir}/src/test/java</directory>
+            <directory>${project.basedir}/src/fuzzTest/java</directory>
+          </directories>
         </configuration>
         <executions>
           <execution>
@@ -307,6 +322,39 @@ SPDX-License-Identifier: EUPL-1.2
               <sources>
                 <source>${project.basedir}/target/generated-sources/openapi/src/main/java</source>
               </sources>
+            </configuration>
+          </execution>
+          <!-- Fuzz tests live outside src/test/java on purpose: OpenSSF Scorecard's Fuzzing
+               check excludes anything under src/test/ when searching for the Jazzer
+               FuzzedDataProvider import (see checks/fileparser/listing.go's isTestdataFile),
+               so tests placed there are invisible to it even though they run identically. -->
+          <execution>
+            <id>add-fuzz-test-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/src/fuzzTest/java</source>
+              </sources>
+            </configuration>
+          </execution>
+          <!-- Seed corpus resources live alongside the fuzz test sources rather than under
+               src/test/resources; Jazzer resolves them via the classpath, not a hardcoded
+               physical path, so any resource root registered on the test classpath works. -->
+          <execution>
+            <id>add-fuzz-test-resource</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>add-test-resource</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/src/fuzzTest/resources</directory>
+                </resource>
+              </resources>
             </configuration>
           </execution>
         </executions>
