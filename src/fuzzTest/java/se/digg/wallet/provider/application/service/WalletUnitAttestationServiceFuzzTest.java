@@ -8,8 +8,8 @@ import com.code_intelligence.jazzer.api.FuzzedDataProvider;
 import com.code_intelligence.jazzer.junit.FuzzTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.core.io.ClassPathResource;
-import se.digg.wallet.provider.application.config.WalletRuntimeException;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
+import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 import tools.jackson.databind.ObjectMapper;
 
 /**

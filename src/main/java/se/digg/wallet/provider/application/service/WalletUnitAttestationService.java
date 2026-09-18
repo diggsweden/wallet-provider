@@ -109,10 +109,9 @@ public class WalletUnitAttestationService {
   public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk, String nonce) {
     try {
       return createWalletUnitAttestationUnsafely(walletPublicKeyJwk, nonce);
-    } catch (ParseException e){
+    } catch (ParseException e) {
       throw new InvalidWuaRequestParameterException("Invalid wallet public key JWK.", e);
-    }
-    catch(JOSEException | RuntimeException e) {
+    } catch (JOSEException | RuntimeException e) {
       log.warn("Could not create WUA", e);
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
