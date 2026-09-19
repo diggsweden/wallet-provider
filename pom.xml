@@ -42,10 +42,10 @@ SPDX-License-Identifier: EUPL-1.2
     <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
     <record-builder.version>53</record-builder.version>
     <openapi-generator-maven-plugin.version>7.25.0</openapi-generator-maven-plugin.version>
-    <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
+    <build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
     <openapi.spec.relative-path>src/main/resources/static/wallet-provider-openapi-v0.yaml</openapi.spec.relative-path>
     <openapi.spec.file>${project.basedir}/${openapi.spec.relative-path}</openapi.spec.file>
-    <openapi-diff-maven.version>2.1.4</openapi-diff-maven.version>
+    <openapi-diff-maven.version>2.1.7</openapi-diff-maven.version>
     <openapi.diff.oldSpec>https://raw.githubusercontent.com/diggsweden/wallet-provider/main/${openapi.spec.relative-path}</openapi.diff.oldSpec>
     <openapi.diff.newSpec>${openapi.spec.file}</openapi.diff.newSpec>
     <openapi.diff.failOnIncompatible>true</openapi.diff.failOnIncompatible>
@@ -69,7 +69,7 @@ SPDX-License-Identifier: EUPL-1.2
     <dependency>
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-core</artifactId>
-      <version>11.0.25</version>
+      <version>11.0.26</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
