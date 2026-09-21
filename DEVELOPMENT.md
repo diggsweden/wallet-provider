@@ -300,7 +300,7 @@ To actually fuzz - explore new inputs beyond the committed seeds - set `JAZZER_F
 one method at a time:
 
 ```shell
-JAZZER_FUZZ=1 mvn test -Dtest="TokenParsingFuzzTest#fuzzEcKeyParsing"
+JAZZER_FUZZ=1 mvn test -Dtest="KeyAttestationServiceFuzzTest#fuzzCreateKeyAttestation"
 ```
 
 Jazzer can only run one `@FuzzTest` method per JVM process in fuzzing mode (libFuzzer holds global
