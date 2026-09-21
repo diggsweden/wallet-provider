@@ -35,7 +35,8 @@ public class WalletUnitAttestationServiceFuzzTest {
         "wallet-provider",
         "PKCS12",
         "{\"status_list\": {\"idx\": 412,\"uri\": \"https://revocation_url/statuslists/1\"}}",
-        24);
+        24,
+        "Digg");
     service = new WalletUnitAttestationService(keystoreProperties, new ObjectMapper());
   }
 
