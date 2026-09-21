@@ -133,7 +133,10 @@ public class KeyAttestationService {
     } catch (ParseException e) {
       throw new InvalidKeyAttestationRequestParameterException(
           "Invalid wallet public key JWK.", e);
-    } catch (JOSEException e) {
+    } catch (WalletRuntimeException e) {
+      throw e;
+    } catch (JOSEException | RuntimeException e) {
+      log.warn("Could not create KA", e);
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
   }
