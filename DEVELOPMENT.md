@@ -308,9 +308,12 @@ state), so `JAZZER_FUZZ=1 mvn test` without a `-Dtest` filter will fuzz only the
 finds and silently skip the rest.
 
 If fuzzing finds a crash, Jazzer saves the failing input under
-`src/fuzzTest/resources/<package>/<TestClass>Inputs/<method>/crash-<hash>`. That file is not
-committed automatically - only commit it once the finding has been triaged (and fixed, if it's a
-real bug), so it becomes a permanent regression test.
+`src/test/resources/<package>/<TestClass>Inputs/<method>/crash-<hash>` - Jazzer always writes to the
+standard Maven test-resources path, regardless of the extra `src/fuzzTest/resources` root registered
+via `build-helper-maven-plugin`. Move the crash file into the matching
+`src/fuzzTest/resources/<package>/<TestClass>Inputs/<method>/` directory once the finding has been
+triaged (and fixed, if it's a real bug), so it becomes a permanent regression test; it is not
+committed automatically.
 
 ### Documentation
 

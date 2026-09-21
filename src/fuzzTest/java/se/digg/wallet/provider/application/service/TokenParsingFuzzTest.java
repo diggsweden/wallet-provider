@@ -65,8 +65,8 @@ public class TokenParsingFuzzTest {
         String jwkJson = new String(decoded);
         ECKey.parse(jwkJson);
       }
-    } catch (ParseException | IllegalArgumentException e) {
-      // Ignore - fuzzing for coverage
+    } catch (ParseException | IllegalArgumentException | NullPointerException e) {
+      // See fuzzEcKeyParsing() - shares the same JWKMetadata.parseKeyType() path.
     }
   }
 
@@ -75,8 +75,8 @@ public class TokenParsingFuzzTest {
     String malformedJson = data.consumeRemainingAsString();
     try {
       ECKey.parse(malformedJson);
-    } catch (ParseException e) {
-      // Ignore - fuzzing for coverage
+    } catch (ParseException | NullPointerException e) {
+      // See fuzzEcKeyParsing() - shares the same JWKMetadata.parseKeyType() path.
     }
   }
 
@@ -89,8 +89,8 @@ public class TokenParsingFuzzTest {
           "{\"kty\":\"EC\",\"kid\":\"%s\",\"crv\":\"P-256\",\"x\":\"%s\",\"y\":\"%s\"}",
           longValue, longValue, longValue);
       ECKey.parse(jwkJson);
-    } catch (ParseException e) {
-      // Ignore - fuzzing for coverage
+    } catch (ParseException | NullPointerException e) {
+      // See fuzzEcKeyParsing() - shares the same JWKMetadata.parseKeyType() path.
     }
   }
 
@@ -100,8 +100,8 @@ public class TokenParsingFuzzTest {
     try {
       String jwkJson = "{\"kty\":\"EC\",\"kid\":\"" + fieldValue + "\",\"crv\":\"P-256\"}";
       ECKey.parse(jwkJson);
-    } catch (ParseException e) {
-      // Ignore - fuzzing for coverage
+    } catch (ParseException | NullPointerException e) {
+      // See fuzzEcKeyParsing() - shares the same JWKMetadata.parseKeyType() path.
     }
   }
 
