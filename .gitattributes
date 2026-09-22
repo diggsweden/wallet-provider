@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
+#
+# SPDX-License-Identifier: EUPL-1.2
+
+# Jazzer fuzz test seed corpus files must not be line-ending-normalized, or their
+# byte content (and therefore the exact input Jazzer replays) would silently change.
+src/fuzzTest/resources/se/digg/wallet/provider/application/**/*FuzzTestInputs/** binary
