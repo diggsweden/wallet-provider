@@ -12,6 +12,7 @@ import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64;
+import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import java.security.cert.CertificateEncodingException;
@@ -64,7 +65,7 @@ public class KeyAttestationService {
       if (jwkString == null || jwkString.isBlank()) {
         throw new InvalidKeyAttestationRequestParameterException("jwk must not be empty.");
       }
-      ECKey attestedKey = ECKey.parse(jwkString);
+      ECKey attestedKey = parseAttestedKey(jwkString);
       if (attestedKey.isPrivate()) {
         throw new InvalidKeyAttestationRequestParameterException("Private keys are not accepted.");
       }
@@ -125,6 +126,14 @@ public class KeyAttestationService {
 
     log.debug("Successfully created KA");
     return signedJwt;
+  }
+
+  private static ECKey parseAttestedKey(String jwkString) throws ParseException {
+    Map<String, Object> jsonObject = JSONObjectUtils.parse(jwkString);
+    if (jsonObject == null) {
+      throw new ParseException("Invalid wallet public key JWK.", 0);
+    }
+    return ECKey.parse(jsonObject);
   }
 
   public SignedJWT createKeyAttestation(List<String> walletPublicKeyJwks, String nonce) {
