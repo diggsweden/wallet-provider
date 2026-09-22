@@ -14,10 +14,8 @@ import tools.jackson.databind.ObjectMapper;
 
 /**
  * Fuzz tests for {@link WalletUnitAttestationService#createWalletUnitAttestation}, the actual
- * end-to-end orchestration entry point (claims/attestedKeys/JOSE header construction) - as opposed
- * to {@link TokenParsingFuzzTest}/{@link WalletUnitAttestationServiceJwkParsingFuzzTest}, which
- * only fuzz the underlying nimbus-jose-jwt/Jackson library calls it depends on. Uses the same test
- * keystore as {@code WalletUnitAttestationServiceTest}
+ * end-to-end orchestration entry point (claims/attestedKeys/JOSE header construction). Uses the
+ * same test keystore as {@code WalletUnitAttestationServiceTest}
  * (src/test/resources/certificates/wallet-provider.p12), built directly rather than via
  * {@code @SpringBootTest}: Jazzer's fuzzing mode manages its own test instance lifecycle, and every
  * other fuzz test in this suite avoids depending on a Spring context for the same reason. Uses
@@ -40,7 +38,7 @@ public class WalletUnitAttestationServiceFuzzTest {
     service = new WalletUnitAttestationService(keystoreProperties, new ObjectMapper());
   }
 
-  @FuzzTest(maxDuration = "10s")
+  @FuzzTest
   public void fuzzCreateWalletUnitAttestation(FuzzedDataProvider data) {
     String jwk = data.consumeString(data.remainingBytes() / 2);
     String nonce = data.consumeRemainingAsString();

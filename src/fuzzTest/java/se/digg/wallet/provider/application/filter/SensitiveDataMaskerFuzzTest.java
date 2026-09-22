@@ -42,12 +42,12 @@ public class SensitiveDataMaskerFuzzTest {
     field.set(masker, value);
   }
 
-  @FuzzTest(maxDuration = "10s")
+  @FuzzTest
   public void fuzzMaskJsonBody(FuzzedDataProvider data) {
     masker.maskJsonBody(data.consumeRemainingAsString());
   }
 
-  @FuzzTest(maxDuration = "5s")
+  @FuzzTest
   public void fuzzMaskHeaders(FuzzedDataProvider data) {
     String headerName = data.consumeString(data.remainingBytes() / 2);
     String headerValue = data.consumeRemainingAsString();

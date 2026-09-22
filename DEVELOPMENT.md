@@ -303,6 +303,9 @@ one method at a time:
 JAZZER_FUZZ=1 mvn test -Dtest="KeyAttestationServiceFuzzTest#fuzzCreateKeyAttestation"
 ```
 
+Each method fuzzes for 5 minutes by default. Change that for a single run with
+`-Djazzer.max_duration`, for example `-Djazzer.max_duration=30s`.
+
 Jazzer can only run one `@FuzzTest` method per JVM process in fuzzing mode (libFuzzer holds global
 state), so `JAZZER_FUZZ=1 mvn test` without a `-Dtest` filter will fuzz only the first method it
 finds and silently skip the rest.
@@ -314,6 +317,9 @@ via `build-helper-maven-plugin`. Move the crash file into the matching
 `src/fuzzTest/resources/<package>/<TestClass>Inputs/<method>/` directory once the finding has been
 triaged (and fixed, if it's a real bug), so it becomes a permanent regression test; it is not
 committed automatically.
+
+A fuzzing run stops at the first crash it finds. After fixing a finding, run the same method again:
+there may be further findings behind the first one.
 
 ### Documentation
 

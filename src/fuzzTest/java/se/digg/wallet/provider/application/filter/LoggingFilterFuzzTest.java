@@ -69,25 +69,25 @@ public class LoggingFilterFuzzTest {
         () -> "correlation id leaked a control character: " + correlationId);
   }
 
-  @FuzzTest(maxDuration = "5s")
+  @FuzzTest
   public void fuzzCorrelationIdHeader(FuzzedDataProvider data) throws ReflectiveOperationException {
     assertSafeCorrelationId(correlationIdFor(data.consumeRemainingAsString(), null));
   }
 
-  @FuzzTest(maxDuration = "5s")
+  @FuzzTest
   public void fuzzRequestIdHeaderFallback(FuzzedDataProvider data)
       throws ReflectiveOperationException {
     assertSafeCorrelationId(correlationIdFor(null, data.consumeRemainingAsString()));
   }
 
-  @FuzzTest(maxDuration = "5s")
+  @FuzzTest
   public void fuzzBothHeadersPresent(FuzzedDataProvider data) throws ReflectiveOperationException {
     String correlationIdValue = data.consumeString(data.remainingBytes() / 2);
     String requestIdValue = data.consumeRemainingAsString();
     assertSafeCorrelationId(correlationIdFor(correlationIdValue, requestIdValue));
   }
 
-  @FuzzTest(maxDuration = "5s")
+  @FuzzTest
   public void fuzzGetPayload(FuzzedDataProvider data) throws ReflectiveOperationException {
     byte[] content = data.consumeRemainingAsBytes();
     String result = (String) getPayload.invoke(filter, (Object) content);
