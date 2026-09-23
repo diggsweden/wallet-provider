@@ -88,7 +88,9 @@ public class WalletUnitAttestationService {
                   try {
                     return Base64.encode(c.getEncoded());
                   } catch (CertificateEncodingException e) {
-                    throw new WalletRuntimeException(e);
+                    throw new WalletRuntimeException(
+                        "Failed to encode certificate for attestation.",
+                        e);
                   }
                 })
             .toList();
