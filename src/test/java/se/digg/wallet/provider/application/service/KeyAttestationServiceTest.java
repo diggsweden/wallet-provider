@@ -21,6 +21,8 @@ import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jwt.SignedJWT;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.text.ParseException;
@@ -122,6 +124,37 @@ class KeyAttestationServiceTest {
 
     assertEquals("Invalid wallet public key JWK.", exception.getMessage());
     assertTrue(exception.getCause() instanceof ParseException);
+  }
+
+  @Test
+  void must_not_leak_certificate_encoding_details() throws Exception {
+    X509Certificate badCert = mock(X509Certificate.class);
+    when(badCert.getEncoded())
+        .thenThrow(new CertificateEncodingException("SENSITIVE INTERNAL DETAIL"));
+
+    WuaKeystoreProperties properties = mock(WuaKeystoreProperties.class);
+    when(properties.getSigningKey()).thenReturn(mock(ECPrivateKey.class));
+    when(properties.getCertificateChain()).thenReturn(List.of(badCert));
+    when(properties.validityHours()).thenReturn(1);
+    when(properties.status()).thenReturn("{}");
+
+    KeyAttestationService service = new KeyAttestationService(properties, new ObjectMapper());
+
+    // Message content is checked for safety only, not an exact string: whether this is
+    // double-wrapped (like WalletUnitAttestationService) or passed through directly currently
+    // depends on how broadly KeyAttestationService's WalletRuntimeException passthrough guard is
+    // scoped - a separate concern from whether the message itself is safe.
+    WalletRuntimeException exception = assertThrows(
+        WalletRuntimeException.class,
+        () -> service.createKeyAttestation(createJwk().toString(), "nonce"));
+
+    assertFalse(exception.getMessage().contains("SENSITIVE INTERNAL DETAIL"));
+    Throwable cause = exception.getCause();
+    if (cause instanceof WalletRuntimeException wrapped) {
+      assertFalse(wrapped.getMessage().contains("SENSITIVE INTERNAL DETAIL"));
+      cause = wrapped.getCause();
+    }
+    assertInstanceOf(CertificateEncodingException.class, cause);
   }
 
   @Test

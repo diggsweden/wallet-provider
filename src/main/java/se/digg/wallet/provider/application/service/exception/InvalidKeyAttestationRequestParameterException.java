@@ -9,10 +9,6 @@ package se.digg.wallet.provider.application.service.exception;
  */
 public class InvalidKeyAttestationRequestParameterException extends WalletRuntimeException {
 
-  public InvalidKeyAttestationRequestParameterException(Throwable cause) {
-    super(cause);
-  }
-
   public InvalidKeyAttestationRequestParameterException(String message) {
     super(message);
   }

@@ -20,6 +20,9 @@ import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jwt.SignedJWT;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.text.ParseException;
 import java.util.List;
@@ -119,6 +122,32 @@ class WalletUnitAttestationServiceTest {
 
     assertEquals("Could not create attestation.", exception.getMessage());
     assertInstanceOf(JOSEException.class, exception.getCause());
+  }
+
+  @Test
+  void must_not_leak_certificate_encoding_details() throws Exception {
+    X509Certificate badCert = mock(X509Certificate.class);
+    when(badCert.getEncoded())
+        .thenThrow(new CertificateEncodingException("SENSITIVE INTERNAL DETAIL"));
+
+    WuaKeystoreProperties properties = mock(WuaKeystoreProperties.class);
+    when(properties.getSigningKey()).thenReturn(mock(ECPrivateKey.class));
+    when(properties.getCertificateChain()).thenReturn(List.of(badCert));
+    when(properties.validityHours()).thenReturn(1);
+    when(properties.status()).thenReturn("{}");
+
+    WalletUnitAttestationService service =
+        new WalletUnitAttestationService(properties, new ObjectMapper());
+
+    WalletRuntimeException exception = assertThrows(
+        WalletRuntimeException.class,
+        () -> service.createWalletUnitAttestation(createJwk().toString(), "nonce"));
+
+    assertEquals("Could not create attestation.", exception.getMessage());
+    assertFalse(exception.getMessage().contains("SENSITIVE INTERNAL DETAIL"));
+    assertInstanceOf(WalletRuntimeException.class, exception.getCause());
+    assertInstanceOf(CertificateEncodingException.class, exception.getCause().getCause());
+    assertFalse(exception.getCause().getMessage().contains("SENSITIVE INTERNAL DETAIL"));
   }
 
 
