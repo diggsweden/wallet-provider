@@ -163,7 +163,9 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   /*
-   * Handle exception not handled elsewhere.
+   * Handle exception not handled elsewhere. The exception here is by definition unanticipated, so
+   * its message is never echoed to the caller - it may come from third-party code we do not control
+   * and could contain internal implementation details. It is still logged in full server-side.
    */
   @ExceptionHandler(Throwable.class)
   public ResponseEntity<Object> handleAnyException(Throwable e) {
@@ -171,7 +173,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     var method = httpServletRequest.getMethod();
     var path = httpServletRequest.getServletPath();
     var problemResponse = buildProblemResponse(INTERNAL)
-        .detail(e.getLocalizedMessage())
+        .detail("An unexpected error occurred.")
         .instance(path)
         .build();
 
