@@ -87,6 +87,20 @@ class WalletUnitAttestationServiceTest {
     assertTrue(exception.getCause() instanceof ParseException);
   }
 
+  @Test
+  void must_throw_invalid_wua_parameter_exception_for_a_jwk_that_is_the_json_literal_null() {
+    // nimbus-jose-jwt's ECKey.parse() throws an unchecked NullPointerException instead of a
+    // ParseException for this specific input (JSONObjectUtils.parse() returns null for the JSON
+    // literal "null" without throwing). Regression test for that library quirk: it must still be
+    // classified as an invalid client parameter (400), not an internal server error (500).
+    InvalidWuaRequestParameterException exception = assertThrows(
+        InvalidWuaRequestParameterException.class,
+        () -> service.createWalletUnitAttestation("null", "nonce"));
+
+    assertEquals("Invalid wallet public key JWK.", exception.getMessage());
+    assertTrue(exception.getCause() instanceof ParseException);
+  }
+
 
   @Test
   void must_wrap_jose_exception_in_wallet_runtime_exception() {
