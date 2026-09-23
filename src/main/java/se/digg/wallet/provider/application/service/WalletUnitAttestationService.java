@@ -12,6 +12,7 @@ import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.util.Base64;
+import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import java.security.cert.CertificateEncodingException;
@@ -56,7 +57,7 @@ public class WalletUnitAttestationService {
       throws ParseException, JOSEException {
     log.debug("Trying to create WUA {} nonce",
         nonce == null ? "without" : "with");
-    ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
+    ECKey attestedKey = parseAttestedKey(walletPublicKeyJwk);
     List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
 
     ECPrivateKey signingKey = keystoreProperties.getSigningKey();
@@ -109,15 +110,23 @@ public class WalletUnitAttestationService {
     return signedJwt;
   }
 
+  private static ECKey parseAttestedKey(String walletPublicKeyJwk) throws ParseException {
+    Map<String, Object> jsonObject = JSONObjectUtils.parse(walletPublicKeyJwk);
+    if (jsonObject == null) {
+      throw new ParseException("Invalid wallet public key JWK.", 0);
+    }
+    return ECKey.parse(jsonObject);
+  }
+
   public SignedJWT createWalletUnitAttestation(String walletPublicKeyJwk, String nonce) {
     try {
       return createWalletUnitAttestationUnsafely(walletPublicKeyJwk, nonce);
     } catch (ParseException e) {
       throw new InvalidWuaRequestParameterException("Invalid wallet public key JWK.", e);
-    } catch (JOSEException e) {
+    } catch (JOSEException | RuntimeException e) {
+      log.warn("Could not create WUA", e);
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
-
   }
 
   private Map<String, Object> getStatus() throws JacksonException {
