@@ -140,21 +140,15 @@ class KeyAttestationServiceTest {
 
     KeyAttestationService service = new KeyAttestationService(properties, new ObjectMapper());
 
-    // Message content is checked for safety only, not an exact string: whether this is
-    // double-wrapped (like WalletUnitAttestationService) or passed through directly currently
-    // depends on how broadly KeyAttestationService's WalletRuntimeException passthrough guard is
-    // scoped - a separate concern from whether the message itself is safe.
     WalletRuntimeException exception = assertThrows(
         WalletRuntimeException.class,
         () -> service.createKeyAttestation(createJwk().toString(), "nonce"));
 
+    assertEquals("Could not create attestation.", exception.getMessage());
     assertFalse(exception.getMessage().contains("SENSITIVE INTERNAL DETAIL"));
-    Throwable cause = exception.getCause();
-    if (cause instanceof WalletRuntimeException wrapped) {
-      assertFalse(wrapped.getMessage().contains("SENSITIVE INTERNAL DETAIL"));
-      cause = wrapped.getCause();
-    }
-    assertInstanceOf(CertificateEncodingException.class, cause);
+    assertInstanceOf(WalletRuntimeException.class, exception.getCause());
+    assertInstanceOf(CertificateEncodingException.class, exception.getCause().getCause());
+    assertFalse(exception.getCause().getMessage().contains("SENSITIVE INTERNAL DETAIL"));
   }
 
   @Test
