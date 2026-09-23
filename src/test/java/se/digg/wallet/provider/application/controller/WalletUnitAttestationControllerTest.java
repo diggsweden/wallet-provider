@@ -199,4 +199,21 @@ class WalletUnitAttestationControllerTest {
         .andExpect(jsonPath("$.type").value("about:blank"));
   }
 
+  @Test
+  void shouldNotLeakMessageForAnUnanticipatedException() throws Exception {
+    when(service.createWalletUnitAttestation(anyString(), anyString()))
+        .thenThrow(new IllegalStateException("SENSITIVE INTERNAL DETAIL"));
+
+    mockMvc.perform(post("/wallet-unit-attestation")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("""
+            {"jwk":"test-jwk","nonce":"test-nonce"}
+            """))
+        .andExpect(status().isInternalServerError())
+        .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+        .andExpect(jsonPath("$.title").value("Internal Server Error"))
+        .andExpect(jsonPath("$.detail").value("An unexpected error occurred."))
+        .andExpect(jsonPath("$.type").value("about:blank"));
+  }
+
 }

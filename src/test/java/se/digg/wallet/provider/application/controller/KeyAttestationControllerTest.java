@@ -209,7 +209,12 @@ class KeyAttestationControllerTest {
             new WalletRuntimeException("Could not create attestation.", null),
             HttpStatus.INTERNAL_SERVER_ERROR,
             "Internal Server Error",
-            "Could not create attestation."));
+            "Could not create attestation."),
+        Arguments.of(
+            new IllegalStateException("SENSITIVE INTERNAL DETAIL"),
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Internal Server Error",
+            "An unexpected error occurred."));
   }
 
   private String asJson(KeyAttestationRequest input) throws JacksonException {
