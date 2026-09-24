@@ -127,10 +127,11 @@ class KeyAttestationServiceTest {
   }
 
   @Test
-  void must_not_leak_certificate_encoding_details() throws Exception {
+  void must_use_a_safe_client_message_for_certificate_encoding_failure_while_preserving_cause_for_logs()
+      throws Exception {
+    String causeDetail = "some encoding failure detail";
     X509Certificate badCert = mock(X509Certificate.class);
-    when(badCert.getEncoded())
-        .thenThrow(new CertificateEncodingException("SENSITIVE INTERNAL DETAIL"));
+    when(badCert.getEncoded()).thenThrow(new CertificateEncodingException(causeDetail));
 
     WuaKeystoreProperties properties = mock(WuaKeystoreProperties.class);
     when(properties.getSigningKey()).thenReturn(mock(ECPrivateKey.class));
@@ -144,11 +145,13 @@ class KeyAttestationServiceTest {
         WalletRuntimeException.class,
         () -> service.createKeyAttestation(createJwk().toString(), "nonce"));
 
+    // Client-facing: fixed and safe, independent of the cause chain's content.
     assertEquals("Could not create attestation.", exception.getMessage());
-    assertFalse(exception.getMessage().contains("SENSITIVE INTERNAL DETAIL"));
+
+    // Server-side: the full cause chain, including the original detail, is preserved intact.
     assertInstanceOf(WalletRuntimeException.class, exception.getCause());
     assertInstanceOf(CertificateEncodingException.class, exception.getCause().getCause());
-    assertFalse(exception.getCause().getMessage().contains("SENSITIVE INTERNAL DETAIL"));
+    assertEquals(causeDetail, exception.getCause().getCause().getMessage());
   }
 
   @Test
