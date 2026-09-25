@@ -9,10 +9,6 @@ package se.digg.wallet.provider.application.service.exception;
  */
 public class InvalidWuaRequestParameterException extends WalletRuntimeException {
 
-  public InvalidWuaRequestParameterException(Throwable cause) {
-    super(cause);
-  }
-
   public InvalidWuaRequestParameterException(String message) {
     super(message);
   }

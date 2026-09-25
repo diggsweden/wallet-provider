@@ -20,6 +20,9 @@ import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jwt.SignedJWT;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.text.ParseException;
 import java.util.List;
@@ -87,6 +90,20 @@ class WalletUnitAttestationServiceTest {
     assertTrue(exception.getCause() instanceof ParseException);
   }
 
+  @Test
+  void must_throw_invalid_wua_parameter_exception_when_jwk_is_the_json_literal_null() {
+    // nimbus-jose-jwt's ECKey.parse() throws an unchecked NullPointerException instead of a
+    // ParseException for this specific input (JSONObjectUtils.parse() returns null for the JSON
+    // literal "null" without throwing). Regression test for that library quirk: it must still be
+    // classified as an invalid client parameter (400), not an internal server error (500).
+    InvalidWuaRequestParameterException exception = assertThrows(
+        InvalidWuaRequestParameterException.class,
+        () -> service.createWalletUnitAttestation("null", "nonce"));
+
+    assertEquals("Invalid wallet public key JWK.", exception.getMessage());
+    assertTrue(exception.getCause() instanceof ParseException);
+  }
+
 
   @Test
   void must_wrap_jose_exception_in_wallet_runtime_exception() {
@@ -105,6 +122,36 @@ class WalletUnitAttestationServiceTest {
 
     assertEquals("Could not create attestation.", exception.getMessage());
     assertInstanceOf(JOSEException.class, exception.getCause());
+  }
+
+  @Test
+  void must_use_safe_client_message_for_cert_encoding_failure_while_preserving_cause_for_logs()
+      throws Exception {
+
+    String causeDetail = "some encoding failure detail";
+    X509Certificate badCert = mock(X509Certificate.class);
+    when(badCert.getEncoded()).thenThrow(new CertificateEncodingException(causeDetail));
+
+    WuaKeystoreProperties properties = mock(WuaKeystoreProperties.class);
+    when(properties.getSigningKey()).thenReturn(mock(ECPrivateKey.class));
+    when(properties.getCertificateChain()).thenReturn(List.of(badCert));
+    when(properties.validityHours()).thenReturn(1);
+    when(properties.status()).thenReturn("{}");
+
+    WalletUnitAttestationService service =
+        new WalletUnitAttestationService(properties, new ObjectMapper());
+
+    WalletRuntimeException exception = assertThrows(
+        WalletRuntimeException.class,
+        () -> service.createWalletUnitAttestation(createJwk().toString(), "nonce"));
+
+    // Client-facing: fixed and safe, independent of the cause chain's content.
+    assertEquals("Could not create attestation.", exception.getMessage());
+
+    // Server-side: the full cause chain, including the original detail, is preserved intact.
+    assertInstanceOf(WalletRuntimeException.class, exception.getCause());
+    assertInstanceOf(CertificateEncodingException.class, exception.getCause().getCause());
+    assertEquals(causeDetail, exception.getCause().getCause().getMessage());
   }
 
 

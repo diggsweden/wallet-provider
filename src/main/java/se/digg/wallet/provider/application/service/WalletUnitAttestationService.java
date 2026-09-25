@@ -56,7 +56,7 @@ public class WalletUnitAttestationService {
       throws ParseException, JOSEException {
     log.debug("Trying to create WUA {} nonce",
         nonce == null ? "without" : "with");
-    ECKey attestedKey = ECKey.parse(walletPublicKeyJwk);
+    ECKey attestedKey = EcKeyParser.parse(walletPublicKeyJwk);
     List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
 
     ECPrivateKey signingKey = keystoreProperties.getSigningKey();
@@ -88,7 +88,9 @@ public class WalletUnitAttestationService {
                   try {
                     return Base64.encode(c.getEncoded());
                   } catch (CertificateEncodingException e) {
-                    throw new WalletRuntimeException(e);
+                    throw new WalletRuntimeException(
+                        "Failed to encode certificate for attestation.",
+                        e);
                   }
                 })
             .toList();
@@ -114,10 +116,10 @@ public class WalletUnitAttestationService {
       return createWalletUnitAttestationUnsafely(walletPublicKeyJwk, nonce);
     } catch (ParseException e) {
       throw new InvalidWuaRequestParameterException("Invalid wallet public key JWK.", e);
-    } catch (JOSEException e) {
+    } catch (JOSEException | RuntimeException e) {
+      log.warn("Could not create WUA", e);
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
-
   }
 
   private Map<String, Object> getStatus() throws JacksonException {

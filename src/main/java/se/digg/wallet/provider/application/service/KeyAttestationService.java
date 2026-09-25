@@ -64,7 +64,7 @@ public class KeyAttestationService {
       if (jwkString == null || jwkString.isBlank()) {
         throw new InvalidKeyAttestationRequestParameterException("jwk must not be empty.");
       }
-      ECKey attestedKey = ECKey.parse(jwkString);
+      ECKey attestedKey = EcKeyParser.parse(jwkString);
       if (attestedKey.isPrivate()) {
         throw new InvalidKeyAttestationRequestParameterException("Private keys are not accepted.");
       }
@@ -106,7 +106,9 @@ public class KeyAttestationService {
                   try {
                     return Base64.encode(c.getEncoded());
                   } catch (CertificateEncodingException e) {
-                    throw new WalletRuntimeException(e);
+                    throw new WalletRuntimeException(
+                        "Failed to encode certificate for attestation.",
+                        e);
                   }
                 })
             .toList();
@@ -133,7 +135,10 @@ public class KeyAttestationService {
     } catch (ParseException e) {
       throw new InvalidKeyAttestationRequestParameterException(
           "Invalid wallet public key JWK.", e);
-    } catch (JOSEException e) {
+    } catch (InvalidKeyAttestationRequestParameterException e) {
+      throw e;
+    } catch (JOSEException | RuntimeException e) {
+      log.warn("Could not create KA", e);
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
   }
