@@ -112,7 +112,7 @@ class KeyAttestationServiceTest {
   }
 
   @Test
-  void must_throw_invalid_key_attestation_parameter_exception_for_a_jwk_that_is_the_json_literal_null() {
+  void must_throw_invalid_key_attestation_parameter_exception_when_jwk_is_the_json_literal_null() {
     // nimbus-jose-jwt's ECKey.parse() throws an unchecked NullPointerException instead of a
     // ParseException for this specific input (JSONObjectUtils.parse() returns null for the JSON
     // literal "null" without throwing). Regression test for that library quirk: it must still be
@@ -127,7 +127,7 @@ class KeyAttestationServiceTest {
   }
 
   @Test
-  void must_use_a_safe_client_message_for_certificate_encoding_failure_while_preserving_cause_for_logs()
+  void must_use_safe_client_message_for_cert_encoding_failure_while_preserving_cause_for_logs()
       throws Exception {
     String causeDetail = "some encoding failure detail";
     X509Certificate badCert = mock(X509Certificate.class);
