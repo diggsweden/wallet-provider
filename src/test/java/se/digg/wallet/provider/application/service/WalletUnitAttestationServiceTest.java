@@ -65,7 +65,7 @@ class WalletUnitAttestationServiceTest {
 
   @Test
   void assertThatCreateWalletUnitAttestation_givenValidJwk_shouldSucceed() throws Exception {
-    ECKey jwk = createJWK();
+    ECKey jwk = createJwk();
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
 
@@ -101,7 +101,7 @@ class WalletUnitAttestationServiceTest {
 
     WalletRuntimeException exception = assertThrows(
         WalletRuntimeException.class,
-        () -> service.createWalletUnitAttestation(createJWK().toString(), "nonce"));
+        () -> service.createWalletUnitAttestation(createJwk().toString(), "nonce"));
 
     assertEquals("Could not create attestation.", exception.getMessage());
     assertInstanceOf(JOSEException.class, exception.getCause());
@@ -109,8 +109,8 @@ class WalletUnitAttestationServiceTest {
 
 
   @Test
-  void assertThatCreateWalletUnitAttestation_hasX5CHeader() throws Exception {
-    ECKey jwk = createJWK();
+  void assertThatCreateWalletUnitAttestation_hasX5cHeader() throws Exception {
+    ECKey jwk = createJwk();
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
 
@@ -120,7 +120,7 @@ class WalletUnitAttestationServiceTest {
 
   @Test
   void assertThatCreateWalletUnitAttestation_containsNonceButNotKid() throws Exception {
-    ECKey jwk = createJWK();
+    ECKey jwk = createJwk();
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
 
@@ -133,7 +133,7 @@ class WalletUnitAttestationServiceTest {
 
   @Test
   void assertThatCreateWalletUnitAttestation_handlesEmptyNonce() throws Exception {
-    ECKey jwk = createJWK();
+    ECKey jwk = createJwk();
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "");
 
@@ -145,7 +145,7 @@ class WalletUnitAttestationServiceTest {
   @Test
   void assertThatCreateWalletUnitAttestation_containsKeyStorageAndUserAuthentication()
       throws Exception {
-    ECKey jwk = createJWK();
+    ECKey jwk = createJwk();
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), "nonce");
 
@@ -157,7 +157,7 @@ class WalletUnitAttestationServiceTest {
 
   @Test
   void assertThatCreateWalletUnitAttestation_handlesNullNonce() throws Exception {
-    ECKey jwk = createJWK();
+    ECKey jwk = createJwk();
 
     SignedJWT jwt = service.createWalletUnitAttestation(jwk.toString(), null);
 
@@ -169,7 +169,7 @@ class WalletUnitAttestationServiceTest {
     assertTrue(jwt.verify(new ECDSAVerifier(publicKey)));
   }
 
-  private ECKey createJWK() throws Exception {
+  private ECKey createJwk() throws Exception {
     KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
     gen.initialize(Curve.P_256.toECParameterSpec());
     KeyPair keyPair = gen.generateKeyPair();

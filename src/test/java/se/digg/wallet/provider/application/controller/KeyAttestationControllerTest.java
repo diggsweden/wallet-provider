@@ -51,7 +51,7 @@ class KeyAttestationControllerTest {
 
   @ParameterizedTest(name = "returns 200 OK for {0} JWK(s)")
   @MethodSource("validJwkListCases")
-  void a_valid_request_with_jwks_returns_200_ok(
+  void validRequestWithJwksReturns200Ok(
       String description, List<KeyAttestationItem> jwks) throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createKeyAttestation(anyList(), anyString()))
@@ -75,7 +75,7 @@ class KeyAttestationControllerTest {
   }
 
   @Test
-  void a_request_with_null_nonce_returns_200_ok() throws Exception {
+  void requestWithNullNonceReturns200Ok() throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createKeyAttestation(anyList(), eq(null)))
         .thenReturn(SignedJWT.parse(expectedJwt));
@@ -132,7 +132,7 @@ class KeyAttestationControllerTest {
 
   @ParameterizedTest(name = "returns 400 Bad Request for {0}")
   @MethodSource("invalidControllerJwkListCases")
-  void an_invalid_jwk_list_returns_400_bad_request(
+  void anInvalidJwkListReturns400BadRequest(
       String description, String jsonPayload, String expectedDetail) throws Exception {
     mockMvc
         .perform(

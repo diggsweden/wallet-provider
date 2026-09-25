@@ -4,8 +4,10 @@
 
 package se.digg.wallet.provider.application.filter;
 
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.util.Map;
@@ -22,10 +24,8 @@ import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith({
     MockitoExtension.class,
