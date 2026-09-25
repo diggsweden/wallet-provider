@@ -74,7 +74,7 @@ class KeyAttestationServiceTest {
 
   @Test
   void assertThatCreateKeyAttestation_givenValidJwk_shouldSucceed() throws Exception {
-    ECKey jwk = createJWK();
+    ECKey jwk = createJwk();
 
     SignedJWT jwt = service.createKeyAttestation(jwk.toString(), "nonce");
 
@@ -91,7 +91,7 @@ class KeyAttestationServiceTest {
   @Test
   void must_throw_invalid_key_attestation_parameter_exception_when_jwk_contains_private_key()
       throws Exception {
-    ECKey jwkWithPrivate = createJWKWithPrivateKey();
+    ECKey jwkWithPrivate = createJwkWithPrivateKey();
 
     assertThatThrownBy(() -> service.createKeyAttestation(jwkWithPrivate.toString(), "nonce"))
         .isInstanceOf(InvalidKeyAttestationRequestParameterException.class)
@@ -122,15 +122,15 @@ class KeyAttestationServiceTest {
     WalletRuntimeException exception =
         assertThrows(
             WalletRuntimeException.class,
-            () -> service.createKeyAttestation(createJWK().toString(), "nonce"));
+            () -> service.createKeyAttestation(createJwk().toString(), "nonce"));
 
     assertEquals("Could not create attestation.", exception.getMessage());
     assertInstanceOf(JOSEException.class, exception.getCause());
   }
 
   @Test
-  void assertThatCreateKeyAttestation_hasX5CHeader() throws Exception {
-    ECKey jwk = createJWK();
+  void assertThatCreateKeyAttestation_hasX5cHeader() throws Exception {
+    ECKey jwk = createJwk();
 
     SignedJWT jwt = service.createKeyAttestation(jwk.toString(), "nonce");
 
@@ -140,7 +140,7 @@ class KeyAttestationServiceTest {
 
   @Test
   void assertThatCreateKeyAttestation_containsNonceButNotKid() throws Exception {
-    ECKey jwk = createJWK();
+    ECKey jwk = createJwk();
 
     SignedJWT jwt = service.createKeyAttestation(jwk.toString(), "nonce");
 
@@ -153,7 +153,7 @@ class KeyAttestationServiceTest {
 
   @Test
   void assertThatCreateKeyAttestation_handlesEmptyNonce() throws Exception {
-    ECKey jwk = createJWK();
+    ECKey jwk = createJwk();
 
     SignedJWT jwt = service.createKeyAttestation(jwk.toString(), "");
 
@@ -176,7 +176,7 @@ class KeyAttestationServiceTest {
 
   @Test
   void assertThatCreateKeyAttestation_containsKeyStorageAndUserAuthentication() throws Exception {
-    ECKey jwk = createJWK();
+    ECKey jwk = createJwk();
 
     SignedJWT jwt = service.createKeyAttestation(jwk.toString(), "nonce");
 
@@ -188,7 +188,7 @@ class KeyAttestationServiceTest {
 
   @Test
   void assertThatCreateKeyAttestation_handlesNullNonce() throws Exception {
-    ECKey jwk = createJWK();
+    ECKey jwk = createJwk();
 
     SignedJWT jwt = service.createKeyAttestation(jwk.toString(), null);
 
@@ -209,8 +209,8 @@ class KeyAttestationServiceTest {
 
   @Test
   void assertThatCreateKeyAttestation_givenMultipleValidJwks_shouldSucceed() throws Exception {
-    ECKey jwk1 = createJWK();
-    ECKey jwk2 = createJWK();
+    ECKey jwk1 = createJwk();
+    ECKey jwk2 = createJwk();
 
     SignedJWT jwt =
         service.createKeyAttestation(List.of(jwk1.toString(), jwk2.toString()), "nonce");
@@ -236,8 +236,8 @@ class KeyAttestationServiceTest {
   @Test
   void must_throw_invalid_key_attestation_parameter_exception_when_any_jwk_contains_private_key()
       throws Exception {
-    ECKey validJwk = createJWK();
-    ECKey jwkWithPrivate = createJWKWithPrivateKey();
+    ECKey validJwk = createJwk();
+    ECKey jwkWithPrivate = createJwkWithPrivateKey();
 
     assertThatThrownBy(
         () -> service.createKeyAttestation(
@@ -259,7 +259,7 @@ class KeyAttestationServiceTest {
 
   @ParameterizedTest(name = "rejects mixed list with {0}")
   @MethodSource("invalidMixedJwkCases")
-  void a_mixed_list_containing_any_invalid_jwk_is_rejected(
+  void mixedListContainingAnyInvalidJwkIsRejected(
       String description, List<String> jwks, String expectedMessagePrefix) {
     assertThatThrownBy(() -> service.createKeyAttestation(jwks, "nonce"))
         .isInstanceOf(InvalidKeyAttestationRequestParameterException.class)
@@ -305,7 +305,7 @@ class KeyAttestationServiceTest {
     assertTrue(jwt.verify(new ECDSAVerifier(publicKey)));
   }
 
-  private ECKey createJWK() throws Exception {
+  private ECKey createJwk() throws Exception {
     KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
     gen.initialize(Curve.P_256.toECParameterSpec());
     KeyPair keyPair = gen.generateKeyPair();
@@ -313,7 +313,7 @@ class KeyAttestationServiceTest {
     return new ECKey.Builder(Curve.P_256, (ECPublicKey) keyPair.getPublic()).build();
   }
 
-  private ECKey createJWKWithPrivateKey() throws Exception {
+  private ECKey createJwkWithPrivateKey() throws Exception {
     KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
     gen.initialize(Curve.P_256.toECParameterSpec());
     KeyPair keyPair = gen.generateKeyPair();

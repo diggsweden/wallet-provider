@@ -4,8 +4,11 @@
 
 package se.digg.wallet.provider.application.filter;
 
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,11 +27,8 @@ import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith({
     MockitoExtension.class,
@@ -58,12 +58,6 @@ public class LoggingFilterBodyEnabledTest {
   void bodyLoggedWhenLogBodyIsTrue(CapturedOutput console) throws IOException, ServletException {
 
     var requestBody = "{\"token\":\"sensitive-value\",\"data\":\"test\"}";
-    var httpServletRequest = MockMvcRequestBuilders
-        .post("/test")
-        .contentType("application/json")
-        .content(requestBody)
-        .buildRequest(new org.springframework.boot.test.mock.web.SpringBootMockServletContext("/"));
-    var httpServletResponse = new MockHttpServletResponse();
 
     when(sensitiveDataMasker.maskHeaders(any())).thenReturn(Map.of());
     when(sensitiveDataMasker.maskJsonBody(requestBody)).thenReturn(requestBody);
@@ -76,6 +70,13 @@ public class LoggingFilterBodyEnabledTest {
       }
       return null;
     }).when(filterChain).doFilter(any(), any());
+
+    var httpServletRequest = MockMvcRequestBuilders
+        .post("/test")
+        .contentType("application/json")
+        .content(requestBody)
+        .buildRequest(new org.springframework.boot.test.mock.web.SpringBootMockServletContext("/"));
+    var httpServletResponse = new MockHttpServletResponse();
 
     filter.doFilterInternal(httpServletRequest, httpServletResponse, filterChain);
 

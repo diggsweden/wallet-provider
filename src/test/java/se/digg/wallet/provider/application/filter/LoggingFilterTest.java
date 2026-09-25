@@ -4,32 +4,6 @@
 
 package se.digg.wallet.provider.application.filter;
 
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
-import java.io.IOException;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.web.SpringBootMockServletContext;
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
-import org.springframework.mock.web.MockFilterChain;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.slf4j.MDC;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37,6 +11,32 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+
+import jakarta.servlet.ServletException;
+import java.io.IOException;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.web.SpringBootMockServletContext;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.mock.web.MockFilterChain;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith({
     MockitoExtension.class,
@@ -116,7 +116,7 @@ public class LoggingFilterTest {
   }
 
   @Test
-  void shouldGenerateCorrelationIdWhenXCorrelationIdIsEmpty(CapturedOutput console)
+  void shouldGenerateCorrelationIdWhenCorrelationIdHeaderIsEmpty(CapturedOutput console)
       throws IOException, ServletException {
 
     var httpServletRequest = MockMvcRequestBuilders
@@ -135,7 +135,7 @@ public class LoggingFilterTest {
   }
 
   @Test
-  void shouldGenerateCorrelationIdWhenXRequestIdIsEmpty(CapturedOutput console)
+  void shouldGenerateCorrelationIdWhenRequestIdHeaderIsEmpty(CapturedOutput console)
       throws IOException, ServletException {
 
     var httpServletRequest = MockMvcRequestBuilders
@@ -154,7 +154,7 @@ public class LoggingFilterTest {
   }
 
   @Test
-  void logGivenXCorrelationId(CapturedOutput console) throws IOException, ServletException {
+  void logGivenCorrelationIdHeader(CapturedOutput console) throws IOException, ServletException {
 
     var expectedId = randomId();
     var httpServletRequest = MockMvcRequestBuilders
@@ -173,7 +173,7 @@ public class LoggingFilterTest {
   }
 
   @Test
-  void logGivenXRequestId(CapturedOutput console) throws IOException, ServletException {
+  void logGivenRequestIdHeader(CapturedOutput console) throws IOException, ServletException {
 
     var expectedId = randomId();
     var httpServletRequest = MockMvcRequestBuilders
