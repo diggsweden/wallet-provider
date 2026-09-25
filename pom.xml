@@ -201,6 +201,8 @@ SPDX-License-Identifier: EUPL-1.2
           <configLocation>
             ${project.basedir}/development/lint/google_checks.xml
           </configLocation>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <testSourceDirectories>${project.basedir}/src/test/java</testSourceDirectories>
           <consoleOutput>true</consoleOutput>
           <failsOnError>true</failsOnError>
           <linkXRef>false</linkXRef>
