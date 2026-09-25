@@ -56,7 +56,7 @@ public class WalletUnitAttestationService {
       throws ParseException, JOSEException {
     log.debug("Trying to create WUA {} nonce",
         nonce == null ? "without" : "with");
-    ECKey attestedKey = EcKeyUtils.parse(walletPublicKeyJwk);
+    ECKey attestedKey = EcKeyParser.parse(walletPublicKeyJwk);
     List<Map<String, Object>> attestedKeys = List.of(attestedKey.toJSONObject());
 
     ECPrivateKey signingKey = keystoreProperties.getSigningKey();

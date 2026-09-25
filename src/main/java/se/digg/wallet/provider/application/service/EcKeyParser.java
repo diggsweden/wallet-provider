@@ -9,9 +9,9 @@ import com.nimbusds.jose.util.JSONObjectUtils;
 import java.text.ParseException;
 import java.util.Map;
 
-public final class EcKeyUtils {
+public final class EcKeyParser {
 
-  private EcKeyUtils() {}
+  private EcKeyParser() {}
 
   /**
    * Parses a wallet public key JWK, raising {@link ParseException} for any malformed input.
