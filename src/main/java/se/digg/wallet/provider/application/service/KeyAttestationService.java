@@ -64,7 +64,7 @@ public class KeyAttestationService {
       if (jwkString == null || jwkString.isBlank()) {
         throw new InvalidKeyAttestationRequestParameterException("jwk must not be empty.");
       }
-      ECKey attestedKey = EcKeyUtils.parse(jwkString);
+      ECKey attestedKey = EcKeyParser.parse(jwkString);
       if (attestedKey.isPrivate()) {
         throw new InvalidKeyAttestationRequestParameterException("Private keys are not accepted.");
       }
