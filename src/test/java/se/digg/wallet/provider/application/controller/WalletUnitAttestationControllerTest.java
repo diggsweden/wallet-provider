@@ -212,6 +212,7 @@ class WalletUnitAttestationControllerTest {
         .andExpect(status().isInternalServerError())
         .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
         .andExpect(jsonPath("$.title").value("Internal Server Error"))
+        .andExpect(jsonPath("$.status").value(500))
         .andExpect(jsonPath("$.detail").value("An unexpected error occurred."))
         .andExpect(jsonPath("$.type").value("about:blank"));
   }

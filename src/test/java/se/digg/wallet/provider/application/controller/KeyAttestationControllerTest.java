@@ -127,7 +127,8 @@ class KeyAttestationControllerTest {
         .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
         .andExpect(jsonPath("$.title").value(expectedTitle))
         .andExpect(jsonPath("$.status").value(expectedStatus.value()))
-        .andExpect(jsonPath("$.detail").value(expectedDetail));
+        .andExpect(jsonPath("$.detail").value(expectedDetail))
+        .andExpect(jsonPath("$.type").value("about:blank"));
   }
 
   @ParameterizedTest(name = "returns 400 Bad Request for {0}")
