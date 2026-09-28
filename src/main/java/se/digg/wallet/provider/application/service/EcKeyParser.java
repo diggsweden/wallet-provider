@@ -14,7 +14,7 @@ public final class EcKeyParser {
   private EcKeyParser() {}
 
   /**
-   * Parses a wallet public key JWK, raising {@link ParseException} for any malformed input.
+   * Parses an EC JWK, raising {@link ParseException} for any malformed input.
    *
    * <p>
    * {@code ECKey.parse(String)} is {@code JSONObjectUtils.parse(s)} followed by
@@ -27,7 +27,7 @@ public final class EcKeyParser {
   public static ECKey parse(String jwk) throws ParseException {
     Map<String, Object> jsonObject = JSONObjectUtils.parse(jwk);
     if (jsonObject == null) {
-      throw new ParseException("Invalid wallet public key JWK.", 0);
+      throw new ParseException("Invalid JWK.", 0);
     }
     return ECKey.parse(jsonObject);
   }
