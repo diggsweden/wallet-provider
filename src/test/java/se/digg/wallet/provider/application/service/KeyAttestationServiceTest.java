@@ -145,13 +145,12 @@ class KeyAttestationServiceTest {
         WalletRuntimeException.class,
         () -> service.createKeyAttestation(createJwk().toString(), "nonce"));
 
-    // Client-facing: fixed and safe, independent of the cause chain's content.
+    // Client-facing
     assertEquals("Could not create attestation.", exception.getMessage());
 
-    // Server-side: the full cause chain, including the original detail, is preserved intact.
-    assertInstanceOf(WalletRuntimeException.class, exception.getCause());
-    assertInstanceOf(CertificateEncodingException.class, exception.getCause().getCause());
-    assertEquals(causeDetail, exception.getCause().getCause().getMessage());
+    // Server-side
+    assertInstanceOf(CertificateEncodingException.class, exception.getCause());
+    assertEquals(causeDetail, exception.getCause().getMessage());
   }
 
   @Test

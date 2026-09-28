@@ -89,7 +89,7 @@ public class WalletUnitAttestationService {
                     return Base64.encode(c.getEncoded());
                   } catch (CertificateEncodingException e) {
                     throw new WalletRuntimeException(
-                        "Failed to encode certificate for attestation.",
+                        "Could not create attestation.",
                         e);
                   }
                 })
@@ -116,7 +116,7 @@ public class WalletUnitAttestationService {
       return createWalletUnitAttestationUnsafely(walletPublicKeyJwk, nonce);
     } catch (ParseException e) {
       throw new InvalidWuaRequestParameterException("Invalid wallet public key JWK.", e);
-    } catch (JOSEException | RuntimeException e) {
+    } catch (JOSEException e) {
       log.warn("Could not create WUA", e);
       throw new WalletRuntimeException("Could not create attestation.", e);
     }

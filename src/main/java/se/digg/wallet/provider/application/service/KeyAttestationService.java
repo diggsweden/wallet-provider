@@ -107,7 +107,7 @@ public class KeyAttestationService {
                     return Base64.encode(c.getEncoded());
                   } catch (CertificateEncodingException e) {
                     throw new WalletRuntimeException(
-                        "Failed to encode certificate for attestation.",
+                        "Could not create attestation.",
                         e);
                   }
                 })
@@ -135,9 +135,7 @@ public class KeyAttestationService {
     } catch (ParseException e) {
       throw new InvalidKeyAttestationRequestParameterException(
           "Invalid wallet public key JWK.", e);
-    } catch (InvalidKeyAttestationRequestParameterException e) {
-      throw e;
-    } catch (JOSEException | RuntimeException e) {
+    } catch (JOSEException e) {
       log.warn("Could not create KA", e);
       throw new WalletRuntimeException("Could not create attestation.", e);
     }
