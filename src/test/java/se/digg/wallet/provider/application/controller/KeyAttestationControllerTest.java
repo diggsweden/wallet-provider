@@ -127,7 +127,8 @@ class KeyAttestationControllerTest {
         .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
         .andExpect(jsonPath("$.title").value(expectedTitle))
         .andExpect(jsonPath("$.status").value(expectedStatus.value()))
-        .andExpect(jsonPath("$.detail").value(expectedDetail));
+        .andExpect(jsonPath("$.detail").value(expectedDetail))
+        .andExpect(jsonPath("$.type").value("about:blank"));
   }
 
   @ParameterizedTest(name = "returns 400 Bad Request for {0}")
@@ -209,7 +210,12 @@ class KeyAttestationControllerTest {
             new WalletRuntimeException("Could not create attestation.", null),
             HttpStatus.INTERNAL_SERVER_ERROR,
             "Internal Server Error",
-            "Could not create attestation."));
+            "Could not create attestation."),
+        Arguments.of(
+            new IllegalStateException("SENSITIVE INTERNAL DETAIL"),
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Internal Server Error",
+            "An unexpected error occurred."));
   }
 
   private String asJson(KeyAttestationRequest input) throws JacksonException {
