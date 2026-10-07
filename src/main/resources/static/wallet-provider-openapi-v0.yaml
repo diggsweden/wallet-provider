@@ -63,18 +63,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletInstanceAttestationResponse'
-        "400":
-          description: Missing or invalid public JWK
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemResponse'
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemResponse'
         default:
           description: Unexpected error
           content:
