@@ -6,6 +6,16 @@ spring:
   application:
     name: wallet-provider
 
+wia:
+  status: '{"status_list": {"idx": 412,"uri": "https://example.org/wia-statuslists/1"}}'
+  status-maintenance-days: 365
+  validity-minutes: 60
+  client-id: digg-wallet
+  wallet-name: Digg Wallet
+  wallet-version: 0.0.1
+  wallet-link: https://www.digg.se
+  wallet-solution-certification-information: UNCERTIFIED
+
 wua:
   keystore:
     location: classpath:certificates/wallet-provider.p12
