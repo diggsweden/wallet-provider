@@ -4,6 +4,7 @@
 
 package se.digg.wallet.provider.application.config;
 
+import jakarta.validation.constraints.AssertTrue;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -18,11 +19,14 @@ import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
+import org.springframework.validation.annotation.Validated;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 
 @ConfigurationProperties(prefix = "wua.keystore")
+@Validated
 public record WuaKeystoreProperties(
     Resource location,
     String password,
@@ -31,6 +35,13 @@ public record WuaKeystoreProperties(
     String status,
     int validityHours,
     String issuer) {
+
+  @AssertTrue(message = "All attestation keystore settings must be explicitly configured")
+  public boolean isConfigurationComplete() {
+    return Stream.of(location == null ? null : location.getDescription(),
+        password, alias, type, status, issuer)
+        .allMatch(value -> value != null && !value.isBlank() && !value.contains("${"));
+  }
 
   public ECPrivateKey getSigningKey() {
     try {

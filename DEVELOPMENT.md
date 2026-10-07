@@ -304,18 +304,21 @@ Its `cnf.jwk` contains the supplied public key.
 Missing, blank, malformed, non-EC, and private keys produce `400` problem details.
 This prototype does not verify key ownership, app integrity, hardware attestation, or revocation status, and does not persist issued attestations.
 
-Wallet metadata comes from the `wia` configuration rather than client input:
+Wallet metadata comes from the `wia` configuration rather than client input.
+All environment variables below are required and have no defaults:
 
-| Environment variable | Purpose | Default |
-| --- | --- | --- |
-| `WALLET_PROVIDER_WIA_CLIENT_ID` | OAuth client identifier in `sub`, shared across instances | `digg-wallet` |
-| `WALLET_PROVIDER_WIA_WALLET_NAME` | Wallet Solution identifier in `wallet_name` | `Digg Wallet` |
-| `WALLET_PROVIDER_WIA_WALLET_VERSION` | Wallet Solution version | `0.0.1` |
-| `WALLET_PROVIDER_WIA_WALLET_LINK` | Wallet Solution information URL | `https://www.digg.se` |
-| `WALLET_PROVIDER_WIA_CERTIFICATION_INFORMATION` | Wallet Solution certification information | `UNCERTIFIED` |
-| `WALLET_PROVIDER_WIA_VALIDITY_MINUTES` | Token lifetime, between 1 and 1439 minutes | `60` |
-| `WALLET_PROVIDER_WIA_STATUS` | Placeholder status reference in `client_status.status` | Index `412` at `https://example.org/wia-statuslists/1` |
-| `WALLET_PROVIDER_WIA_STATUS_MAINTENANCE_DAYS` | Period represented by `client_status.exp`, at least 31 days | `365` |
+| Environment variable | Purpose |
+| --- | --- |
+| `WALLET_PROVIDER_WIA_CLIENT_ID` | OAuth client identifier in `sub`, shared across instances |
+| `WALLET_PROVIDER_WIA_WALLET_NAME` | Wallet Solution identifier in `wallet_name` |
+| `WALLET_PROVIDER_WIA_WALLET_VERSION` | Wallet Solution version |
+| `WALLET_PROVIDER_WIA_WALLET_LINK` | Wallet Solution information URL |
+| `WALLET_PROVIDER_WIA_CERTIFICATION_INFORMATION` | Wallet Solution certification information |
+| `WALLET_PROVIDER_WIA_VALIDITY_MINUTES` | Token lifetime, between 1 and 1439 minutes |
+| `WALLET_PROVIDER_WIA_STATUS` | Placeholder status reference in `client_status.status` |
+| `WALLET_PROVIDER_WIA_STATUS_MAINTENANCE_DAYS` | Period represented by `client_status.exp`, at least 31 days |
+
+The shared `wua.keystore` configuration also requires `WALLET_PROVIDER_ISSUER` and `WALLET_PROVIDER_WUA_STATUS`.
 
 The token's `exp` and `client_status.exp` are independent.
 The status reference and maintenance period are placeholders; this prototype publishes no live status list and provides no revocation-maintenance guarantee.

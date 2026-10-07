@@ -68,14 +68,14 @@ management:
 
 wia:
   # Prototype placeholders; these entries are not backed by a live status list.
-  status: '${WALLET_PROVIDER_WIA_STATUS:{"status_list": {"idx": 412,"uri": "https://example.org/wia-statuslists/1"}}}'
-  status-maintenance-days: ${WALLET_PROVIDER_WIA_STATUS_MAINTENANCE_DAYS:365}
-  validity-minutes: ${WALLET_PROVIDER_WIA_VALIDITY_MINUTES:60}
-  client-id: ${WALLET_PROVIDER_WIA_CLIENT_ID:digg-wallet}
-  wallet-name: ${WALLET_PROVIDER_WIA_WALLET_NAME:Digg Wallet}
-  wallet-version: ${WALLET_PROVIDER_WIA_WALLET_VERSION:0.0.1}
-  wallet-link: ${WALLET_PROVIDER_WIA_WALLET_LINK:https://www.digg.se}
-  wallet-solution-certification-information: ${WALLET_PROVIDER_WIA_CERTIFICATION_INFORMATION:UNCERTIFIED}
+  status: ${WALLET_PROVIDER_WIA_STATUS}
+  status-maintenance-days: ${WALLET_PROVIDER_WIA_STATUS_MAINTENANCE_DAYS}
+  validity-minutes: ${WALLET_PROVIDER_WIA_VALIDITY_MINUTES}
+  client-id: ${WALLET_PROVIDER_WIA_CLIENT_ID}
+  wallet-name: ${WALLET_PROVIDER_WIA_WALLET_NAME}
+  wallet-version: ${WALLET_PROVIDER_WIA_WALLET_VERSION}
+  wallet-link: ${WALLET_PROVIDER_WIA_WALLET_LINK}
+  wallet-solution-certification-information: ${WALLET_PROVIDER_WIA_CERTIFICATION_INFORMATION}
 
 wua:
   keystore:
@@ -84,5 +84,5 @@ wua:
     alias: ${WUA_KEYSTORE_ALIAS}
     type: PKCS12
     validity-hours: 24
-    issuer: ${WALLET_PROVIDER_ISSUER:Digg}
-    status: '${WALLET_PROVIDER_WUA_STATUS:{"status_list": {"idx": 412,"uri": "https://revocation_url/statuslists/1"}}}'
+    issuer: ${WALLET_PROVIDER_ISSUER}
+    status: ${WALLET_PROVIDER_WUA_STATUS}
