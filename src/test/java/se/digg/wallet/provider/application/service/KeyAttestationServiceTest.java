@@ -39,8 +39,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
-import se.digg.wallet.provider.domain.exception.InvalidKeyAttestationRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
+import se.digg.wallet.provider.domain.exception.InvalidKeyAttestationRequestParameterException;
 import se.digg.wallet.provider.domain.service.KeyAttestationService;
 import tools.jackson.databind.ObjectMapper;
 

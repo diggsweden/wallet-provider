@@ -9,11 +9,11 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.provider.api.v0.KeyAttestationApi;
-import se.digg.wallet.provider.api.v0.model.KeyAttestationItem;
-import se.digg.wallet.provider.api.v0.model.KeyAttestationRequest;
-import se.digg.wallet.provider.api.v0.model.KeyAttestationResponse;
-import se.digg.wallet.provider.domain.service.KeyAttestationService;
+import se.digg.wallet.provider.api.v0.model.KeyAttestationItemDto;
+import se.digg.wallet.provider.api.v0.model.KeyAttestationRequestDto;
+import se.digg.wallet.provider.api.v0.model.KeyAttestationResponseDto;
 import se.digg.wallet.provider.domain.exception.InvalidKeyAttestationRequestParameterException;
+import se.digg.wallet.provider.domain.service.KeyAttestationService;
 
 @RestController
 public class KeyAttestationController implements KeyAttestationApi {
@@ -25,9 +25,9 @@ public class KeyAttestationController implements KeyAttestationApi {
   }
 
   @Override
-  public ResponseEntity<KeyAttestationResponse> postKeyAttestation(
-      KeyAttestationRequest keyAttestationRequest) {
-    List<KeyAttestationItem> items = keyAttestationRequest.getJwks();
+  public ResponseEntity<KeyAttestationResponseDto> postKeyAttestation(
+      KeyAttestationRequestDto keyAttestationRequest) {
+    List<KeyAttestationItemDto> items = keyAttestationRequest.getJwks();
     if (items == null || items.isEmpty()) {
       throw new InvalidKeyAttestationRequestParameterException("jwks must not be empty.");
     }
@@ -36,11 +36,11 @@ public class KeyAttestationController implements KeyAttestationApi {
       throw new InvalidKeyAttestationRequestParameterException("jwk must not be empty.");
     }
 
-    List<String> jwks = items.stream().map(KeyAttestationItem::getJwk).toList();
+    List<String> jwks = items.stream().map(KeyAttestationItemDto::getJwk).toList();
     SignedJWT signedJwt =
         attestationService.createKeyAttestation(
             jwks,
             keyAttestationRequest.getNonce().orElse(null));
-    return ResponseEntity.ok(new KeyAttestationResponse(signedJwt.serialize()));
+    return ResponseEntity.ok(new KeyAttestationResponseDto(signedJwt.serialize()));
   }
 }

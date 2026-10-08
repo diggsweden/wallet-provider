@@ -32,10 +32,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import se.digg.wallet.provider.api.v0.model.ProblemResponse;
-import se.digg.wallet.provider.domain.exception.InvalidKeyAttestationRequestParameterException;
+import se.digg.wallet.provider.api.v0.model.ProblemResponseDto;
 import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
+import se.digg.wallet.provider.domain.exception.InvalidKeyAttestationRequestParameterException;
 
 
 @RestControllerAdvice
@@ -113,7 +113,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     var path = httpServletRequest.getServletPath();
 
     var statusCode = HttpStatus.BAD_REQUEST;
-    var problemDetailResponse = ProblemResponse.builder()
+    var problemDetailResponse = ProblemResponseDto.builder()
         .type(REQUEST_ARGUMENT_NOT_VALID.getUri().toString())
         .title(statusCode.getReasonPhrase())
         .status(statusCode.value())
@@ -188,7 +188,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
   protected ResponseEntity<Object> createResponseEntity(@Nullable Object body,
       HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
 
-    var problemDetailResponse = ProblemResponse.builder()
+    var problemDetailResponse = ProblemResponseDto.builder()
         .type(ABOUT_BLANK)
         .status(statusCode.value())
         .instance(request.getContextPath());
@@ -210,7 +210,7 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
     return createResponseEntity(problemDetailResponse.build());
   }
 
-  private ResponseEntity<Object> createResponseEntity(ProblemResponse problemResponse) {
+  private ResponseEntity<Object> createResponseEntity(ProblemResponseDto problemResponse) {
 
 
     return ResponseEntity
@@ -219,18 +219,18 @@ public class DefaultExceptionHandler extends ResponseEntityExceptionHandler {
         .body(problemResponse);
   }
 
-  private ProblemResponse.Builder buildProblemResponse(ProblemType problemType) {
+  private ProblemResponseDto.Builder buildProblemResponse(ProblemType problemType) {
 
-    return ProblemResponse.builder()
+    return ProblemResponseDto.builder()
         .type(Optional.ofNullable(problemType.getUri().toASCIIString())
             .orElse(ABOUT_BLANK))
         .title(problemType.getTitle())
         .status(problemType.getHttpStatus().value());
   }
 
-  private ProblemResponse buildProblemResponse(
+  private ProblemResponseDto buildProblemResponse(
       HttpStatus status, String detail, String path) {
-    return ProblemResponse.builder()
+    return ProblemResponseDto.builder()
         .status(status.value())
         .type(ABOUT_BLANK)
         .title(status.getReasonPhrase())

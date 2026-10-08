@@ -28,12 +28,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import se.digg.wallet.provider.api.v0.model.KeyAttestationItem;
-import se.digg.wallet.provider.api.v0.model.KeyAttestationRequest;
+import se.digg.wallet.provider.api.v0.model.KeyAttestationItemDto;
+import se.digg.wallet.provider.api.v0.model.KeyAttestationRequestDto;
 import se.digg.wallet.provider.application.filter.SensitiveDataMasker;
-import se.digg.wallet.provider.domain.service.KeyAttestationService;
-import se.digg.wallet.provider.domain.exception.InvalidKeyAttestationRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
+import se.digg.wallet.provider.domain.exception.InvalidKeyAttestationRequestParameterException;
+import se.digg.wallet.provider.domain.service.KeyAttestationService;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectWriter;
@@ -52,14 +52,14 @@ class KeyAttestationControllerTest {
   @ParameterizedTest(name = "returns 200 OK for {0} JWK(s)")
   @MethodSource("validJwkListCases")
   void validRequestWithJwksReturns200Ok(
-      String description, List<KeyAttestationItem> jwks) throws Exception {
+      String description, List<KeyAttestationItemDto> jwks) throws Exception {
     String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
     when(service.createKeyAttestation(anyList(), anyString()))
         .thenReturn(SignedJWT.parse(expectedJwt));
 
     String nonce = "123123123123";
-    KeyAttestationRequest input =
-        KeyAttestationRequest.builder().jwks(jwks).nonce(nonce).build();
+    KeyAttestationRequestDto input =
+        KeyAttestationRequestDto.builder().jwks(jwks).nonce(nonce).build();
 
     mockMvc
         .perform(
@@ -70,7 +70,7 @@ class KeyAttestationControllerTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.key_attestation").value(expectedJwt));
 
-    List<String> expectedJwkStrings = jwks.stream().map(KeyAttestationItem::getJwk).toList();
+    List<String> expectedJwkStrings = jwks.stream().map(KeyAttestationItemDto::getJwk).toList();
     verify(service).createKeyAttestation(eq(expectedJwkStrings), eq(nonce));
   }
 
@@ -90,9 +90,9 @@ class KeyAttestationControllerTest {
                 "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
             }
             """;
-    KeyAttestationRequest input =
-        KeyAttestationRequest.builder()
-            .jwks(List.of(KeyAttestationItem.builder().jwk(jwk).build()))
+    KeyAttestationRequestDto input =
+        KeyAttestationRequestDto.builder()
+            .jwks(List.of(KeyAttestationItemDto.builder().jwk(jwk).build()))
             .nonce(null)
             .build();
 
@@ -191,12 +191,12 @@ class KeyAttestationControllerTest {
             }
             """;
     return Stream.of(
-        Arguments.of("single", List.of(KeyAttestationItem.builder().jwk(jwk1).build())),
+        Arguments.of("single", List.of(KeyAttestationItemDto.builder().jwk(jwk1).build())),
         Arguments.of(
             "multiple",
             List.of(
-                KeyAttestationItem.builder().jwk(jwk1).build(),
-                KeyAttestationItem.builder().jwk(jwk2).build())));
+                KeyAttestationItemDto.builder().jwk(jwk1).build(),
+                KeyAttestationItemDto.builder().jwk(jwk2).build())));
   }
 
   static Stream<Arguments> serviceErrorCases() {
@@ -218,7 +218,7 @@ class KeyAttestationControllerTest {
             "An unexpected error occurred."));
   }
 
-  private String asJson(KeyAttestationRequest input) throws JacksonException {
+  private String asJson(KeyAttestationRequestDto input) throws JacksonException {
     ObjectWriter objectWriter = mapper.writer().withDefaultPrettyPrinter();
     return objectWriter.writeValueAsString(input);
   }
