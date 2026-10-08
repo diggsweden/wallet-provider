@@ -24,16 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
 
-@SpringBootTest(properties = {
-    "wia.client-id=digg-test-client",
-    "wia.wallet-name=Digg Test Wallet",
-    "wia.wallet-version=1.2.3",
-    "wia.wallet-link=https://example.org/wallet",
-    "wia.wallet-solution-certification-information=https://example.org/certification",
-    "wia.validity-minutes=30",
-    "wia.status-maintenance-days=90",
-    "wia.status={\"status_list\":{\"idx\":7,\"uri\":\"https://example.org/wia-statuslists/1\"}}"
-})
+@SpringBootTest
 @AutoConfigureMockMvc
 @SuppressWarnings("checkstyle:MethodName")
 class WalletInstanceAttestationControllerComponentTest {
@@ -107,7 +98,7 @@ class WalletInstanceAttestationControllerComponentTest {
     var issuedAt = claims.getIssueTime().toInstant();
     var expiresAt = claims.getExpirationTime().toInstant();
     assertThat(issuedAt).isBetween(beforeRequest, Instant.now());
-    assertThat(Duration.between(issuedAt, expiresAt)).isEqualTo(Duration.ofMinutes(30));
+    assertThat(Duration.between(issuedAt, expiresAt)).isEqualTo(Duration.ofMinutes(60));
     assertThat(Duration.between(issuedAt, expiresAt)).isLessThan(Duration.ofHours(24));
   }
 
@@ -117,10 +108,10 @@ class WalletInstanceAttestationControllerComponentTest {
 
     var clientStatus = claims.getJSONObjectClaim("client_status");
     assertThat(clientStatus).containsEntry("status", Map.of("status_list", Map.of(
-        "idx", 7L, "uri", "https://example.org/wia-statuslists/1")));
+        "idx", 412L, "uri", "https://example.org/wia-statuslists/1")));
     var statusExpiration = Instant.ofEpochSecond(((Number) clientStatus.get("exp")).longValue());
     assertThat(Duration.between(claims.getIssueTime().toInstant(), statusExpiration))
-        .isEqualTo(Duration.ofDays(90));
+        .isEqualTo(Duration.ofDays(365));
     assertThat(statusExpiration).isAfter(claims.getExpirationTime().toInstant());
   }
 
@@ -189,11 +180,11 @@ class WalletInstanceAttestationControllerComponentTest {
     var jwt = requestWia();
 
     assertThat(jwt.getJWTClaimsSet().getClaims())
-        .containsEntry("sub", "digg-test-client")
-        .containsEntry("wallet_name", "Digg Test Wallet")
-        .containsEntry("wallet_version", "1.2.3")
-        .containsEntry("wallet_link", "https://example.org/wallet")
+        .containsEntry("sub", "digg-wallet")
+        .containsEntry("wallet_name", "Digg Wallet")
+        .containsEntry("wallet_version", "0.0.1")
+        .containsEntry("wallet_link", "https://www.digg.se")
         .containsEntry("wallet_solution_certification_information",
-            "https://example.org/certification");
+            "UNCERTIFIED");
   }
 }
