@@ -22,6 +22,7 @@ jobs:
   integration-test:
     uses: diggsweden/wallet-ecosystem/.github/workflows/reusable-integration.yml@main
     with:
+      ecosystem-ref: ${{ github.head_ref || github.ref_name }}
       service-name: wallet-provider
       service-repo: ${{ github.repository }}
       service-ref: ${{ github.event.pull_request.head.sha || github.ref }}
