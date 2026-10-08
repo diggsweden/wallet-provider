@@ -25,6 +25,7 @@ import se.digg.wallet.provider.application.config.WiaProperties;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
 import se.digg.wallet.provider.application.service.exception.InvalidWiaRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
+import se.digg.wallet.provider.domain.EcKeyParser;
 
 @Service
 public class WalletInstanceAttestationService {

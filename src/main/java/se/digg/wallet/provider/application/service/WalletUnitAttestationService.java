@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
 import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
+import se.digg.wallet.provider.domain.EcKeyParser;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
