@@ -12,8 +12,8 @@ import se.digg.wallet.provider.api.v0.KeyAttestationApi;
 import se.digg.wallet.provider.api.v0.model.KeyAttestationItem;
 import se.digg.wallet.provider.api.v0.model.KeyAttestationRequest;
 import se.digg.wallet.provider.api.v0.model.KeyAttestationResponse;
-import se.digg.wallet.provider.application.service.KeyAttestationService;
-import se.digg.wallet.provider.application.service.exception.InvalidKeyAttestationRequestParameterException;
+import se.digg.wallet.provider.domain.service.KeyAttestationService;
+import se.digg.wallet.provider.domain.exception.InvalidKeyAttestationRequestParameterException;
 
 @RestController
 public class KeyAttestationController implements KeyAttestationApi {

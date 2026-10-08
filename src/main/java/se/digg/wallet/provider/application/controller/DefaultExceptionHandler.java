@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import se.digg.wallet.provider.api.v0.model.ProblemResponse;
-import se.digg.wallet.provider.application.service.exception.InvalidKeyAttestationRequestParameterException;
+import se.digg.wallet.provider.domain.exception.InvalidKeyAttestationRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
 import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 
