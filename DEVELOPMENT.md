@@ -320,6 +320,28 @@ All environment variables below are required and have no defaults:
 
 The shared `wua.keystore` configuration also requires `WALLET_PROVIDER_ISSUER` and `WALLET_PROVIDER_WUA_STATUS`.
 
+#### Wallet metadata settings and production values
+
+The following settings describe the wallet software and are copied into every signed WIA.
+The example values are development fixtures, not defaults or official production identifiers.
+
+| `wia` setting | JWT claim | Meaning | Expected production value |
+| --- | --- | --- | --- |
+| `client-id` | `sub` | OAuth client identifier, shared across wallet instances; it does not identify a user or installation. | The agreed OAuth client identifier used by the wallet and authorization servers. `digg-wallet` can remain if adopted as the official identifier. Wallet-ecosystem currently uses `wallet-dev` to match its Keycloak client. |
+| `wallet-name` | `wallet_name` | Wallet Solution identifier in the Wallet Provider Trusted List, rather than just a display name. | The exact identifier from the official trusted-list registration. `Digg Wallet` is currently an example value. |
+| `wallet-version` | `wallet_version` | Version of the wallet software being attested, rather than the wallet-provider backend version. | The actual wallet software release, for example `1.2.3`. `0.0.1` is a prototype value. Supporting several releases will require selecting the version from validated information about the requesting app. |
+| `wallet-link` | `wallet_link` | Public URL providing information about the wallet solution. | A stable HTTPS page dedicated to Digg Wallet and its relevant product and certification information. `https://www.digg.se` is currently a generic placeholder. |
+| `wallet-solution-certification-information` | `wallet_solution_certification_information` | Information about the certification body, certificate number, and other relevant certification details. | Actual certification information from trusted records, using the agreed format when established. `UNCERTIFIED` is a local placeholder, not a standardized certification status or certification evidence. |
+
+The metadata requirements are defined in [EUDI TS3, section 2.3.1](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts3-wallet-unit-attestation.md#231-wallet-solution-identification-and-certification-information).
+TS3 currently leaves the exact certification-information format undefined.
+For client attestation authentication, the request's OAuth `client_id` normally must match the WIA's `sub`, as described in the [OAuth client attestation specification](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-attestation-based-client-auth).
+
+These metadata values must not be inferred from the supplied public JWK.
+The JWK supplies only the public key for `cnf.jwk`; it does not establish app identity, version, or certification.
+This prototype uses static provider configuration and does not validate the running app's version or certification.
+Most metadata can remain provider configuration, while a future implementation supporting multiple wallet releases should obtain and verify app-version information before signing it.
+
 The token's `exp` and `client_status.exp` are independent.
 The status reference and maintenance period are placeholders; this prototype publishes no live status list and provides no revocation-maintenance guarantee.
 The wallet must create its own proof of possession when presenting the WIA to an authorization server.
