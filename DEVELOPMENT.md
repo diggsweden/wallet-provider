@@ -318,7 +318,8 @@ All environment variables below are required and have no defaults:
 | `WALLET_PROVIDER_WIA_STATUS` | Placeholder status reference in `client_status.status` |
 | `WALLET_PROVIDER_WIA_STATUS_MAINTENANCE_DAYS` | Period represented by `client_status.exp`, at least 31 days |
 
-The shared `wua.keystore` configuration also requires `WALLET_PROVIDER_ISSUER` and `WALLET_PROVIDER_WUA_STATUS`.
+The shared `wua.keystore` configuration accepts `WALLET_PROVIDER_ISSUER` and `WALLET_PROVIDER_WUA_STATUS` overrides.
+Their defaults are `Digg` and a placeholder status-list reference with index `412` and URI `https://revocation_url/statuslists/1`, respectively.
 
 #### Wallet metadata settings and production values
 
