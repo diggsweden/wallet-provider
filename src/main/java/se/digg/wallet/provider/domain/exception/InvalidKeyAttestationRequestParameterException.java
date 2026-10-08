@@ -2,7 +2,9 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.provider.application.service.exception;
+package se.digg.wallet.provider.domain.exception;
+
+import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
 
 /**
  * Indicates that a client supplied an invalid parameter when requesting a Key Attestation.
