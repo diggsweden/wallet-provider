@@ -19,7 +19,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequest;
+import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequestDto;
 import se.digg.wallet.provider.application.filter.SensitiveDataMasker;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
@@ -57,8 +57,8 @@ class WalletUnitAttestationControllerTest {
             }
             """;
     String nonce = "123123123123";
-    WalletUnitAttestationRequest input =
-        WalletUnitAttestationRequest.builder().jwk(jwk).nonce(nonce).build();
+    WalletUnitAttestationRequestDto input =
+        WalletUnitAttestationRequestDto.builder().jwk(jwk).nonce(nonce).build();
 
     mockMvc
         .perform(
@@ -113,8 +113,8 @@ class WalletUnitAttestationControllerTest {
             }
             """;
     String nonce = "";
-    WalletUnitAttestationRequest input =
-        WalletUnitAttestationRequest.builder().jwk(jwk).nonce(nonce).build();
+    WalletUnitAttestationRequestDto input =
+        WalletUnitAttestationRequestDto.builder().jwk(jwk).nonce(nonce).build();
 
     mockMvc
         .perform(
@@ -143,8 +143,8 @@ class WalletUnitAttestationControllerTest {
             }
             """;
 
-    WalletUnitAttestationRequest input =
-        WalletUnitAttestationRequest.builder().jwk(jwk).nonce(null).build();
+    WalletUnitAttestationRequestDto input =
+        WalletUnitAttestationRequestDto.builder().jwk(jwk).nonce(null).build();
 
     mockMvc
         .perform(
@@ -155,7 +155,7 @@ class WalletUnitAttestationControllerTest {
         .andExpect(content().string(expectedJwt));
   }
 
-  private String asJson(WalletUnitAttestationRequest input) throws JacksonException {
+  private String asJson(WalletUnitAttestationRequestDto input) throws JacksonException {
     ObjectWriter objectWriter = mapper.writer().withDefaultPrettyPrinter();
     return objectWriter.writeValueAsString(input);
   }

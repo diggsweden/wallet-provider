@@ -282,6 +282,7 @@ SPDX-License-Identifier: EUPL-1.2
               <generatorName>spring</generatorName>
               <apiPackage>se.digg.wallet.provider.api.v0</apiPackage>
               <modelPackage>se.digg.wallet.provider.api.v0.model</modelPackage>
+              <modelNameSuffix>Dto</modelNameSuffix>
               <generateSupportingFiles>false</generateSupportingFiles>
               <generateApiTests>false</generateApiTests>
               <generateModelTests>false</generateModelTests>

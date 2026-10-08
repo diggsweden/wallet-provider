@@ -7,8 +7,8 @@ package se.digg.wallet.provider.application.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.provider.api.v0.WalletInstanceAttestationApi;
-import se.digg.wallet.provider.api.v0.model.WalletInstanceAttestationRequest;
-import se.digg.wallet.provider.api.v0.model.WalletInstanceAttestationResponse;
+import se.digg.wallet.provider.api.v0.model.WalletInstanceAttestationRequestDto;
+import se.digg.wallet.provider.api.v0.model.WalletInstanceAttestationResponseDto;
 import se.digg.wallet.provider.application.service.WalletInstanceAttestationService;
 
 @RestController
@@ -21,9 +21,9 @@ public class WalletInstanceAttestationController implements WalletInstanceAttest
   }
 
   @Override
-  public ResponseEntity<WalletInstanceAttestationResponse> postWalletInstanceAttestation(
-      WalletInstanceAttestationRequest request) {
+  public ResponseEntity<WalletInstanceAttestationResponseDto> postWalletInstanceAttestation(
+      WalletInstanceAttestationRequestDto request) {
     var jwt = attestationService.createWalletInstanceAttestation(request.getJwk());
-    return ResponseEntity.ok(new WalletInstanceAttestationResponse(jwt.serialize()));
+    return ResponseEntity.ok(new WalletInstanceAttestationResponseDto(jwt.serialize()));
   }
 }
