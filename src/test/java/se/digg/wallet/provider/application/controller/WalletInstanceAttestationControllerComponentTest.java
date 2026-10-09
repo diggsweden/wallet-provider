@@ -19,8 +19,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.client.EntityExchangeResult;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
 
@@ -43,12 +45,7 @@ class WalletInstanceAttestationControllerComponentTest {
 
   @Test
   void a_public_key_request_returns_a_wia_signed_by_the_wallet_provider() throws Exception {
-    var response =
-        RestTestClient.bindTo(mockMvc).build().post().uri("/v0/wallet-instance-attestations")
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(Map.of("jwk", PUBLIC_JWK))
-            .exchange()
-            .expectBody(Map.class).returnResult();
+    var response = tryRequestWia(Map.of("jwk", PUBLIC_JWK));
 
     assertThat(response.getStatus().value()).isEqualTo(200);
     assertThat(response.getResponseHeaders().getContentType())
@@ -118,11 +115,7 @@ class WalletInstanceAttestationControllerComponentTest {
   @ParameterizedTest
   @ValueSource(strings = {"", " ", "not-json", "null", "{}", "{\"kty\":\"RSA\"}"})
   void an_invalid_public_key_is_rejected_with_problem_details(String invalidJwk) {
-    var response =
-        RestTestClient.bindTo(mockMvc).build().post().uri("/v0/wallet-instance-attestations")
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(Map.of("jwk", invalidJwk))
-            .exchange().expectBody(Map.class).returnResult();
+    var response = tryRequestWia(Map.of("jwk", invalidJwk));
 
     assertThat(response.getStatus().value()).isEqualTo(400);
     assertThat(response.getResponseHeaders().getContentType())
@@ -135,11 +128,7 @@ class WalletInstanceAttestationControllerComponentTest {
   void a_private_key_is_rejected_instead_of_being_embedded_in_a_wia() throws Exception {
     var privateJwk = new ECKeyGenerator(Curve.P_256).generate().toJSONString();
 
-    var response =
-        RestTestClient.bindTo(mockMvc).build().post().uri("/v0/wallet-instance-attestations")
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(Map.of("jwk", privateJwk))
-            .exchange().expectBody(Map.class).returnResult();
+    var response = tryRequestWia(Map.of("jwk", privateJwk));
 
     assertThat(response.getStatus().value()).isEqualTo(400);
     assertThat(response.getResponseHeaders().getContentType())
@@ -152,11 +141,7 @@ class WalletInstanceAttestationControllerComponentTest {
   @ParameterizedTest
   @ValueSource(strings = {"{}", "{\"jwk\":null}"})
   void a_request_without_a_public_key_is_rejected_with_problem_details(String requestBody) {
-    var response =
-        RestTestClient.bindTo(mockMvc).build().post().uri("/v0/wallet-instance-attestations")
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(requestBody)
-            .exchange().expectBody(Map.class).returnResult();
+    var response = tryRequestWia(requestBody);
 
     assertThat(response.getStatus().value()).isEqualTo(400);
     assertThat(response.getResponseHeaders().getContentType())
@@ -179,12 +164,16 @@ class WalletInstanceAttestationControllerComponentTest {
   }
 
   private SignedJWT requestWia() throws Exception {
-    var response =
-        RestTestClient.bindTo(mockMvc).build().post().uri("/v0/wallet-instance-attestations")
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(Map.of("jwk", PUBLIC_JWK))
-            .exchange().expectBody(Map.class).returnResult();
+    var response = tryRequestWia(Map.of("jwk", PUBLIC_JWK));
     assertThat(response.getStatus().value()).isEqualTo(200);
     return SignedJWT.parse((String) response.getResponseBody().get("wallet_instance_attestation"));
+  }
+
+  private EntityExchangeResult<Map<String, Object>> tryRequestWia(Object body) {
+    return RestTestClient.bindTo(mockMvc).build().post().uri("/v0/wallet-instance-attestations")
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(body)
+        .exchange().expectBody(new ParameterizedTypeReference<Map<String, Object>>() {})
+        .returnResult();
   }
 }
