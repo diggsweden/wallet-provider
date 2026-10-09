@@ -165,16 +165,6 @@ class WalletInstanceAttestationControllerComponentTest {
     assertThat(response.getResponseBody()).doesNotContainKey("wallet_instance_attestation");
   }
 
-  private SignedJWT requestWia() throws Exception {
-    var response =
-        RestTestClient.bindTo(mockMvc).build().post().uri("/v0/wallet-instance-attestations")
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(Map.of("jwk", PUBLIC_JWK))
-            .exchange().expectBody(Map.class).returnResult();
-    assertThat(response.getStatus().value()).isEqualTo(200);
-    return SignedJWT.parse((String) response.getResponseBody().get("wallet_instance_attestation"));
-  }
-
   @Test
   void a_wia_contains_the_configured_wallet_solution_identity() throws Exception {
     var jwt = requestWia();
@@ -186,5 +176,15 @@ class WalletInstanceAttestationControllerComponentTest {
         .containsEntry("wallet_link", "https://www.digg.se")
         .containsEntry("wallet_solution_certification_information",
             "UNCERTIFIED");
+  }
+
+  private SignedJWT requestWia() throws Exception {
+    var response =
+        RestTestClient.bindTo(mockMvc).build().post().uri("/v0/wallet-instance-attestations")
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(Map.of("jwk", PUBLIC_JWK))
+            .exchange().expectBody(Map.class).returnResult();
+    assertThat(response.getStatus().value()).isEqualTo(200);
+    return SignedJWT.parse((String) response.getResponseBody().get("wallet_instance_attestation"));
   }
 }
