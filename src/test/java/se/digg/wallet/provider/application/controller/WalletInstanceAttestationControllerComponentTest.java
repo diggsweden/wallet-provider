@@ -51,17 +51,17 @@ class WalletInstanceAttestationControllerComponentTest {
     assertThat(response.getResponseHeaders().getContentType())
         .isEqualTo(MediaType.APPLICATION_JSON);
     assertThat(response.getResponseBody()).containsKey("wallet_instance_attestation");
-    var jwt =
+    var wia =
         SignedJWT.parse((String) response.getResponseBody().get("wallet_instance_attestation"));
-    assertThat(jwt.verify(new ECDSAVerifier(keystoreProperties.getPublicKey()))).isTrue();
+    assertThat(wia.verify(new ECDSAVerifier(keystoreProperties.getPublicKey()))).isTrue();
   }
 
   @Test
   void a_wia_identifies_its_oauth_type_and_provider_certificate_chain() throws Exception {
-    var jwt = requestWia();
+    var wia = requestWia();
 
-    assertThat(jwt.getHeader().getType().toString()).isEqualTo("oauth-client-attestation+jwt");
-    assertThat(jwt.getHeader().getAlgorithm().getName()).isEqualTo("ES256");
+    assertThat(wia.getHeader().getType().toString()).isEqualTo("oauth-client-attestation+jwt");
+    assertThat(wia.getHeader().getAlgorithm().getName()).isEqualTo("ES256");
     var expectedChain = keystoreProperties.getCertificateChain().stream()
         .map(certificate -> {
           try {
@@ -70,14 +70,14 @@ class WalletInstanceAttestationControllerComponentTest {
             throw new IllegalStateException(e);
           }
         }).toList();
-    assertThat(jwt.getHeader().getX509CertChain()).containsExactlyElementsOf(expectedChain);
+    assertThat(wia.getHeader().getX509CertChain()).containsExactlyElementsOf(expectedChain);
   }
 
   @Test
   void a_wia_binds_proof_of_possession_to_the_supplied_public_key() throws Exception {
-    var jwt = requestWia();
+    var wia = requestWia();
 
-    assertThat(jwt.getJWTClaimsSet().getJSONObjectClaim("cnf"))
+    assertThat(wia.getJWTClaimsSet().getJSONObjectClaim("cnf"))
         .containsEntry("jwk", Map.of(
             "kty", "EC", "crv", "P-256",
             "x", "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
@@ -152,9 +152,9 @@ class WalletInstanceAttestationControllerComponentTest {
 
   @Test
   void a_wia_contains_the_configured_wallet_solution_identity() throws Exception {
-    var jwt = requestWia();
+    var wia = requestWia();
 
-    assertThat(jwt.getJWTClaimsSet().getClaims())
+    assertThat(wia.getJWTClaimsSet().getClaims())
         .containsEntry("sub", "digg-wallet")
         .containsEntry("wallet_name", "Digg Wallet")
         .containsEntry("wallet_version", "0.0.1")
