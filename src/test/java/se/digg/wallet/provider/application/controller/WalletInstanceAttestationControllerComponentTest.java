@@ -28,7 +28,6 @@ import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@SuppressWarnings("checkstyle:MethodName")
 class WalletInstanceAttestationControllerComponentTest {
 
   private static final String PUBLIC_JWK = """
@@ -44,7 +43,7 @@ class WalletInstanceAttestationControllerComponentTest {
   private WuaKeystoreProperties keystoreProperties;
 
   @Test
-  void a_public_key_request_returns_a_wia_signed_by_the_wallet_provider() throws Exception {
+  void returnsSignedWia() throws Exception {
     var response = tryRequestWia(Map.of("jwk", PUBLIC_JWK));
 
     assertThat(response.getStatus().value()).isEqualTo(200);
@@ -57,7 +56,7 @@ class WalletInstanceAttestationControllerComponentTest {
   }
 
   @Test
-  void a_wia_identifies_its_oauth_type_and_provider_certificate_chain() throws Exception {
+  void returnsWiaWithOauthTypeAndCertificateChain() throws Exception {
     var wia = requestWia();
 
     assertThat(wia.getHeader().getType().toString()).isEqualTo("oauth-client-attestation+jwt");
@@ -74,7 +73,7 @@ class WalletInstanceAttestationControllerComponentTest {
   }
 
   @Test
-  void a_wia_binds_proof_of_possession_to_the_supplied_public_key() throws Exception {
+  void returnsWiaWithProofOfPossessionBoundToTheSuppliedPublicKey() throws Exception {
     var wia = requestWia();
 
     assertThat(wia.getJWTClaimsSet().getJSONObjectClaim("cnf"))
@@ -85,7 +84,7 @@ class WalletInstanceAttestationControllerComponentTest {
   }
 
   @Test
-  void a_wia_has_the_configured_lifetime_below_24_hours() throws Exception {
+  void returnsWiaWithConfiguredLifetimeBelow24Hours() throws Exception {
     var beforeRequest = Instant.now().minusSeconds(1);
 
     var claims = requestWia().getJWTClaimsSet();
@@ -100,7 +99,7 @@ class WalletInstanceAttestationControllerComponentTest {
   }
 
   @Test
-  void a_wia_has_a_status_maintenance_period_independent_of_token_expiration() throws Exception {
+  void returnsWiaWithMaintenancePeriodIndependentOfTokenExpiration() throws Exception {
     var claims = requestWia().getJWTClaimsSet();
 
     var clientStatus = claims.getJSONObjectClaim("client_status");
@@ -114,7 +113,7 @@ class WalletInstanceAttestationControllerComponentTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"", " ", "not-json", "null", "{}", "{\"kty\":\"RSA\"}"})
-  void an_invalid_public_key_is_rejected_with_problem_details(String invalidJwk) {
+  void rejectsInvalidPublicKey(String invalidJwk) {
     var response = tryRequestWia(Map.of("jwk", invalidJwk));
 
     assertThat(response.getStatus().value()).isEqualTo(400);
@@ -125,7 +124,7 @@ class WalletInstanceAttestationControllerComponentTest {
   }
 
   @Test
-  void a_private_key_is_rejected_instead_of_being_embedded_in_a_wia() throws Exception {
+  void rejectsPrivateKey() throws Exception {
     var privateJwk = new ECKeyGenerator(Curve.P_256).generate().toJSONString();
 
     var response = tryRequestWia(Map.of("jwk", privateJwk));
@@ -140,7 +139,7 @@ class WalletInstanceAttestationControllerComponentTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"{}", "{\"jwk\":null}"})
-  void a_request_without_a_public_key_is_rejected_with_problem_details(String requestBody) {
+  void rejectsRequestWithNoPublicKey(String requestBody) {
     var response = tryRequestWia(requestBody);
 
     assertThat(response.getStatus().value()).isEqualTo(400);
@@ -151,7 +150,7 @@ class WalletInstanceAttestationControllerComponentTest {
   }
 
   @Test
-  void a_wia_contains_the_configured_wallet_solution_identity() throws Exception {
+  void returnsWiaWithConfiguredWalletSolutionIdentity() throws Exception {
     var wia = requestWia();
 
     assertThat(wia.getJWTClaimsSet().getClaims())
