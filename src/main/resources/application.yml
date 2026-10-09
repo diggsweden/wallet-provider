@@ -66,6 +66,17 @@ management:
     diskspace:
       enabled: true
 
+wia:
+  # Prototype placeholders; these entries are not backed by a live status list.
+  status: ${WALLET_PROVIDER_WIA_STATUS}
+  status-maintenance-days: ${WALLET_PROVIDER_WIA_STATUS_MAINTENANCE_DAYS}
+  validity-minutes: ${WALLET_PROVIDER_WIA_VALIDITY_MINUTES}
+  client-id: ${WALLET_PROVIDER_WIA_CLIENT_ID}
+  wallet-name: ${WALLET_PROVIDER_WIA_WALLET_NAME}
+  wallet-version: ${WALLET_PROVIDER_WIA_WALLET_VERSION}
+  wallet-link: ${WALLET_PROVIDER_WIA_WALLET_LINK}
+  wallet-solution-certification-information: ${WALLET_PROVIDER_WIA_CERTIFICATION_INFORMATION}
+
 wua:
   keystore:
     location: ${WUA_KEYSTORE_PATH}
