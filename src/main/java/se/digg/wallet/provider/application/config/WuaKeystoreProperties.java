@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.validation.annotation.Validated;
-import se.digg.wallet.provider.application.exception.WalletRuntimeException;
+import se.digg.wallet.provider.domain.exception.WalletRuntimeException;
 
 @ConfigurationProperties(prefix = "wua.keystore")
 @Validated

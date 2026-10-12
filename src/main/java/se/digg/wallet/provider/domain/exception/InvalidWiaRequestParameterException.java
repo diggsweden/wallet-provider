@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.provider.application.exception;
+package se.digg.wallet.provider.domain.exception;
 
 /**
  * Indicates that a client supplied an invalid parameter when requesting a WIA.

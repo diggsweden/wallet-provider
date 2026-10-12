@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.provider.application.exception;
+package se.digg.wallet.provider.domain.exception;
 
 public class WalletRuntimeException extends RuntimeException {
   public WalletRuntimeException(String message) {

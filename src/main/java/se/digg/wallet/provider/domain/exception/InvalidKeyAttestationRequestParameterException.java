@@ -4,8 +4,6 @@
 
 package se.digg.wallet.provider.domain.exception;
 
-import se.digg.wallet.provider.application.exception.WalletRuntimeException;
-
 /**
  * Indicates that a client supplied an invalid parameter when requesting a Key Attestation.
  */

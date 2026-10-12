@@ -23,8 +23,8 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import se.digg.wallet.provider.application.config.WiaProperties;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
-import se.digg.wallet.provider.application.exception.InvalidWiaRequestParameterException;
-import se.digg.wallet.provider.application.exception.WalletRuntimeException;
+import se.digg.wallet.provider.domain.exception.InvalidWiaRequestParameterException;
+import se.digg.wallet.provider.domain.exception.WalletRuntimeException;
 import se.digg.wallet.provider.domain.jwk.EcKeyParser;
 
 @Service
