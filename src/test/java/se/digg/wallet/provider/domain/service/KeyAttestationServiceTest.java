@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.provider.application.service;
+package se.digg.wallet.provider.domain.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,9 +39,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
-import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
+import se.digg.wallet.provider.application.exception.WalletRuntimeException;
 import se.digg.wallet.provider.domain.exception.InvalidKeyAttestationRequestParameterException;
-import se.digg.wallet.provider.domain.service.KeyAttestationService;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest

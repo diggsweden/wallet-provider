@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.provider.api.v0.WalletInstanceAttestationApi;
 import se.digg.wallet.provider.api.v0.model.WalletInstanceAttestationRequestDto;
 import se.digg.wallet.provider.api.v0.model.WalletInstanceAttestationResponseDto;
-import se.digg.wallet.provider.application.service.WalletInstanceAttestationService;
+import se.digg.wallet.provider.domain.service.WalletInstanceAttestationService;
 
 @RestController
 public class WalletInstanceAttestationController implements WalletInstanceAttestationApi {

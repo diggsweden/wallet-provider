@@ -31,8 +31,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import se.digg.wallet.provider.application.config.WuaKeystoreProperties;
-import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
-import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
+import se.digg.wallet.provider.application.exception.InvalidWuaRequestParameterException;
+import se.digg.wallet.provider.application.exception.WalletRuntimeException;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest

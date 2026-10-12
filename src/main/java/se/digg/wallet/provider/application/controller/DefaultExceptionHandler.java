@@ -7,7 +7,7 @@ package se.digg.wallet.provider.application.controller;
 import static se.digg.wallet.provider.application.controller.ProblemType.INTERNAL;
 import static se.digg.wallet.provider.application.controller.ProblemType.REQUEST_ARGUMENT_NOT_VALID;
 import static se.digg.wallet.provider.application.controller.ProblemType.REQUEST_VALIDATION_FAILURE;
-import static se.digg.wallet.provider.application.filter.LoggingFilter.MDC_TRANSACTION_ID;
+import static se.digg.wallet.provider.application.logging.LoggingFilter.MDC_TRANSACTION_ID;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -33,9 +33,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import se.digg.wallet.provider.api.v0.model.ProblemResponseDto;
-import se.digg.wallet.provider.application.service.exception.InvalidWiaRequestParameterException;
-import se.digg.wallet.provider.application.service.exception.InvalidWuaRequestParameterException;
-import se.digg.wallet.provider.application.service.exception.WalletRuntimeException;
+import se.digg.wallet.provider.application.exception.InvalidWiaRequestParameterException;
+import se.digg.wallet.provider.application.exception.InvalidWuaRequestParameterException;
+import se.digg.wallet.provider.application.exception.WalletRuntimeException;
 import se.digg.wallet.provider.domain.exception.InvalidKeyAttestationRequestParameterException;
 
 

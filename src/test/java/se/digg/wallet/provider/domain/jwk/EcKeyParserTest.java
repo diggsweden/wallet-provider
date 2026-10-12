@@ -2,14 +2,13 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.provider.application.service;
+package se.digg.wallet.provider.domain.jwk;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.nimbusds.jose.jwk.ECKey;
 import java.text.ParseException;
 import org.junit.jupiter.api.Test;
-import se.digg.wallet.provider.domain.EcKeyParser;
 
 class EcKeyParserTest {
 
