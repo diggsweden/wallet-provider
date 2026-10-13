@@ -7,12 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
 
-- Merge pull request #144 from diggsweden/refactor/wallet-provider-structure
-
-
-## [0.1.6] - 2026-10-13
+## [0.1.8] - 2026-10-13
 
 ### Added
 
@@ -20,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Merge pull request #144 from diggsweden/refactor/wallet-provider-structure
 - Move exceptions from application to domain
 - Sync test with test with main structure
 - Move key attestation components to domain layer
@@ -540,8 +537,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove default value for config wua.keystore.location
 
 
-[unreleased]: https://github.com/diggsweden/wallet-provider/compare/v0.1.6..HEAD
-[0.1.6]: https://github.com/diggsweden/wallet-provider/compare/v0.1.5..v0.1.6
+[unreleased]: https://github.com/diggsweden/wallet-provider/compare/v0.1.8..HEAD
+[0.1.8]: https://github.com/diggsweden/wallet-provider/compare/v0.1.5..v0.1.8
 [0.1.5]: https://github.com/diggsweden/wallet-provider/compare/v0.1.4..v0.1.5
 [0.1.4]: https://github.com/diggsweden/wallet-provider/compare/v0.1.3..v0.1.4
 [0.1.3]: https://github.com/diggsweden/wallet-provider/compare/v0.1.2..v0.1.3
