@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.provider.application.filter;
+package se.digg.wallet.provider.application.logging;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

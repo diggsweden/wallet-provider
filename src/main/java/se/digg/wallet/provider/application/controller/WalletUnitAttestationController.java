@@ -8,7 +8,7 @@ import com.nimbusds.jwt.SignedJWT;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import se.digg.wallet.provider.api.v0.WalletUnitAttestationApi;
-import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequest;
+import se.digg.wallet.provider.api.v0.model.WalletUnitAttestationRequestDto;
 import se.digg.wallet.provider.application.service.WalletUnitAttestationService;
 
 @Deprecated
@@ -23,7 +23,7 @@ public class WalletUnitAttestationController implements WalletUnitAttestationApi
 
   @Override
   public ResponseEntity<String> postWalletUnitAttestation(
-      WalletUnitAttestationRequest walletUnitAttestationRequest) {
+      WalletUnitAttestationRequestDto walletUnitAttestationRequest) {
     SignedJWT signedJwt =
         attestationService.createWalletUnitAttestation(walletUnitAttestationRequest.getJwk(),
             walletUnitAttestationRequest.getNonce().orElse(null));

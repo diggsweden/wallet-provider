@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-package se.digg.wallet.provider.application.filter;
+package se.digg.wallet.provider.application.logging;
 
 import java.util.HashMap;
 import java.util.List;
