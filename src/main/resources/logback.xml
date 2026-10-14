@@ -22,7 +22,7 @@ SPDX-License-Identifier: EUPL-1.2
   <logger name="com.zaxxer.hikari" level="WARN" />
 
   <!-- Application-specific loggers -->
-  <logger name="se.digg.wallet.provider" level="INFO" additivity="false">
+  <logger name="se.digg.wallet.attestation.issuer" level="INFO" additivity="false">
     <appender-ref ref="CONSOLE" />
   </logger>
 

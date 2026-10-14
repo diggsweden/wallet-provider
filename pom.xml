@@ -280,8 +280,8 @@ SPDX-License-Identifier: EUPL-1.2
             <configuration>
               <inputSpec>${openapi.spec.file}</inputSpec>
               <generatorName>spring</generatorName>
-              <apiPackage>se.digg.wallet.provider.api.v0</apiPackage>
-              <modelPackage>se.digg.wallet.provider.api.v0.model</modelPackage>
+              <apiPackage>se.digg.wallet.attestation.issuer.api.v0</apiPackage>
+              <modelPackage>se.digg.wallet.attestation.issuer.api.v0.model</modelPackage>
               <modelNameSuffix>Dto</modelNameSuffix>
               <generateSupportingFiles>false</generateSupportingFiles>
               <generateApiTests>false</generateApiTests>

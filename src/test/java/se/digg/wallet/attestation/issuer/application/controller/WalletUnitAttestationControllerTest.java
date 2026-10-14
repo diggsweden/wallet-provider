@@ -1,0 +1,220 @@
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
+//
+// SPDX-License-Identifier: EUPL-1.2
+
+package se.digg.wallet.attestation.issuer.application.controller;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.nimbusds.jwt.SignedJWT;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import se.digg.wallet.attestation.issuer.api.v0.model.WalletUnitAttestationRequestDto;
+import se.digg.wallet.attestation.issuer.application.logging.SensitiveDataMasker;
+import se.digg.wallet.attestation.issuer.application.service.WalletUnitAttestationService;
+import se.digg.wallet.attestation.issuer.domain.exception.InvalidWuaRequestParameterException;
+import se.digg.wallet.attestation.issuer.domain.exception.WalletRuntimeException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
+
+@WebMvcTest(WalletUnitAttestationController.class)
+class WalletUnitAttestationControllerTest {
+
+  private final ObjectMapper mapper = new ObjectMapper();
+  @Autowired
+  private MockMvc mockMvc;
+  @MockitoBean
+  private WalletUnitAttestationService service;
+  @MockitoBean
+  private SensitiveDataMasker sensitiveDataMasker;
+
+  @Test
+  void assertThatPostWalletUnitAttestation_givenPublicKeyAndNonce_shouldReturnOk()
+      throws Exception {
+    String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
+    when(service.createWalletUnitAttestation(anyString(), anyString()))
+        .thenReturn(SignedJWT.parse(expectedJwt));
+
+    String jwk =
+        """
+            {
+                "kty": "EC",
+                "use": "sig",
+                "crv": "P-256",
+                "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
+                "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
+            }
+            """;
+    String nonce = "123123123123";
+    WalletUnitAttestationRequestDto input =
+        WalletUnitAttestationRequestDto.builder().jwk(jwk).nonce(nonce).build();
+
+    mockMvc
+        .perform(
+            post("/wallet-unit-attestation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJson(input)))
+        .andExpect(status().isOk())
+        .andExpect(content().string(expectedJwt));
+  }
+
+  @Test
+  void assertThatPostWalletUnitAttestation_givenIncorrectDatatype_shouldReturnBadRequest()
+      throws Exception {
+
+    String jsonString = """
+        {
+        "jwk":{
+                "kty": "EC",
+                "use": "sig",
+                "crv": "P-256",
+                "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
+                "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
+            },
+        "nonce":"123123123",
+        "walletId":"abc"
+        }
+        """;
+
+    mockMvc
+        .perform(
+            post("/wallet-unit-attestation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonString))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void assertThatPostWalletUnitAttestation_givenPublicKeyAndEmptyNonce_shouldReturnOk()
+      throws Exception {
+    String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
+    when(service.createWalletUnitAttestation(anyString(), anyString()))
+        .thenReturn(SignedJWT.parse(expectedJwt));
+
+    String jwk =
+        """
+            {
+                "kty": "EC",
+                "use": "sig",
+                "crv": "P-256",
+                "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
+                "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
+            }
+            """;
+    String nonce = "";
+    WalletUnitAttestationRequestDto input =
+        WalletUnitAttestationRequestDto.builder().jwk(jwk).nonce(nonce).build();
+
+    mockMvc
+        .perform(
+            post("/wallet-unit-attestation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJson(input)))
+        .andExpect(status().isOk())
+        .andExpect(content().string(expectedJwt));
+  }
+
+  @Test
+  void assertThatPostWalletUnitAttestation_givenPublicKeyAndNullNonce_shouldReturnOk()
+      throws Exception {
+    String expectedJwt = "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJEaWdnIn0.test";
+    when(service.createWalletUnitAttestation(anyString(), eq(null)))
+        .thenReturn(SignedJWT.parse(expectedJwt));
+
+    String jwk =
+        """
+            {
+                "kty": "EC",
+                "use": "sig",
+                "crv": "P-256",
+                "x": "18wHLeIgW9wVN6VD1Txgpqy2LszYkMf6J8njVAibvhM",
+                "y": "-V4dS4UaLMgP_4fY4j8ir7cl1TXlFdAgcx55o7TkcSA"
+            }
+            """;
+
+    WalletUnitAttestationRequestDto input =
+        WalletUnitAttestationRequestDto.builder().jwk(jwk).nonce(null).build();
+
+    mockMvc
+        .perform(
+            post("/wallet-unit-attestation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJson(input)))
+        .andExpect(status().isOk())
+        .andExpect(content().string(expectedJwt));
+  }
+
+  private String asJson(WalletUnitAttestationRequestDto input) throws JacksonException {
+    ObjectWriter objectWriter = mapper.writer().withDefaultPrettyPrinter();
+    return objectWriter.writeValueAsString(input);
+  }
+
+  @Test
+  void shouldReturnInternalServerErrorForWalletRuntimeException() throws Exception {
+    String errorMessage = "Could not create attestation.";
+    when(service.createWalletUnitAttestation(anyString(), anyString()))
+        .thenThrow(new WalletRuntimeException(errorMessage, null));
+
+    mockMvc.perform(post("/wallet-unit-attestation")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("""
+            {"jwk":"test-jwk","nonce":"test-nonce"}
+            """))
+        .andExpect(status().isInternalServerError())
+        .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+        .andExpect(jsonPath("$.title").value("Internal Server Error"))
+        .andExpect(jsonPath("$.detail").value(errorMessage))
+        .andExpect(jsonPath("$.type").value("about:blank"));
+  }
+
+
+  @Test
+  void must_return_bad_request_for_an_invalid_wua_parameter() throws Exception {
+    String errorMessage = "Invalid wallet public key JWK.";
+    when(service.createWalletUnitAttestation(anyString(), anyString()))
+        .thenThrow(
+            new InvalidWuaRequestParameterException(errorMessage, new IllegalArgumentException()));
+
+    mockMvc.perform(post("/wallet-unit-attestation")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("""
+            {"jwk":"invalid-jwk","nonce":"test-nonce"}
+            """))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+        .andExpect(jsonPath("$.title").value("Bad Request"))
+        .andExpect(jsonPath("$.status").value(400))
+        .andExpect(jsonPath("$.detail").value(errorMessage))
+        .andExpect(jsonPath("$.type").value("about:blank"));
+  }
+
+  @Test
+  void shouldNotLeakMessageForAnUnanticipatedException() throws Exception {
+    when(service.createWalletUnitAttestation(anyString(), anyString()))
+        .thenThrow(new IllegalStateException("SENSITIVE INTERNAL DETAIL"));
+
+    mockMvc.perform(post("/wallet-unit-attestation")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("""
+            {"jwk":"test-jwk","nonce":"test-nonce"}
+            """))
+        .andExpect(status().isInternalServerError())
+        .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+        .andExpect(jsonPath("$.title").value("Internal Server Error"))
+        .andExpect(jsonPath("$.status").value(500))
+        .andExpect(jsonPath("$.detail").value("An unexpected error occurred."))
+        .andExpect(jsonPath("$.type").value("about:blank"));
+  }
+
+}

@@ -1,0 +1,15 @@
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
+//
+// SPDX-License-Identifier: EUPL-1.2
+
+package se.digg.wallet.attestation.issuer.domain.exception;
+
+public class WalletRuntimeException extends RuntimeException {
+  public WalletRuntimeException(String message) {
+    super(message);
+  }
+
+  public WalletRuntimeException(String message, Throwable cause) {
+    super(message, cause);
+  }
+}
