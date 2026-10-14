@@ -20,7 +20,7 @@ wua:
   keystore:
     location: classpath:certificates/wallet-attestation-issuer.p12
     password: secret
-    alias: wallet-provider
+    alias: wallet-attestation-issuer
     type: PKCS12
     issuer: "Digg"
     validity-hours: 24
