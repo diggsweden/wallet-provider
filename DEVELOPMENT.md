@@ -340,8 +340,8 @@ For client attestation authentication, the request's OAuth `client_id` normally 
 
 These metadata values must not be inferred from the supplied public JWK.
 The JWK supplies only the public key for `cnf.jwk`; it does not establish app identity, version, or certification.
-This prototype uses static provider configuration and does not validate the running app's version or certification.
-Most metadata can remain provider configuration, while a future implementation supporting multiple wallet releases should obtain and verify app-version information before signing it.
+This prototype uses static configuration and does not validate the running app's version or certification.
+Most metadata can remain configuration, while a future implementation supporting multiple wallet releases should obtain and verify app-version information before signing it.
 
 The token's `exp` and `client_status.exp` are independent.
 The status reference and maintenance period are placeholders; this prototype publishes no live status list and provides no revocation-maintenance guarantee.
