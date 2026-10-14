@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2025 Digg - Agency for Digital Government
 # SPDX-License-Identifier: EUPL-1.2
 
-# Gitleaks configuration file for Wallet Provider
+# Gitleaks configuration file for Wallet Attestation Issuer
 
-title = "Wallet Provider - Gitleaks Configuration"
+title = "Wallet Attestation Issuer - Gitleaks Configuration"
 
 [[allowlists]]
 description = "Global allow list"

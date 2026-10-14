@@ -4,11 +4,11 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security Issues
-    url: https://github.com/diggsweden/wallet-provider/security/advisories/new
+    url: https://github.com/diggsweden/wallet-attestation-issuer/security/advisories/new
     about: Please report security vulnerabilities through GitHub Security Advisories
   - name: Questions and Discussions
-    url: https://github.com/diggsweden/wallet-provider/discussions
+    url: https://github.com/diggsweden/wallet-attestation-issuer/discussions
     about: Ask questions and discuss ideas with the community
   - name: Documentation
-    url: https://github.com/diggsweden/wallet-provider/blob/main/README.md
+    url: https://github.com/diggsweden/wallet-attestation-issuer/blob/main/README.md
     about: Check the documentation for usage instructions and guides

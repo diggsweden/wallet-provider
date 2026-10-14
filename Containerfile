@@ -5,7 +5,7 @@
 FROM docker.io/library/eclipse-temurin:25-jdk-alpine-3.22@sha256:916251d7b0ff689bff9f22c3bc5e0bdc2704f1bbfa41f016e0ea5eaa6cf300f8 AS builder
 
 LABEL maintainer="Digg - Agency for Digital Government"
-LABEL description="Build stage for Wallet Provider"
+LABEL description="Build stage for Wallet Attestation Issuer"
 
 # Install dependencies needed for building
 # hadolint ignore=DL3018
@@ -36,7 +36,7 @@ RUN mv /app/target/layers/application/*.jar /app/target/layers/application/appli
 FROM cgr.dev/chainguard/jre:latest@sha256:df582a702538248c0f07138a35975752cc16cf393901bc730f39e2478bada19c AS runtime
 
 LABEL maintainer="Digg - Agency for Digital Government"
-LABEL description="Wallet Provider"
+LABEL description="Wallet Attestation Issuer"
 
 WORKDIR /app
 

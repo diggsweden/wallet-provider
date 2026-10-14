@@ -269,7 +269,7 @@ just lint-openapi-diff
    You can reset `development/openapi-diff.yaml` back to default in a follow-up commit to re-enable full strict checking.
 
 2. **Introducing New Specification Files (Major Version Bumps)**:
-   When introducing a brand new specification file (for example, `wallet-provider-openapi-v2.yaml`) that does not yet exist on `main`, `just lint-openapi-diff` automatically detects that no prior version exists on `main` and skips the diff check.
+   When introducing a brand new specification file (for example, `wallet-attestation-issuer-openapi-v2.yaml`) that does not yet exist on `main`, `just lint-openapi-diff` automatically detects that no prior version exists on `main` and skips the diff check.
    Once the Pull Request is merged to `main`, subsequent changes to the new specification file are automatically tracked and verified.
 
 #### Compatibility Rules and Suppression Keys
@@ -309,16 +309,16 @@ All environment variables below are required and have no defaults:
 
 | Environment variable | Purpose |
 | --- | --- |
-| `WALLET_PROVIDER_WIA_CLIENT_ID` | OAuth client identifier in `sub`, shared across instances |
-| `WALLET_PROVIDER_WIA_WALLET_NAME` | Wallet Solution identifier in `wallet_name` |
-| `WALLET_PROVIDER_WIA_WALLET_VERSION` | Wallet Solution version |
-| `WALLET_PROVIDER_WIA_WALLET_LINK` | Wallet Solution information URL |
-| `WALLET_PROVIDER_WIA_CERTIFICATION_INFORMATION` | Wallet Solution certification information |
-| `WALLET_PROVIDER_WIA_VALIDITY_MINUTES` | Token lifetime, between 1 and 1439 minutes |
-| `WALLET_PROVIDER_WIA_STATUS` | Placeholder status reference in `client_status.status` |
-| `WALLET_PROVIDER_WIA_STATUS_MAINTENANCE_DAYS` | Period represented by `client_status.exp`, at least 31 days |
+| `WALLET_ATTESTATION_ISSUER_WIA_CLIENT_ID` | OAuth client identifier in `sub`, shared across instances |
+| `WALLET_ATTESTATION_ISSUER_WIA_WALLET_NAME` | Wallet Solution identifier in `wallet_name` |
+| `WALLET_ATTESTATION_ISSUER_WIA_WALLET_VERSION` | Wallet Solution version |
+| `WALLET_ATTESTATION_ISSUER_WIA_WALLET_LINK` | Wallet Solution information URL |
+| `WALLET_ATTESTATION_ISSUER_WIA_CERTIFICATION_INFORMATION` | Wallet Solution certification information |
+| `WALLET_ATTESTATION_ISSUER_WIA_VALIDITY_MINUTES` | Token lifetime, between 1 and 1439 minutes |
+| `WALLET_ATTESTATION_ISSUER_WIA_STATUS` | Placeholder status reference in `client_status.status` |
+| `WALLET_ATTESTATION_ISSUER_WIA_STATUS_MAINTENANCE_DAYS` | Period represented by `client_status.exp`, at least 31 days |
 
-The shared `wua.keystore` configuration accepts `WALLET_PROVIDER_ISSUER` and `WALLET_PROVIDER_WUA_STATUS` overrides.
+The shared `wua.keystore` configuration accepts `WALLET_ATTESTATION_ISSUER_ISSUER` and `WALLET_ATTESTATION_ISSUER_WUA_STATUS` overrides.
 Their defaults are `Digg` and a placeholder status-list reference with index `412` and URI `https://revocation_url/statuslists/1`, respectively.
 
 #### Wallet metadata settings and production values
@@ -330,7 +330,7 @@ The example values are development fixtures, not defaults or official production
 | --- | --- | --- | --- |
 | `client-id` | `sub` | OAuth client identifier, shared across wallet instances; it does not identify a user or installation. | The agreed OAuth client identifier used by the wallet and authorization servers. `digg-wallet` can remain if adopted as the official identifier. Wallet-ecosystem currently uses `wallet-dev` to match its Keycloak client. |
 | `wallet-name` | `wallet_name` | Wallet Solution identifier in the Wallet Provider Trusted List, rather than just a display name. | The exact identifier from the official trusted-list registration. `Digg Wallet` is currently an example value. |
-| `wallet-version` | `wallet_version` | Version of the wallet software being attested, rather than the wallet-provider backend version. | The actual wallet software release, for example `1.2.3`. `0.0.1` is a prototype value. Supporting several releases will require selecting the version from validated information about the requesting app. |
+| `wallet-version` | `wallet_version` | Version of the wallet software being attested, rather than the wallet-attestation-issuer backend version. | The actual wallet software release, for example `1.2.3`. `0.0.1` is a prototype value. Supporting several releases will require selecting the version from validated information about the requesting app. |
 | `wallet-link` | `wallet_link` | Public URL providing information about the wallet solution. | A stable HTTPS page dedicated to Digg Wallet and its relevant product and certification information. `https://www.digg.se` is currently a generic placeholder. |
 | `wallet-solution-certification-information` | `wallet_solution_certification_information` | Information about the certification body, certificate number, and other relevant certification details. | Actual certification information from trusted records, using the agreed format when established. `UNCERTIFIED` is a local placeholder, not a standardized certification status or certification evidence. |
 
