@@ -4,7 +4,7 @@
 
 spring:
   application:
-    name: wallet-provider
+    name: wallet-attestation-issuer
 
 wia:
   status: '{"status_list": {"idx": 412,"uri": "https://example.org/wia-statuslists/1"}}'
@@ -18,9 +18,9 @@ wia:
 
 wua:
   keystore:
-    location: classpath:certificates/wallet-provider.p12
+    location: classpath:certificates/wallet-attestation-issuer.p12
     password: secret
-    alias: wallet-provider
+    alias: wallet-attestation-issuer
     type: PKCS12
     issuer: "Digg"
     validity-hours: 24
@@ -36,4 +36,4 @@ wua:
           "wscd_certification_information": "UNCERTIFIED"
         }
       }
-    status: '${WALLET_PROVIDER_WUA_STATUS:{"status_list": {"idx": 412,"uri": "https://revocation_url/statuslists/1"}}}'
+    status: '${WALLET_ATTESTATION_ISSUER_WUA_STATUS:{"status_list": {"idx": 412,"uri": "https://revocation_url/statuslists/1"}}}'

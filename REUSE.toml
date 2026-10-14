@@ -20,7 +20,7 @@ path = [
   "CONTRIBUTING.md",
 ]
 precedence = "aggregate"
-SPDX-FileCopyrightText = "2025 diggsweden/wallet-provider"
+SPDX-FileCopyrightText = "2025 diggsweden/wallet-attestation-issuer"
 SPDX-License-Identifier = "CC0-1.0"
 
 [[annotations]]
@@ -32,7 +32,7 @@ SPDX-License-Identifier = "CC-BY-4.0"
 [[annotations]]
 path = ["GOVERNANCE.md"]
 precedence = "aggregate"
-SPDX-FileCopyrightText = "2025 diggsweden/wallet-provider"
+SPDX-FileCopyrightText = "2025 diggsweden/wallet-attestation-issuer"
 SPDX-License-Identifier = "EUPL-1.2"
 
 [[annotations]]

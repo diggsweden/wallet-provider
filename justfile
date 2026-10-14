@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-# Quality checks and automation for Wallet Provider
+# Quality checks and automation for Wallet Attestation Issuer
 # Run 'just' to see available commands
 
 devtools_repo := env("DEVBASE_CHECK_REPO", "https://github.com/diggsweden/devbase-check")
@@ -12,7 +12,7 @@ java_lint := devtools_dir + "/linters/java"
 colors := devtools_dir + "/utils/colors.sh"
 
 maven_opts := "--batch-mode --no-transfer-progress --errors -Dstyle.color=always"
-openapi_spec_path := "src/main/resources/static/wallet-provider-openapi-v0.yaml"
+openapi_spec_path := "src/main/resources/static/wallet-attestation-issuer-openapi-v0.yaml"
 
 # Color variables
 CYAN_BOLD := "\\033[1;36m"
@@ -26,7 +26,7 @@ NC := "\\033[0m"
 
 # Display available recipes
 default:
-    @printf "{{CYAN_BOLD}} Wallet Provider{{NC}}\n\n"
+    @printf "{{CYAN_BOLD}} Wallet Attestation Issuer{{NC}}\n\n"
     @printf "Quick start: {{GREEN}}just setup-devtools{{NC}} | {{BLUE}}just verify{{NC}}\n\n"
     @just --list --unsorted
 

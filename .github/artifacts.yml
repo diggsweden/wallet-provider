@@ -1,12 +1,12 @@
-# SPDX-FileCopyrightText: 2025 diggsweden/wallet-provider
+# SPDX-FileCopyrightText: 2025 diggsweden/wallet-attestation-issuer
 #
 # SPDX-License-Identifier: CC0-1.0
 
-# Artifacts Configuration for wallet-provider
+# Artifacts Configuration for wallet-attestation-issuer
 # Defines what to build and where to publish
 
 artifacts:
-  - name: wallet-provider
+  - name: wallet-attestation-issuer
     project-type: maven
     working-directory: .
     build-type: application
@@ -14,8 +14,8 @@ artifacts:
       java-version: 25
 
 containers:
-  - name: wallet-provider
-    from: [wallet-provider]
+  - name: wallet-attestation-issuer
+    from: [wallet-attestation-issuer]
     container-file: Containerfile
     context: .
     platforms: linux/amd64,linux/arm64
@@ -23,4 +23,4 @@ containers:
 
 publishers:
   - type: github-packages
-    artifacts: [wallet-provider]
+    artifacts: [wallet-attestation-issuer]

@@ -13,7 +13,7 @@ categories:
 description:
   en:
     features:
-      - Digital Identity Wallet Provider Backend
+      - Digital Identity Wallet Attestation Issuer Backend
       - Secure API Endpoints
       - Wallet Architecture Compliance
       - Encrypted Credential Management
@@ -23,7 +23,7 @@ description:
 
       The contents of the unit attestations will be end-to-end encrypted
       and not readable by this service.
-    shortDescription: "Waller provider service for European Digital Identity Wallet ecosystem"
+    shortDescription: "Wallet attestation issuing service for European Digital Identity Wallet ecosystem"
 developmentStatus: development
 legal:
   license: EUPL-1.2
@@ -35,7 +35,7 @@ maintenance:
   contacts:
     - name: ospo@digg.se
   type: internal
-name: Wallet Provider
+name: Wallet Attestation Issuer
 platforms:
   - web
   - linux
@@ -44,4 +44,4 @@ platforms:
 releaseDate: "2025-08-22"
 softwareType: standalone/backend
 softwareVersion: "0.1.0"
-url: "https://github.com/diggsweden/wallet-provider.git"
+url: "https://github.com/diggsweden/wallet-attestation-issuer.git"

@@ -15,10 +15,10 @@ SPDX-License-Identifier: EUPL-1.2
     <relativePath />
   </parent>
   <groupId>se.digg</groupId>
-  <artifactId>wallet-provider</artifactId>
+  <artifactId>wallet-attestation-issuer</artifactId>
   <version>0.1.9</version>
-  <name>wallet-provider</name>
-  <description>Backend service for Waller Provider</description>
+  <name>wallet-attestation-issuer</name>
+  <description>Backend service for issuing of wallet attestations</description>
   <url />
   <licenses>
     <license />
@@ -43,10 +43,10 @@ SPDX-License-Identifier: EUPL-1.2
     <record-builder.version>53</record-builder.version>
     <openapi-generator-maven-plugin.version>7.25.0</openapi-generator-maven-plugin.version>
     <build-helper-maven-plugin.version>3.6.2</build-helper-maven-plugin.version>
-    <openapi.spec.relative-path>src/main/resources/static/wallet-provider-openapi-v0.yaml</openapi.spec.relative-path>
+    <openapi.spec.relative-path>src/main/resources/static/wallet-attestation-issuer-openapi-v0.yaml</openapi.spec.relative-path>
     <openapi.spec.file>${project.basedir}/${openapi.spec.relative-path}</openapi.spec.file>
     <openapi-diff-maven.version>2.1.7</openapi-diff-maven.version>
-    <openapi.diff.oldSpec>https://raw.githubusercontent.com/diggsweden/wallet-provider/main/${openapi.spec.relative-path}</openapi.diff.oldSpec>
+    <openapi.diff.oldSpec>https://raw.githubusercontent.com/diggsweden/wallet-attestation-issuer/main/${openapi.spec.relative-path}</openapi.diff.oldSpec>
     <openapi.diff.newSpec>${openapi.spec.file}</openapi.diff.newSpec>
     <openapi.diff.failOnIncompatible>true</openapi.diff.failOnIncompatible>
     <openapi.diff.configFile>${project.basedir}/development/openapi-diff.yaml</openapi.diff.configFile>
@@ -273,15 +273,15 @@ SPDX-License-Identifier: EUPL-1.2
         <version>${openapi-generator-maven-plugin.version}</version>
         <executions>
           <execution>
-            <id>wallet-provider-openapi-v0</id>
+            <id>wallet-attestation-issuer-openapi-v0</id>
             <goals>
               <goal>generate</goal>
             </goals>
             <configuration>
               <inputSpec>${openapi.spec.file}</inputSpec>
               <generatorName>spring</generatorName>
-              <apiPackage>se.digg.wallet.provider.api.v0</apiPackage>
-              <modelPackage>se.digg.wallet.provider.api.v0.model</modelPackage>
+              <apiPackage>se.digg.wallet.attestation.issuer.api.v0</apiPackage>
+              <modelPackage>se.digg.wallet.attestation.issuer.api.v0.model</modelPackage>
               <modelNameSuffix>Dto</modelNameSuffix>
               <generateSupportingFiles>false</generateSupportingFiles>
               <generateApiTests>false</generateApiTests>

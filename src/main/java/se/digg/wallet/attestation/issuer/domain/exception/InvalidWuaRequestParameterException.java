@@ -1,0 +1,19 @@
+// SPDX-FileCopyrightText: 2026 Digg - Agency for Digital Government
+//
+// SPDX-License-Identifier: EUPL-1.2
+
+package se.digg.wallet.attestation.issuer.domain.exception;
+
+/**
+ * Indicates that a client supplied an invalid parameter.
+ */
+public class InvalidWuaRequestParameterException extends WalletRuntimeException {
+
+  public InvalidWuaRequestParameterException(String message) {
+    super(message);
+  }
+
+  public InvalidWuaRequestParameterException(String message, Throwable cause) {
+    super(message, cause);
+  }
+}
